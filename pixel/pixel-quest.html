@@ -111,7 +111,7 @@ code { font-family: var(--f-code); }
 .consigne p { margin: 0; }
 .bouton { font: 700 15px var(--f-titre); background: var(--violet); color: var(--sur-violet); border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
 .bouton.second { background: transparent; color: var(--violet-texte); border: 2px solid var(--violet-texte); }
-.bouton:disabled { opacity: .45; cursor: default; }
+.bouton:disabled { opacity: .45; cursor: not-allowed; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--neon); outline-offset: 2px; }
 .rangee { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .retour { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 700; min-height: 44px; }
@@ -344,7 +344,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
           <p class="rvb-code" id="n6-cible"></p>
           <div class="nuanciers" id="n6-nuanciers"></div></div>
         <div class="retour info" id="n6-retour">255 = lumière à fond, 0 = éteinte.</div></div>
-      <div class="panneau p2-verrou" id="n6-p2"><div class="cadenas6" id="n6-cadenas"><span>🔒 Partie 2<br><small style="font-weight:400;font-size:15px">Termine d’abord la partie 1.</small></span></div><h3 id="n6-mix-titre">Partie 2 · Fabrique la couleur</h3>
+      <div class="panneau" id="n6-p2"><h3 id="n6-mix-titre">Simulateur RVB · Partie 2</h3>
         <p class="cible-q" id="n6-mix-cible"></p>
         <div class="mix"><div class="curseurs">
           <label for="m-r">R<input type="range" id="m-r" min="0" max="255" value="0"><input type="number" id="m-rn" min="0" max="255" value="0" aria-label="Valeur du rouge"></label>
@@ -353,7 +353,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
         </div><div class="apercu" id="m-apercu"></div></div>
         <p class="discret" style="margin:8px 0 0">Glisse le curseur ou tape directement le nombre.</p>
         <div class="rangee" style="margin-top:12px"><button class="bouton" id="n6-mix-verif">Vérifier ma couleur</button></div>
-        <div class="retour info" id="n6-mix-retour">Lis bien le code demandé : chaque valeur compte.</div></div>
+        <div class="retour info" id="n6-mix-retour">Le simulateur est libre : teste les codes de la partie 1 pour t’aider&nbsp;!</div></div>
     </div>
   </section>
 
@@ -650,6 +650,8 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   n6.mix = [melange(MIX.slice(0, 3))[0], melange(MIX.slice(3))[0]];
   function n6MixTitre() {
     var t = document.getElementById('n6-mix-cible');
+    document.getElementById('n6-mix-verif').disabled = !n6.part1 || n6.part2;
+    if (!n6.part1) { t.innerHTML = '🔒 Le défi de fabrication s’ouvre après la partie 1. En attendant, <b>teste les codes</b> avec les curseurs ou en tapant les nombres.'; return; }
     if (n6.part2) { t.innerHTML = ''; document.getElementById('n6-mix-titre').textContent = 'Partie 2 · Réussie ✓'; return; }
     var c = n6.mix[n6.mixTour];
     t.innerHTML = 'Fabrique du <b>' + c[3] + '</b> (' + (n6.mixTour + 1) + ' / 2) : <span class="rvb-code" style="display:inline-flex;font-size:18px;margin:0 0 0 6px">' + codeRVB(c) + '</span>';
@@ -677,8 +679,9 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     }
   });
   function ouvrirP2() {
-    var p = document.getElementById('n6-p2'); p.classList.remove('p2-verrou'); p.classList.add('p2-ouvert');
-    var c = document.getElementById('n6-cadenas'); if (c) c.remove();
+    var p = document.getElementById('n6-p2'); p.classList.add('p2-ouvert');
+    n6MixTitre();
+    var mr = document.getElementById('n6-mix-retour'); mr.className = 'retour info'; mr.textContent = 'Lis bien le code demandé : chaque valeur compte.';
     p.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setTimeout(function () { document.getElementById('m-rn').focus({ preventScroll: true }); }, 400);
   }
