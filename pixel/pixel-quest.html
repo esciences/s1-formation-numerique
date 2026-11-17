@@ -40,6 +40,31 @@ body { margin: 0; background: var(--fond); color: var(--encre); font-family: var
 .octet-bits button.on { background: var(--violet); color: var(--sur-violet); border-color: var(--violet); }
 .octet-bits button.ici { outline: 3px solid var(--neon); outline-offset: 1px; }
 .octet-bits button.verrou { opacity: .4; cursor: not-allowed; }
+.octet-bits button.boss { margin-left: 6px; border-color: var(--ambre); color: var(--ambre); font-size: 16px; }
+.octet-bits button.boss.on { background: var(--ambre); color: #1B1030; border-color: var(--ambre); }
+/* Niveau 6 */
+.cible-q { font-weight: 700; margin: 0 0 4px; }
+.rvb-code { display: flex; flex-wrap: nowrap; gap: 14px; font: 700 22px var(--f-code); white-space: nowrap; margin: 0 0 12px; overflow-x: auto; }
+.rvb-code .r { color: #D62828; } .rvb-code .v { color: #15803D; } .rvb-code .b { color: #2E6FD8; }
+.etat6 { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.etat6 span { font: 600 14px var(--f-titre); padding: 4px 12px; border-radius: 999px; background: var(--violet-clair); color: var(--violet-texte); }
+.etat6 span.ok { background: var(--bon-fond); color: var(--bon); }
+.mix .curseurs label { grid-template-columns: 24px 1fr 76px !important; }
+.mix .curseurs input[type=number] { width: 76px; padding: 4px 6px; font-size: 16px; text-align: center; }
+.fini6 { padding: 18px; text-align: center; border-radius: 10px; background: var(--bon-fond); color: var(--bon); font: 700 18px var(--f-titre); }
+/* Niveau 7 : conversions */
+.escalier { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 4px 0 16px; }
+.escalier .marche { font: 800 22px var(--f-titre); color: var(--violet-texte); background: var(--surface); border: 2px solid var(--violet-texte); border-radius: 10px; padding: 8px 14px; min-width: 64px; text-align: center; }
+.escalier .marche small { display: block; font: 500 11px var(--f-corps); color: var(--discret); }
+.escalier .fleche { display: flex; flex-direction: column; align-items: center; font: 700 13px var(--f-code); line-height: 1.2; color: var(--discret); }
+.escalier .fleche .x { color: var(--bon); } .escalier .fleche .d { color: var(--faux); }
+.conv { display: grid; gap: 10px; }
+.conv .ligne-conv { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 10px 14px; font: 500 18px var(--f-code); }
+.conv .ligne-conv.ok { border-color: var(--bon); }
+.conv .ligne-conv .n { color: var(--discret); font: 700 14px var(--f-titre); min-width: 22px; }
+.conv .ligne-conv input { width: 120px; }
+.conv .ligne-conv .indice { font: 400 14px var(--f-corps); color: var(--discret); }
+.conv .ligne-conv.texte { font: 500 16px var(--f-corps); }
 .secret { margin: 18px auto 0; max-width: 520px; background: var(--surface); border: 3px dashed var(--violet-texte); border-radius: var(--r); padding: 16px 20px; }
 .secret .mot { font: 800 clamp(28px, 7vw, 48px) var(--f-code); letter-spacing: .12em; color: var(--violet-texte); margin: 4px 0; }
 .bouton.suite { background: var(--neon); color: #1B1030; }
@@ -175,6 +200,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
 
 /* Fin */
 .fin { text-align: center; padding: 20px 0; }
+.fin p { margin-left: auto; margin-right: auto; }
 .fin .gros { font: 800 clamp(48px, 12vw, 110px) var(--f-titre); color: var(--violet-texte); line-height: 1; }
 .badge { display: inline-block; margin-top: 14px; background: var(--neon); color: #1B1030; font: 800 18px var(--f-titre); padding: 10px 18px; border-radius: 999px; }
 .resume { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin: 18px 0; text-align: left; }
@@ -209,12 +235,12 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
         <p class="eyebrow">Formation numérique · 1re secondaire</p>
         <h1>Pixel <span class="neon">Quest</span></h1>
         <p style="font-size:19px">Tu as construit ton pixel art dans Minecraft. Maintenant, prouve que tu maîtrises les pixels, les bits et les octets&nbsp;!</p>
-        <p><b>8 niveaux = 8 bits.</b> Chaque niveau réussi allume un bit de ton octet, en haut de la page. Un octet complet vaut <b>255</b> : c’est ton objectif.</p>
-        <p class="discret">Chaque niveau réussi déverrouille le suivant. Ta progression est gardée sur cet ordinateur. À la fin t’attend un <b>mot secret</b> à donner à ton professeur.</p>
+        <p><b>8 niveaux = 8 bits.</b> Chaque niveau réussi allume un bit de ton octet, en haut de la page. Quand ton octet vaut <b>255</b>, le <b>défi final ★</b> se débloque.</p>
+        <p class="discret">Chaque niveau réussi déverrouille le suivant. Ta progression est gardée sur cet ordinateur. Réussis le défi final pour découvrir le <b>mot secret</b> à donner à ton professeur.</p>
         <button class="bouton" id="btn-go">Commencer le niveau 1 →</button>
       </div>
       <div class="panneau">
-        <h3>Les 8 niveaux</h3>
+        <h3>Ta quête</h3>
         <div class="resume" id="resume-accueil" style="margin:8px 0 0;grid-template-columns:1fr"></div>
       </div>
     </div>
@@ -301,25 +327,48 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   <!-- 6 RVB -->
   <section class="niveau" data-nom="RVB" hidden>
     <p class="eyebrow">Niveau 6 · bit 6</p>
-    <h2>Devine la couleur</h2>
-    <div class="consigne"><p>Un pixel en couleurs = 3 octets : <b>R</b>ouge, <b>V</b>ert, <b>B</b>leu, chacun de 0 à 255. Trouve la bonne couleur 4 fois, puis fabrique les 2 couleurs demandées.</p></div>
+    <h2>Les couleurs RVB</h2>
+    <div class="consigne"><p>Un pixel en couleurs = 3 octets : <b>R</b>ouge, <b>V</b>ert, <b>B</b>leu, chacun de 0 (éteint) à 255 (à fond). Réussis les <b>deux parties</b>, dans l’ordre que tu veux.</p></div>
+    <div class="etat6"><span id="n6-etat1">Partie 1 : 0 / 4</span><span id="n6-etat2">Partie 2 : 0 / 2</span></div>
     <div class="duo">
-      <div class="panneau"><div class="serie" id="n6-serie"></div><p class="rvb-cible" id="n6-cible"></p><div class="nuanciers" id="n6-nuanciers"></div>
+      <div class="panneau"><h3>Partie 1 · Devine la couleur</h3>
+        <div id="n6-jeu"><div class="serie" id="n6-serie"></div>
+          <p class="cible-q">Quelle couleur correspond à ce code&nbsp;?</p>
+          <p class="rvb-code" id="n6-cible"></p>
+          <div class="nuanciers" id="n6-nuanciers"></div></div>
         <div class="retour info" id="n6-retour">255 = lumière à fond, 0 = éteinte.</div></div>
-      <div class="panneau"><h3 id="n6-mix-titre">Fabrique du…</h3>
+      <div class="panneau"><h3 id="n6-mix-titre">Partie 2 · Fabrique la couleur</h3>
+        <p class="cible-q" id="n6-mix-cible"></p>
         <div class="mix"><div class="curseurs">
-          <label for="m-r">R<input type="range" id="m-r" min="0" max="255" value="128"><span id="m-rv">128</span></label>
-          <label for="m-v">V<input type="range" id="m-v" min="0" max="255" value="128"><span id="m-vv">128</span></label>
-          <label for="m-b">B<input type="range" id="m-b" min="0" max="255" value="128"><span id="m-bv">128</span></label>
+          <label for="m-r">R<input type="range" id="m-r" min="0" max="255" value="0"><input type="number" id="m-rn" min="0" max="255" value="0" aria-label="Valeur du rouge"></label>
+          <label for="m-v">V<input type="range" id="m-v" min="0" max="255" value="0"><input type="number" id="m-vn" min="0" max="255" value="0" aria-label="Valeur du vert"></label>
+          <label for="m-b">B<input type="range" id="m-b" min="0" max="255" value="0"><input type="number" id="m-bn" min="0" max="255" value="0" aria-label="Valeur du bleu"></label>
         </div><div class="apercu" id="m-apercu"></div></div>
+        <p class="discret" style="margin:8px 0 0">Glisse le curseur ou tape directement le nombre.</p>
         <div class="rangee" style="margin-top:12px"><button class="bouton" id="n6-mix-verif">Vérifier ma couleur</button></div>
-        <div class="retour info" id="n6-mix-retour">Mets chaque lumière à fond (255) ou éteinte (0).</div></div>
+        <div class="retour info" id="n6-mix-retour">Lis bien le code demandé : chaque valeur compte.</div></div>
     </div>
   </section>
 
-  <!-- 7 Poids -->
-  <section class="niveau" data-nom="Poids" hidden>
+  <!-- 7 Convertir -->
+  <section class="niveau" data-nom="Convertir" hidden>
     <p class="eyebrow">Niveau 7 · bit 7</p>
+    <h2>Convertis les unités</h2>
+    <div class="consigne"><p>Pour passer à l’unité <b>plus grande</b>, on divise par 1 000. Pour passer à l’unité <b>plus petite</b>, on multiplie par 1 000. Réponds aux 6 questions. Calculatrice permise&nbsp;!</p></div>
+    <div class="escalier" aria-label="De l’octet au gigaoctet">
+      <span class="marche">o<small>octet</small></span><span class="fleche"><span class="d">÷ 1 000 →</span><span class="x">← × 1 000</span></span>
+      <span class="marche">ko<small>kilooctet</small></span><span class="fleche"><span class="d">÷ 1 000 →</span><span class="x">← × 1 000</span></span>
+      <span class="marche">Mo<small>mégaoctet</small></span><span class="fleche"><span class="d">÷ 1 000 →</span><span class="x">← × 1 000</span></span>
+      <span class="marche">Go<small>gigaoctet</small></span>
+    </div>
+    <div class="conv" id="n7c-questions"></div>
+    <div class="rangee" style="margin-top:12px"><button class="bouton" id="n7c-verif">Vérifier</button><button class="bouton second" id="n7c-nouveau">Autres questions</button></div>
+    <div class="retour info" id="n7c-retour">Tu peux écrire les nombres à virgule avec une virgule : 1,5.</div>
+  </section>
+
+  <!-- 8 Poids -->
+  <section class="niveau" data-nom="Poids" hidden>
+    <p class="eyebrow">Niveau 8 · bit 8</p>
     <h2>Combien pèse l’image&nbsp;?</h2>
     <div class="consigne"><p>Poids = largeur × hauteur × bits par pixel, puis ÷ 8 pour avoir des octets. 1 ko ≈ 1 000 octets, 1 Mo ≈ 1 000 ko. La calculatrice est permise&nbsp;!</p></div>
     <div id="n7-problemes"></div>
@@ -327,9 +376,9 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     <div class="retour info" id="n7-retour">Attention au dernier problème : <b>b</b> minuscule = bit, <b>o</b> = octet.</div>
   </section>
 
-  <!-- 8 Défi final -->
+  <!-- 9 Défi final -->
   <section class="niveau" data-nom="Défi" hidden>
-    <p class="eyebrow">Niveau 8 · bit 8</p>
+    <p class="eyebrow">Défi final ★ · octet complet</p>
     <h2>Défi final : la planète</h2>
     <div class="consigne"><p>Reproduis la planète <b>exactement</b>, case par case, dans la grille 16 × 16. Choisis une couleur dans la palette, puis clique (ou glisse) sur les cases. Quand tu penses avoir fini, clique sur <b>Vérifier</b> : les cases fausses seront entourées en rouge.</p></div>
     <div class="atelier">
@@ -354,7 +403,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     </div>
   </section>
 
-  <!-- 9 Fin -->
+  <!-- 10 Fin -->
   <section class="niveau fin" data-nom="Bilan" hidden>
     <p class="eyebrow">Ton octet</p>
     <div class="gros" id="fin-val">0</div>
@@ -379,14 +428,15 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
 <script>
 (function () {
   'use strict';
-  var NOMS = ['Décoder l’image', 'Encoder l’image', 'Mesurer l’image', 'Quatre couleurs, deux bits', 'Lire et écrire un octet', 'Deviner la couleur', 'Peser une image', 'Défi final : la planète'];
-  var bits = [0, 0, 0, 0, 0, 0, 0, 0];
-  try { var sv = JSON.parse(localStorage.getItem('pixelquest') || 'null'); if (sv && sv.length === 8) bits = sv.map(function (b) { return b ? 1 : 0; }); } catch (e) {}
-  function sauver() { try { localStorage.setItem('pixelquest', JSON.stringify(bits)); } catch (e) {} }
+  var NOMS = ['Décoder l’image', 'Encoder l’image', 'Mesurer l’image', 'Quatre couleurs, deux bits', 'Lire et écrire un octet', 'Les couleurs RVB', 'Convertir les unités', 'Peser une image'];
+  var BOSS = 'Défi final : la planète';
+  var bits = [0, 0, 0, 0, 0, 0, 0, 0], boss = false;
+  try { var sv = JSON.parse(localStorage.getItem('pixelquest2') || 'null'); if (sv && sv.bits && sv.bits.length === 8) { bits = sv.bits.map(function (b) { return b ? 1 : 0; }); boss = !!sv.boss; } } catch (e) {}
+  function sauver() { try { localStorage.setItem('pixelquest2', JSON.stringify({ bits: bits, boss: boss })); } catch (e) {} }
   function valeur() { return bits.reduce(function (a, b) { return a * 2 + b; }, 0); }
 
   var debug = false; try { debug = localStorage.getItem('pixelquest-prof') === '1'; } catch (e) {}
-  function debloque(i) { if (debug || i <= 1) return true; if (i === 9) return bits[7] === 1; return bits[i - 2] === 1; }
+  function debloque(i) { if (debug || i <= 1) return true; if (i <= 8) return bits[i - 2] === 1; if (i === 9) return valeur() === 255; return boss; }
   /* Mode prof : 5 clics sur « OCTET · Pixel Quest », puis le code */
   var clics = 0, dernier = 0;
   document.getElementById('marque').addEventListener('click', function () {
@@ -411,31 +461,36 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     var b = document.createElement('button'); b.textContent = i + 1; b.setAttribute('aria-label', 'Niveau ' + (i + 1));
     b.addEventListener('click', function () { if (debloque(i + 1)) aller(i + 1); }); ob.appendChild(b);
   });
+  var bb = document.createElement('button'); bb.className = 'boss'; bb.setAttribute('aria-label', 'Défi final'); bb.addEventListener('click', function () { if (debloque(9)) aller(9); }); ob.appendChild(bb);
   function majOctet() {
-    Array.prototype.forEach.call(ob.children, function (b, i) { b.classList.toggle('on', bits[i] === 1); b.classList.toggle('ici', cur === i + 1); b.classList.toggle('verrou', !debloque(i + 1)); b.textContent = debloque(i + 1) ? (i + 1) : '🔒'; });
+    Array.prototype.forEach.call(ob.children, function (b, i) {
+      if (i < 8) { b.classList.toggle('on', bits[i] === 1); b.classList.toggle('ici', cur === i + 1); b.classList.toggle('verrou', !debloque(i + 1)); b.textContent = debloque(i + 1) ? (i + 1) : '🔒'; }
+      else { b.classList.toggle('on', boss); b.classList.toggle('ici', cur === 9); b.classList.toggle('verrou', !debloque(9)); b.textContent = debloque(9) ? '★' : '🔒'; }
+    });
     document.getElementById('suiv').disabled = cur === niveaux.length - 1 || !debloque(cur + 1);
-    document.getElementById('suiv').textContent = (cur > 0 && cur < 9 && !debloque(cur + 1)) ? 'Réussis ce niveau pour continuer' : 'Suivant →';
+    document.getElementById('suiv').textContent = (cur > 0 && cur < 10 && !debloque(cur + 1)) ? (cur === 8 && valeur() !== 255 ? 'Complète ton octet pour continuer' : 'Réussis ce niveau pour continuer') : 'Suivant →';
     document.getElementById('octet-val').innerHTML = bits.join('') + ' = <b>' + valeur() + '</b>';
     sauver();
   }
   function resume(el) {
-    el.innerHTML = NOMS.map(function (n, i) { return '<div><i class="' + (bits[i] ? 'ok' : (debloque(i + 1) ? '' : 'verrou')) + '"></i>' + (i + 1) + '. ' + n + (debloque(i + 1) ? '' : ' 🔒') + '</div>'; }).join('');
+    el.innerHTML = NOMS.map(function (n, i) { return '<div><i class="' + (bits[i] ? 'ok' : (debloque(i + 1) ? '' : 'verrou')) + '"></i>' + (i + 1) + '. ' + n + (debloque(i + 1) ? '' : ' 🔒') + '</div>'; }).join('') +
+      '<div><i class="' + (boss ? 'ok' : (debloque(9) ? '' : 'verrou')) + '"></i>★ ' + BOSS + (debloque(9) ? '' : ' 🔒') + '</div>';
   }
   function aller(i) {
     if (!debloque(i)) return;
     cur = Math.max(0, Math.min(niveaux.length - 1, i));
     niveaux.forEach(function (s, k) { s.hidden = k !== cur; });
-    document.getElementById('num').textContent = cur === 0 ? 'Accueil' : (cur === 9 ? 'Bilan' : 'Niveau ' + cur + ' / 8');
+    document.getElementById('num').textContent = cur === 0 ? 'Accueil' : (cur === 10 ? 'Bilan' : (cur === 9 ? 'Défi final' : 'Niveau ' + cur + ' / 8'));
     document.getElementById('prec').disabled = cur === 0;
     if (cur === 0) resume(document.getElementById('resume-accueil'));
-    if (cur === 9) {
+    if (cur === 10) {
       document.getElementById('fin-val').textContent = valeur();
       document.getElementById('fin-bin').textContent = bits.join(' ');
       var v = valeur();
-      document.getElementById('fin-msg').innerHTML = v === 255 ? '<span class="badge">Octet complet ! Tu es un vrai maître des pixels.</span>' : 'Il te reste ' + bits.filter(function (b) { return !b; }).length + ' bit(s) à allumer.';
-      document.getElementById('secret').hidden = v !== 255;
-      document.getElementById('fin-aide').hidden = v === 255;
-      if (v === 255) document.getElementById('mot-secret').textContent = String.fromCharCode.apply(null, [77,201,71,65,80,73,88,69,76]);
+      document.getElementById('fin-msg').innerHTML = boss && v === 255 ? '<span class="badge">Octet complet et défi réussi ! Tu es un vrai maître des pixels.</span>' : (v === 255 ? 'Octet complet ! Il te reste le défi final ★.' : 'Il te reste ' + bits.filter(function (b) { return !b; }).length + ' bit(s) à allumer.');
+      document.getElementById('secret').hidden = !(boss && v === 255);
+      document.getElementById('fin-aide').hidden = boss && v === 255;
+      if (boss && v === 255) document.getElementById('mot-secret').textContent = String.fromCharCode.apply(null, [77,201,71,65,80,73,88,69,76]);
       resume(document.getElementById('resume-fin'));
     }
     majOctet();
@@ -443,13 +498,17 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   }
   function reussi(i, retourEl, msg) {
     bits[i] = 1; majOctet();
-    retourEl.className = 'retour ok'; retourEl.innerHTML = '<span class="etoile">★</span> ' + msg + ' Bit ' + (i + 1) + ' allumé ! <button type="button" class="bouton suite" style="margin-left:10px" onclick="document.getElementById(&quot;suiv&quot;).click()">' + (i === 7 ? 'Voir mon bilan →' : 'Niveau ' + (i + 2) + ' →') + '</button>';
+    retourEl.className = 'retour ok'; retourEl.innerHTML = '<span class="etoile">★</span> ' + msg + ' Bit ' + (i + 1) + ' allumé ! <button type="button" class="bouton suite" style="margin-left:10px" onclick="document.getElementById(&quot;suiv&quot;).click()">' + (i === 7 ? (valeur() === 255 ? 'Défi final ★ →' : 'Voir mon octet →') : 'Niveau ' + (i + 2) + ' →') + '</button>';
+  }
+  function reussiBoss(retourEl, msg) {
+    boss = true; majOctet();
+    retourEl.className = 'retour ok'; retourEl.innerHTML = '<span class="etoile">★</span> ' + msg + ' <button type="button" class="bouton suite" style="margin-left:10px" onclick="document.getElementById(&quot;suiv&quot;).click()">Découvrir le mot secret →</button>';
   }
   function rate(retourEl, msg) { retourEl.className = 'retour ko'; retourEl.innerHTML = msg; }
   document.getElementById('prec').addEventListener('click', function () { aller(cur - 1); });
   document.getElementById('suiv').addEventListener('click', function () { aller(cur + 1); });
   document.getElementById('btn-go').addEventListener('click', function () { aller(1); });
-  document.getElementById('btn-recommencer').addEventListener('click', function () { bits = [0, 0, 0, 0, 0, 0, 0, 0]; sauver(); try { history.replaceState(null, '', location.pathname); } catch (e) {} location.reload(); });
+  document.getElementById('btn-recommencer').addEventListener('click', function () { bits = [0, 0, 0, 0, 0, 0, 0, 0]; boss = false; sauver(); try { history.replaceState(null, '', location.pathname); } catch (e) {} location.reload(); });
   document.addEventListener('keydown', function (e) {
     var t = e.target.tagName; if (t === 'INPUT' || t === 'SELECT') return;
     if (e.key === 'ArrowRight') aller(cur + 1); if (e.key === 'ArrowLeft') aller(cur - 1);
@@ -552,41 +611,116 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   });
 
   /* ---------- Niveau 6 : RVB ---------- */
-  var COULEURS = [[255, 0, 0, 'rouge'], [0, 255, 0, 'vert'], [0, 0, 255, 'bleu'], [255, 255, 0, 'jaune'], [255, 0, 255, 'magenta'], [0, 255, 255, 'cyan'], [255, 255, 255, 'blanc'], [0, 0, 0, 'noir'], [255, 128, 0, 'orange'], [128, 0, 128, 'violet']];
-  var n6 = { tour: 0, cible: null, ok: 0 };
+  var COULEURS = [[255, 0, 0, 'rouge'], [0, 255, 0, 'vert'], [0, 0, 255, 'bleu'], [255, 255, 0, 'jaune'], [255, 0, 255, 'magenta'], [0, 255, 255, 'cyan'], [255, 255, 255, 'blanc'], [0, 0, 0, 'noir'], [255, 128, 0, 'orange'], [128, 0, 128, 'violet'], [128, 128, 128, 'gris']];
+  var n6 = { ok: 0, cible: null, part1: false, part2: false, mixTour: 0 };
   function rgb(c) { return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'; }
+  function codeRVB(c) { return '<span class="r">R ' + c[0] + '</span><span class="v">V ' + c[1] + '</span><span class="b">B ' + c[2] + '</span>'; }
+  function n6Etat() {
+    var e1 = document.getElementById('n6-etat1'), e2 = document.getElementById('n6-etat2');
+    e1.textContent = 'Partie 1 : ' + n6.ok + ' / 4' + (n6.part1 ? ' ✓' : ''); e1.classList.toggle('ok', n6.part1);
+    e2.textContent = 'Partie 2 : ' + n6.mixTour + ' / 2' + (n6.part2 ? ' ✓' : ''); e2.classList.toggle('ok', n6.part2);
+  }
   function n6Nouveau() {
     var m = melange(COULEURS).slice(0, 4); n6.cible = m[0];
-    document.getElementById('n6-serie').innerHTML = 'Couleur ' + (n6.tour + 1) + ' / 4 &nbsp; <span class="points">' + [0, 1, 2, 3].map(function (i) { return '<i class="' + (i < n6.ok ? 'ok' : '') + '"></i>'; }).join('') + '</span>';
-    document.getElementById('n6-cible').innerHTML = 'Quelle couleur donne <span class="r">R ' + n6.cible[0] + '</span>, <span class="v">V ' + n6.cible[1] + '</span>, <span class="b">B ' + n6.cible[2] + '</span> ?';
+    document.getElementById('n6-serie').innerHTML = 'Couleur ' + (n6.ok + 1) + ' / 4 &nbsp; <span class="points">' + [0, 1, 2, 3].map(function (i) { return '<i class="' + (i < n6.ok ? 'ok' : '') + '"></i>'; }).join('') + '</span>';
+    document.getElementById('n6-cible').innerHTML = codeRVB(n6.cible);
     var z = document.getElementById('n6-nuanciers'); z.innerHTML = '';
-    melange(m).forEach(function (c) { var b = document.createElement('button'); b.type = 'button'; b.style.background = rgb(c); b.setAttribute('aria-label', c[3]);
+    melange(m).forEach(function (c) {
+      var b = document.createElement('button'); b.type = 'button'; b.style.background = rgb(c); b.setAttribute('aria-label', c[3]);
       b.addEventListener('click', function () {
+        if (n6.part1 || n6.attente) return;
         var r = document.getElementById('n6-retour');
-        if (c === n6.cible) { b.classList.add('bon'); n6.ok++; n6.tour++; r.className = 'retour ok'; r.textContent = 'Oui, c’est du ' + c[3] + ' !';
-          if (n6.tour >= 4) { n6.tour = 0; n6.ok = 0; n6.part1 = true; n6Fini(); } setTimeout(n6Nouveau, 800); }
-        else { b.classList.add('faux'); rate(r, 'Non, ça c’est du ' + c[3] + '. Regarde quelles lumières sont à 255.'); }
-      }); z.appendChild(b); });
+        if (c === n6.cible) {
+          b.classList.add('bon'); n6.ok++; r.className = 'retour ok'; r.textContent = 'Oui, c’est du ' + c[3] + ' !';
+          if (n6.ok >= 4) { n6.part1 = true; n6Etat(); document.getElementById('n6-jeu').innerHTML = '<div class="fini6">Partie 1 réussie : 4 couleurs sur 4 ✓</div>'; n6Fini(); }
+          else { n6Etat(); n6.attente = true; setTimeout(function () { n6.attente = false; n6Nouveau(); }, 800); }
+        } else { b.classList.add('faux'); rate(r, 'Non, ça c’est du ' + c[3] + '. Regarde quelles lumières sont à 255, à 128 ou à 0.'); }
+      });
+      z.appendChild(b);
+    });
   }
-  var MIX = [[255, 255, 255, 'blanc'], [255, 255, 0, 'jaune'], [255, 0, 255, 'magenta'], [0, 255, 255, 'cyan']];
-  n6.mix = melange(MIX).slice(0, 2); n6.mixTour = 0; n6.part1 = false; n6.part2 = false;
-  function n6MixTitre() { document.getElementById('n6-mix-titre').textContent = n6.part2 ? 'Mélanges réussis !' : 'Fabrique du ' + n6.mix[n6.mixTour][3] + ' (' + (n6.mixTour + 1) + ' / 2)'; }
-  n6MixTitre();
-  ['r', 'v', 'b'].forEach(function (k) { document.getElementById('m-' + k).addEventListener('input', majMix); });
-  function majMix() { var r = +document.getElementById('m-r').value, v = +document.getElementById('m-v').value, b = +document.getElementById('m-b').value; document.getElementById('m-rv').textContent = r; document.getElementById('m-vv').textContent = v; document.getElementById('m-bv').textContent = b; document.getElementById('m-apercu').style.background = 'rgb(' + r + ',' + v + ',' + b + ')'; }
-  majMix();
+  var MIX = [[255, 255, 0, 'jaune'], [255, 0, 255, 'magenta'], [0, 255, 255, 'cyan'], [128, 128, 128, 'gris'], [255, 128, 0, 'orange'], [128, 0, 128, 'violet']];
+  n6.mix = [melange(MIX.slice(0, 3))[0], melange(MIX.slice(3))[0]];
+  function n6MixTitre() {
+    var t = document.getElementById('n6-mix-cible');
+    if (n6.part2) { t.innerHTML = ''; document.getElementById('n6-mix-titre').textContent = 'Partie 2 · Réussie ✓'; return; }
+    var c = n6.mix[n6.mixTour];
+    t.innerHTML = 'Fabrique du <b>' + c[3] + '</b> (' + (n6.mixTour + 1) + ' / 2) : <span class="rvb-code" style="display:inline-flex;font-size:18px;margin:0 0 0 6px">' + codeRVB(c) + '</span>';
+  }
+  ['r', 'v', 'b'].forEach(function (k) {
+    var rg = document.getElementById('m-' + k), nb = document.getElementById('m-' + k + 'n');
+    rg.addEventListener('input', function () { nb.value = rg.value; majMix(); });
+    nb.addEventListener('input', function () { var v = Math.max(0, Math.min(255, Math.round(+nb.value || 0))); rg.value = v; majMix(); });
+    nb.addEventListener('change', function () { nb.value = rg.value; });
+  });
+  function majMix() { document.getElementById('m-apercu').style.background = 'rgb(' + document.getElementById('m-r').value + ',' + document.getElementById('m-v').value + ',' + document.getElementById('m-b').value + ')'; }
+  majMix(); n6MixTitre(); n6Etat();
   document.getElementById('n6-mix-verif').addEventListener('click', function () {
     if (n6.part2) return;
     var c = n6.mix[n6.mixTour], r = document.getElementById('n6-mix-retour');
     var vals = ['r', 'v', 'b'].map(function (k) { return +document.getElementById('m-' + k).value; });
-    var ok = vals.every(function (x, i) { return Math.abs(x - c[i]) <= 20; });
-    if (ok) { n6.mixTour++; r.className = 'retour ok'; r.textContent = 'Du ' + c[3] + ' : ' + c[0] + ', ' + c[1] + ', ' + c[2] + '. Bravo !'; if (n6.mixTour >= 2) { n6.part2 = true; n6Fini(); } n6MixTitre(); }
-    else rate(r, 'Pas encore du ' + c[3] + '. Indice : chaque lumière doit être à 0 ou à 255.');
+    var ok = vals.every(function (x, i) { return Math.abs(x - c[i]) <= 10; });
+    if (ok) {
+      n6.mixTour++; r.className = 'retour ok'; r.textContent = 'Du ' + c[3] + ' : R ' + c[0] + ' V ' + c[1] + ' B ' + c[2] + '. Bravo !';
+      if (n6.mixTour >= 2) n6.part2 = true;
+      n6MixTitre(); n6Etat(); n6Fini();
+    } else {
+      var faux = ['R', 'V', 'B'].filter(function (_, i) { return Math.abs(vals[i] - c[i]) > 10; });
+      rate(r, 'Pas encore. Vérifie ' + (faux.length > 1 ? 'les valeurs ' : 'la valeur ') + faux.join(', ') + '.');
+    }
   });
-  function n6Fini() { if (n6.part1 && n6.part2) reussi(5, document.getElementById('n6-retour'), 'Tu maîtrises le RVB.'); }
+  function n6Fini() {
+    if (n6.part1 && n6.part2) reussi(5, document.getElementById('n6-retour'), 'Tu maîtrises le RVB.');
+    else if (n6.part1) { var r = document.getElementById('n6-retour'); r.className = 'retour info'; r.textContent = 'Passe maintenant à la partie 2, à droite.'; }
+    else if (n6.part2) { var r2 = document.getElementById('n6-mix-retour'); r2.className = 'retour ok'; r2.textContent = 'Partie 2 réussie ! Termine la partie 1, à gauche.'; }
+  }
   n6Nouveau();
 
-  /* ---------- Niveau 7 : poids ---------- */
+  /* ---------- Niveau 7 : convertir les unités ---------- */
+  var UNITES = ['o', 'ko', 'Mo', 'Go'];
+  function hasard(t) { return t[Math.floor(Math.random() * t.length)]; }
+  function frn(n) { return String(n).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function genConv() {
+    var q = [];
+    // 1. vers l'unité plus grande, résultat entier
+    var u = hasard([0, 1, 2]), v = hasard([2, 3, 4, 5, 6, 8]) * 1000; q.push({ t: frn(v) + ' ' + UNITES[u] + ' =', u: UNITES[u + 1], r: v / 1000 });
+    // 2. vers l'unité plus petite
+    u = hasard([1, 2, 3]); v = hasard([2, 3, 5, 7, 9]); q.push({ t: frn(v) + ' ' + UNITES[u] + ' =', u: UNITES[u - 1], r: v * 1000 });
+    // 3. vers l'unité plus grande, résultat à virgule
+    u = hasard([0, 1, 2]); v = hasard([1500, 2500, 3500, 500]); q.push({ t: frn(v) + ' ' + UNITES[u] + ' =', u: UNITES[u + 1], r: v / 1000 });
+    // 4. nombre à virgule vers l'unité plus petite
+    u = hasard([1, 2, 3]); v = hasard([1.5, 2.5, 0.5, 4.5]); q.push({ t: frn(v) + ' ' + UNITES[u] + ' =', u: UNITES[u - 1], r: Math.round(v * 1000) });
+    // 5. deux marches
+    v = hasard([2, 3, 4, 5]); q.push({ t: frn(v) + ' Mo =', u: 'o', r: v * 1000000, indice: 'deux marches : × 1 000, puis encore × 1 000' });
+    // 6. problème
+    var cle = hasard([4, 8, 16, 32]), photo = hasard([2, 4]);
+    q.push({ t: 'Ta clé USB fait <b>' + cle + ' Go</b>. Une photo pèse <b>' + photo + ' Mo</b>. Combien de photos peux-tu y ranger&nbsp;?', u: 'photos', r: cle * 1000 / photo, texte: true, indice: 'convertis d’abord les Go en Mo' });
+    return q;
+  }
+  var n7c = genConv();
+  function n7cAfficher() {
+    var z = document.getElementById('n7c-questions'); z.innerHTML = '';
+    n7c.forEach(function (q, i) {
+      z.innerHTML += '<div class="ligne-conv' + (q.texte ? ' texte' : '') + '" id="n7c-l' + i + '"><span class="n">' + (i + 1) + '.</span><span>' + q.t + '</span><input type="text" inputmode="decimal" autocomplete="off" id="n7c-i' + i + '" aria-label="Réponse ' + (i + 1) + '"><span>' + q.u + '</span>' + (q.indice ? '<span class="indice" hidden id="n7c-h' + i + '">Indice : ' + q.indice + '</span>' : '') + '</div>';
+    });
+    var r = document.getElementById('n7c-retour'); r.className = 'retour info'; r.textContent = 'Tu peux écrire les nombres à virgule avec une virgule : 1,5.';
+  }
+  n7cAfficher();
+  document.getElementById('n7c-nouveau').addEventListener('click', function () { n7c = genConv(); n7cAfficher(); });
+  document.getElementById('n7c-verif').addEventListener('click', function () {
+    var err = 0;
+    n7c.forEach(function (q, i) {
+      var inp = document.getElementById('n7c-i' + i), v = parseFloat(String(inp.value).replace(/\s| /g, '').replace(',', '.'));
+      var ok = !isNaN(v) && Math.abs(v - q.r) < 1e-9;
+      inp.className = ok ? 'bon' : 'faux'; document.getElementById('n7c-l' + i).classList.toggle('ok', ok);
+      var h = document.getElementById('n7c-h' + i); if (h) h.hidden = ok;
+      if (!ok) err++;
+    });
+    if (err === 0) reussi(6, document.getElementById('n7c-retour'), 'Tu passes d’une unité à l’autre sans te tromper.');
+    else rate(document.getElementById('n7c-retour'), err + ' réponse' + (err > 1 ? 's' : '') + ' à revoir. Regarde l’escalier : vers la droite ÷ 1 000, vers la gauche × 1 000.');
+  });
+
+  /* ---------- Niveau 8 : poids ---------- */
   var PB = [
     { e: 'Ton pixel art Minecraft en noir et blanc : 16 × 16 pixels, 1 bit par pixel.', u: 'octets', r: 32 },
     { e: 'L’écran de la Game Boy : 160 × 144 pixels, 2 bits par pixel.', u: 'octets', r: 5760 },
@@ -599,11 +733,11 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   document.getElementById('n7-verif').addEventListener('click', function () {
     var err = 0;
     PB.forEach(function (p, i) { var inp = document.getElementById('n7-i' + i); var v = parseFloat(String(inp.value).replace(',', '.')); var ok = !isNaN(v) && Math.abs(v - p.r) <= (p.tol || 0); inp.className = ok ? 'bon' : 'faux'; document.getElementById('n7-p' + i).classList.toggle('ok', ok); if (!ok) err++; });
-    if (err === 0) reussi(6, document.getElementById('n7-retour'), 'Tu sais peser une image, en octets, en ko et en Mo.');
+    if (err === 0) reussi(7, document.getElementById('n7-retour'), 'Tu sais peser une image, en octets, en ko et en Mo.');
     else rate(document.getElementById('n7-retour'), err + ' réponse' + (err > 1 ? 's' : '') + ' à revoir. Étapes : pixels, puis × bits, puis ÷ 8, puis ÷ 1 000 pour les ko.');
   });
 
-  /* ---------- Niveau 8 : défi final (planète) ---------- */
+  /* ---------- Défi final (planète) ---------- */
   var PAL8 = { '0': ['#FFFFFF', 'blanc'], '1': ['#1B1030', 'noir'], '5': ['#F77F00', 'orange'], '6': ['#FFD23F', 'jaune'], 'c': ['#6C2BD9', 'violet'] };
   var CLES8 = ['0', '1', '5', '6', 'c'];
   var PLANETE = ["0000000000000000", "0000000000000000", "0000000000000000", "0000011661100000", "0000155555510000", "0001666666661000", "00cc66666666cc00", "0cc5555555555cc0", "0cc6666666666cc0", "00cccccccccccc00", "0001555555551000", "0000166666610000", "0000011661100000", "0000000000000000", "0000000000000000", "0000000000000000"];
@@ -636,7 +770,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   document.getElementById('n8-verif').addEventListener('click', function () {
     var err = 0;
     c8.forEach(function (b, k) { var ok = n8.grille[k] === PLANETE[Math.floor(k / 16)][k % 16]; b.classList.toggle('err', !ok); if (!ok) err++; });
-    if (err === 0) reussi(7, document.getElementById('n8-retour'), 'Planète parfaite : 256 pixels justes, 96 octets.');
+    if (err === 0) reussiBoss(document.getElementById('n8-retour'), 'Planète parfaite : 256 pixels justes, 96 octets. Défi réussi !');
     else rate(document.getElementById('n8-retour'), err + ' case' + (err > 1 ? 's' : '') + ' à corriger (entourée' + (err > 1 ? 's' : '') + ' en rouge).');
   });
   n8Stats();
