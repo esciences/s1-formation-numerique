@@ -51,6 +51,13 @@ body { margin: 0; background: var(--fond); color: var(--encre); font-family: var
 .etat6 span.ok { background: var(--bon-fond); color: var(--bon); }
 .mix .curseurs label { grid-template-columns: 24px 1fr 76px !important; }
 .mix .curseurs input[type=number] { width: 76px; padding: 4px 6px; font-size: 16px; text-align: center; }
+.p2-verrou { position: relative; }
+.p2-verrou > *:not(.cadenas6) { opacity: .35; pointer-events: none; filter: grayscale(.6); }
+.cadenas6 { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; font: 700 18px var(--f-titre); color: var(--encre); }
+.cadenas6 span { background: var(--surface); border: 2px solid var(--violet-texte); border-radius: 12px; padding: 14px 18px; box-shadow: 0 6px 20px rgba(27,16,48,.15); }
+.p2-ouvert { animation: ouvre .6s ease; }
+@keyframes ouvre { 0% { box-shadow: 0 0 0 0 var(--neon); } 50% { box-shadow: 0 0 0 8px var(--neon); } 100% { box-shadow: 0 0 0 0 var(--neon); } }
+@media (prefers-reduced-motion: reduce) { .p2-ouvert { animation: none; } }
 .fini6 { padding: 18px; text-align: center; border-radius: 10px; background: var(--bon-fond); color: var(--bon); font: 700 18px var(--f-titre); }
 /* Niveau 7 : conversions */
 .escalier { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 4px 0 16px; }
@@ -328,7 +335,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   <section class="niveau" data-nom="RVB" hidden>
     <p class="eyebrow">Niveau 6 · bit 6</p>
     <h2>Les couleurs RVB</h2>
-    <div class="consigne"><p>Un pixel en couleurs = 3 octets : <b>R</b>ouge, <b>V</b>ert, <b>B</b>leu, chacun de 0 (éteint) à 255 (à fond). Réussis les <b>deux parties</b>, dans l’ordre que tu veux.</p></div>
+    <div class="consigne"><p>Un pixel en couleurs = 3 octets : <b>R</b>ouge, <b>V</b>ert, <b>B</b>leu, chacun de 0 (éteint) à 255 (à fond). Réussis d’abord la <b>partie 1</b> (deviner 4 couleurs), puis la <b>partie 2</b> (fabriquer 2 couleurs). Le bit 6 s’allume quand les deux sont réussies.</p></div>
     <div class="etat6"><span id="n6-etat1">Partie 1 : 0 / 4</span><span id="n6-etat2">Partie 2 : 0 / 2</span></div>
     <div class="duo">
       <div class="panneau"><h3>Partie 1 · Devine la couleur</h3>
@@ -337,7 +344,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
           <p class="rvb-code" id="n6-cible"></p>
           <div class="nuanciers" id="n6-nuanciers"></div></div>
         <div class="retour info" id="n6-retour">255 = lumière à fond, 0 = éteinte.</div></div>
-      <div class="panneau"><h3 id="n6-mix-titre">Partie 2 · Fabrique la couleur</h3>
+      <div class="panneau p2-verrou" id="n6-p2"><div class="cadenas6" id="n6-cadenas"><span>🔒 Partie 2<br><small style="font-weight:400;font-size:15px">Termine d’abord la partie 1.</small></span></div><h3 id="n6-mix-titre">Partie 2 · Fabrique la couleur</h3>
         <p class="cible-q" id="n6-mix-cible"></p>
         <div class="mix"><div class="curseurs">
           <label for="m-r">R<input type="range" id="m-r" min="0" max="255" value="0"><input type="number" id="m-rn" min="0" max="255" value="0" aria-label="Valeur du rouge"></label>
@@ -632,7 +639,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
         var r = document.getElementById('n6-retour');
         if (c === n6.cible) {
           b.classList.add('bon'); n6.ok++; r.className = 'retour ok'; r.textContent = 'Oui, c’est du ' + c[3] + ' !';
-          if (n6.ok >= 4) { n6.part1 = true; n6Etat(); document.getElementById('n6-jeu').innerHTML = '<div class="fini6">Partie 1 réussie : 4 couleurs sur 4 ✓</div>'; n6Fini(); }
+          if (n6.ok >= 4) { n6.part1 = true; n6Etat(); document.getElementById('n6-jeu').innerHTML = '<div class="fini6">Partie 1 réussie : 4 couleurs sur 4 ✓</div>'; ouvrirP2(); n6Fini(); }
           else { n6Etat(); n6.attente = true; setTimeout(function () { n6.attente = false; n6Nouveau(); }, 800); }
         } else { b.classList.add('faux'); rate(r, 'Non, ça c’est du ' + c[3] + '. Regarde quelles lumières sont à 255, à 128 ou à 0.'); }
       });
@@ -656,7 +663,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   function majMix() { document.getElementById('m-apercu').style.background = 'rgb(' + document.getElementById('m-r').value + ',' + document.getElementById('m-v').value + ',' + document.getElementById('m-b').value + ')'; }
   majMix(); n6MixTitre(); n6Etat();
   document.getElementById('n6-mix-verif').addEventListener('click', function () {
-    if (n6.part2) return;
+    if (n6.part2 || !n6.part1) return;
     var c = n6.mix[n6.mixTour], r = document.getElementById('n6-mix-retour');
     var vals = ['r', 'v', 'b'].map(function (k) { return +document.getElementById('m-' + k).value; });
     var ok = vals.every(function (x, i) { return Math.abs(x - c[i]) <= 10; });
@@ -669,10 +676,17 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
       rate(r, 'Pas encore. Vérifie ' + (faux.length > 1 ? 'les valeurs ' : 'la valeur ') + faux.join(', ') + '.');
     }
   });
+  function ouvrirP2() {
+    var p = document.getElementById('n6-p2'); p.classList.remove('p2-verrou'); p.classList.add('p2-ouvert');
+    var c = document.getElementById('n6-cadenas'); if (c) c.remove();
+    p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { document.getElementById('m-rn').focus({ preventScroll: true }); }, 400);
+  }
   function n6Fini() {
-    if (n6.part1 && n6.part2) reussi(5, document.getElementById('n6-retour'), 'Tu maîtrises le RVB.');
-    else if (n6.part1) { var r = document.getElementById('n6-retour'); r.className = 'retour info'; r.textContent = 'Passe maintenant à la partie 2, à droite.'; }
-    else if (n6.part2) { var r2 = document.getElementById('n6-mix-retour'); r2.className = 'retour ok'; r2.textContent = 'Partie 2 réussie ! Termine la partie 1, à gauche.'; }
+    if (n6.part1 && n6.part2) {
+      reussi(5, document.getElementById('n6-mix-retour'), 'Tu maîtrises le RVB.');
+      var r = document.getElementById('n6-retour'); r.className = 'retour ok'; r.textContent = 'Niveau 6 réussi : les deux parties sont terminées.';
+    } else if (n6.part1) { var r1 = document.getElementById('n6-retour'); r1.className = 'retour info'; r1.innerHTML = 'Bravo ! Le niveau n’est pas fini : <b>passe à la partie 2</b>, à droite.'; }
   }
   n6Nouveau();
 
