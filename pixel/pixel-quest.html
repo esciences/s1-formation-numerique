@@ -1,0 +1,638 @@
+<title>Pixel Quest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Poppins:wght@600;700;800&family=Fira+Code:wght@400;500;700&display=swap">
+<style>
+/* Parcours de 8 niveaux = 8 bits : chaque niveau réussi allume un bit de l'octet de progression. Charte OCTET. */
+:root {
+  --fond: #F8F6FC; --surface: #FFFFFF; --encre: #1B1030; --discret: #5E5670; --filet: #DCD4EA; --grille: #ADA6BD;
+  --violet: #6C2BD9; --violet-texte: #6C2BD9; --violet-clair: #EAE1FA; --sur-violet: #FFFFFF;
+  --neon: #D4FF3D; --ambre: #F5A623;
+  --bon: #15803D; --bon-fond: #E0F7E8; --faux: #B3261E; --faux-fond: #FCE4E2;
+  --f-titre: "Poppins", "Arial", sans-serif; --f-corps: "Atkinson Hyperlegible", "Verdana", sans-serif; --f-code: "Fira Code", "Consolas", monospace;
+  --r: 12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --fond: #140C24; --surface: #1F1634; --encre: #F2EDFB; --discret: #B7AECB; --filet: #3A2E55; --grille: #6B5F85;
+  --violet: #7C3AED; --violet-texte: #B794FF; --violet-clair: #2C1F4A;
+  --bon: #4ADE80; --bon-fond: #123222; --faux: #FF8A80; --faux-fond: #3B1816; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --fond: #140C24; --surface: #1F1634; --encre: #F2EDFB; --discret: #B7AECB; --filet: #3A2E55; --grille: #6B5F85;
+  --violet: #7C3AED; --violet-texte: #B794FF; --violet-clair: #2C1F4A;
+  --bon: #4ADE80; --bon-fond: #123222; --faux: #FF8A80; --faux-fond: #3B1816; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--fond); color: var(--encre); font-family: var(--f-corps); font-size: 17px; line-height: 1.5; }
+.deck { min-height: 100%; display: flex; flex-direction: column; max-width: 1080px; margin: 0 auto; gap: 14px;
+  padding-block: 16px 14px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* En-tête : octet de progression */
+.haut { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.marque { font-family: var(--f-titre); font-weight: 700; letter-spacing: .06em; font-size: 14px; color: var(--violet-texte); text-transform: uppercase; }
+.octet { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.octet-bits { display: flex; gap: 5px; }
+.octet-bits button { width: 30px; height: 30px; padding: 0; border-radius: 4px; border: 2px solid var(--violet-texte); background: var(--surface); color: var(--violet-texte); font: 700 14px var(--f-code); cursor: pointer; }
+.octet-bits button.on { background: var(--violet); color: var(--sur-violet); border-color: var(--violet); }
+.octet-bits button.ici { outline: 3px solid var(--neon); outline-offset: 1px; }
+.octet-bits button.verrou { opacity: .4; cursor: not-allowed; }
+.secret { margin: 18px auto 0; max-width: 520px; background: var(--surface); border: 3px dashed var(--violet-texte); border-radius: var(--r); padding: 16px 20px; }
+.secret .mot { font: 800 clamp(28px, 7vw, 48px) var(--f-code); letter-spacing: .12em; color: var(--violet-texte); margin: 4px 0; }
+.bouton.suite { background: var(--neon); color: #1B1030; }
+.resume i.verrou { border-style: dashed; opacity: .5; }
+.marque { cursor: default; user-select: none; }
+.debug-boite[hidden] { display: none; }
+.cle-prof { margin-left: 10px; border: 0; background: transparent; color: var(--discret); opacity: .35; font-size: 15px; cursor: pointer; padding: 2px 4px; }
+.cle-prof:hover, .cle-prof:focus-visible { opacity: 1; }
+.debug-boite { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 14px; }
+.debug-boite input { width: 120px; font-size: 15px; padding: 5px 8px; }
+.debug-on { font: 700 12px var(--f-code); background: var(--ambre); color: #1B1030; padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
+.octet-val { font: 700 15px var(--f-code); color: var(--discret); min-width: 110px; }
+.octet-val b { color: var(--violet-texte); font-size: 20px; }
+
+.scene { flex: 1; }
+.niveau { animation: entre .3s ease; }
+@keyframes entre { from { transform: translateY(8px); opacity: .3; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .niveau { animation: none; } }
+
+.eyebrow { font-family: var(--f-titre); font-weight: 600; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--violet-texte); margin: 0 0 4px; }
+h1, h2 { font-family: var(--f-titre); font-weight: 800; line-height: 1.08; margin: 0 0 10px; text-wrap: balance; }
+h1 { font-size: clamp(34px, 6vw, 64px); }
+h2 { font-size: clamp(26px, 4vw, 40px); }
+h3 { font-family: var(--f-titre); font-weight: 700; font-size: 18px; margin: 0 0 6px; }
+p { margin: 0 0 10px; max-width: 64ch; }
+.neon { background: var(--neon); color: #1B1030; padding: 0 6px; border-radius: 4px; }
+.discret { color: var(--discret); font-size: 15px; }
+code { font-family: var(--f-code); }
+
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.duo > * { min-width: 0; }
+@media (max-width: 760px) { .duo { grid-template-columns: 1fr; gap: 18px; } }
+.panneau { background: var(--surface); border: 1.5px solid var(--filet); border-radius: var(--r); padding: 16px; }
+.consigne { background: var(--violet-clair); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; }
+.consigne p { margin: 0; }
+.bouton { font: 700 15px var(--f-titre); background: var(--violet); color: var(--sur-violet); border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+.bouton.second { background: transparent; color: var(--violet-texte); border: 2px solid var(--violet-texte); }
+.bouton:disabled { opacity: .45; cursor: default; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--neon); outline-offset: 2px; }
+.rangee { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.retour { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-weight: 700; min-height: 44px; }
+.retour.ok { background: var(--bon-fond); color: var(--bon); }
+.retour.ko { background: var(--faux-fond); color: var(--faux); }
+.retour.info { background: var(--violet-clair); color: var(--encre); font-weight: 400; }
+.etoile { display: inline-block; font-size: 22px; vertical-align: -3px; }
+input[type=text], input[type=number], select { font: 500 17px var(--f-code); padding: 7px 10px; border-radius: 8px; border: 2px solid var(--filet); background: var(--surface); color: var(--encre); }
+input.bon { border-color: var(--bon); background: var(--bon-fond); }
+input.faux { border-color: var(--faux); background: var(--faux-fond); }
+
+/* Grilles de pixels */
+.grille { display: grid; gap: 2px; background: var(--grille); padding: 2px; border-radius: 6px; width: max-content; max-width: 100%; touch-action: manipulation; }
+.grille button { border: 0; padding: 0; background: #FFFFFF; border-radius: 1px; cursor: pointer; width: var(--c, 32px); height: var(--c, 32px); }
+.grille button:focus-visible { outline: 3px solid var(--neon); outline-offset: -3px; z-index: 1; }
+.grille.lecture button { cursor: default; }
+.grille button.err { box-shadow: inset 0 0 0 3px var(--faux); }
+.code-lignes { font: 500 17px var(--f-code); letter-spacing: .14em; line-height: 2; }
+.code-lignes b { color: var(--violet-texte); }
+.code-paire { font: 500 16px var(--f-code); line-height: 1.9; white-space: nowrap; overflow-x: auto; }
+.lignes-saisie { display: grid; gap: 6px; }
+.lignes-saisie label { display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: center; font: 600 14px var(--f-code); color: var(--discret); }
+.lignes-saisie input { width: 100%; letter-spacing: .25em; }
+.legende { display: flex; gap: 12px; flex-wrap: wrap; margin: 10px 0; font: 500 15px var(--f-code); }
+.legende span { display: inline-flex; align-items: center; gap: 6px; }
+.legende i { width: 22px; height: 22px; border-radius: 4px; border: 1.5px solid var(--encre); display: inline-block; }
+.palette { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.palette button { width: 38px; height: 38px; border-radius: 8px; border: 2px solid var(--filet); cursor: pointer; padding: 0; }
+.palette button.actif { border-color: var(--encre); outline: 3px solid var(--neon); }
+.palette button:focus-visible { outline: 3px solid var(--neon); }
+
+/* Niveau 3 */
+.definition-q { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.definition-q label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--discret); }
+.definition-q input { width: 100%; }
+@media (max-width: 520px) { .definition-q { grid-template-columns: 1fr; } }
+.serie { font: 600 14px var(--f-code); color: var(--discret); margin-bottom: 8px; }
+.points { display: flex; gap: 6px; }
+.points i { width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--violet-texte); display: inline-block; }
+.points i.ok { background: var(--violet); border-color: var(--violet); }
+
+/* Niveau 5 */
+.interr { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 10px; }
+.interr button { width: 44px; height: 56px; border-radius: 8px; border: 2px solid var(--violet-texte); background: var(--surface); color: var(--violet-texte); font: 700 22px var(--f-code); cursor: pointer; }
+.interr button.un { background: var(--violet); color: var(--sur-violet); border-color: var(--violet); }
+.interr-poids { display: flex; gap: 6px; font: 500 12px var(--f-code); color: var(--discret); }
+.interr-poids span { width: 44px; text-align: center; }
+@media (max-width: 480px) { .interr button, .interr-poids span { width: 34px; } .interr button { height: 48px; font-size: 18px; } }
+.defis { display: grid; gap: 12px; }
+.defi { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 10px 14px; }
+.defi.ok { border-color: var(--bon); }
+.defi input { width: 90px; }
+
+/* Niveau 6 */
+.nuanciers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.nuanciers button { aspect-ratio: 1; border-radius: 10px; border: 3px solid var(--filet); cursor: pointer; }
+.nuanciers button.bon { border-color: var(--bon); outline: 3px solid var(--bon); }
+.nuanciers button.faux { border-color: var(--faux); opacity: .5; }
+.rvb-cible { font: 700 24px var(--f-code); }
+.rvb-cible .r { color: #E5383B; } .rvb-cible .v { color: #15803D; } .rvb-cible .b { color: #2E6FD8; }
+.mix { display: grid; grid-template-columns: 1fr 120px; gap: 16px; align-items: center; }
+.mix .curseurs { display: grid; gap: 8px; }
+.mix .curseurs label { display: grid; grid-template-columns: 24px 1fr 52px; gap: 8px; align-items: center; font: 700 16px var(--f-code); }
+.mix input[type=range] { width: 100%; }
+#m-r { accent-color: #E5383B; } #m-v { accent-color: #22C55E; } #m-b { accent-color: #2E6FD8; }
+.mix .apercu { aspect-ratio: 1; border-radius: 10px; border: 3px solid var(--encre); }
+
+/* Niveau 7 */
+.probleme { background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; }
+.probleme.ok { border-color: var(--bon); }
+.probleme .enonce { font-weight: 700; margin-bottom: 6px; }
+.probleme .calc { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font: 500 16px var(--f-code); }
+.probleme input { width: 120px; max-width: 100%; }
+.probleme select { width: auto; }
+
+/* Niveau 8 */
+#n8-grille { --c: clamp(13px, calc((100vw - 96px) / 16), 22px); grid-template-columns: repeat(16, var(--c)) !important; }
+.atelier { display: grid; grid-template-columns: auto auto minmax(220px, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .atelier { grid-template-columns: 1fr 1fr; } .atelier .stats { grid-column: 1 / -1; } }
+@media (max-width: 600px) { .atelier { grid-template-columns: 1fr; } .atelier .stats { grid-column: auto; } }
+.modeles { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.modeles button { padding: 4px; border-radius: 8px; border: 2px solid var(--filet); background: var(--surface); cursor: pointer; display: grid; gap: 2px; justify-items: center; font: 600 12px var(--f-corps); color: var(--encre); }
+.modeles button.actif { border-color: var(--encre); outline: 3px solid var(--neon); }
+.modeles canvas, .modeles .libre { width: 40px; height: 40px; image-rendering: pixelated; border-radius: 4px; background: #fff; }
+.modeles .libre { display: grid; place-items: center; font-size: 22px; }
+#n8-modele { width: 200px; max-width: 100%; aspect-ratio: 1; image-rendering: pixelated; border: 2px solid var(--filet); border-radius: 6px; background: #fff; display: block; }
+.fichier { font-size: 13px; color: var(--discret); margin-top: 8px; }
+.fichier input { font-size: 13px; max-width: 100%; }
+.stats { display: grid; gap: 8px; }
+.stat { display: grid; grid-template-columns: 1fr auto; gap: 10px; background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 8px 14px; font-size: 15px; }
+.stat b { font: 700 18px var(--f-code); color: var(--violet-texte); }
+.apercu-png { image-rendering: pixelated; width: 96px; height: 96px; border: 2px solid var(--filet); border-radius: 6px; background: #fff; }
+
+/* Fin */
+.fin { text-align: center; padding: 20px 0; }
+.fin .gros { font: 800 clamp(48px, 12vw, 110px) var(--f-titre); color: var(--violet-texte); line-height: 1; }
+.badge { display: inline-block; margin-top: 14px; background: var(--neon); color: #1B1030; font: 800 18px var(--f-titre); padding: 10px 18px; border-radius: 999px; }
+.resume { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin: 18px 0; text-align: left; }
+.resume div { background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 8px 12px; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+.resume i { width: 20px; height: 20px; border-radius: 4px; border: 2px solid var(--violet-texte); flex: none; }
+.resume i.ok { background: var(--violet); border-color: var(--violet); }
+
+/* Navigation */
+.bas { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1.5px solid var(--filet); padding-top: 12px; }
+.bas .num { font: 600 14px var(--f-code); color: var(--discret); }
+.credit { font-size: 12px; color: var(--discret); max-width: none; margin: 10px 0 0; }
+</style>
+
+<div class="deck">
+  <header class="haut">
+    <span class="marque" id="marque">OCTET · Pixel Quest<span class="debug-on" id="debug-on" hidden>MODE PROF</span></span>
+    <div class="debug-boite" id="debug-boite" hidden><label for="debug-code">Code :</label><input type="password" id="debug-code" autocomplete="off"><button class="bouton second" id="debug-ok" style="padding:6px 12px">OK</button><span id="debug-msg" class="discret" aria-live="polite"></span></div>
+    <div class="octet" aria-label="Octet de progression">
+      <div class="octet-bits" id="octet-bits"></div>
+      <span class="octet-val" id="octet-val"></span>
+    </div>
+  </header>
+
+  <main class="scene" id="scene">
+
+  <!-- 0 Accueil -->
+  <section class="niveau" data-nom="Accueil">
+    <div class="duo">
+      <div>
+        <p class="eyebrow">Formation numérique · 1re secondaire</p>
+        <h1>Pixel <span class="neon">Quest</span></h1>
+        <p style="font-size:19px">Tu as construit ton pixel art dans Minecraft. Maintenant, prouve que tu maîtrises les pixels, les bits et les octets&nbsp;!</p>
+        <p><b>8 niveaux = 8 bits.</b> Chaque niveau réussi allume un bit de ton octet, en haut de la page. Un octet complet vaut <b>255</b> : c’est ton objectif.</p>
+        <p class="discret">Chaque niveau réussi déverrouille le suivant. Ta progression est gardée sur cet ordinateur. À la fin t’attend un <b>mot secret</b> à donner à ton professeur.</p>
+        <button class="bouton" id="btn-go">Commencer le niveau 1 →</button>
+      </div>
+      <div class="panneau">
+        <h3>Les 8 niveaux</h3>
+        <div class="resume" id="resume-accueil" style="margin:8px 0 0;grid-template-columns:1fr"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 Décoder -->
+  <section class="niveau" data-nom="Décoder" hidden>
+    <p class="eyebrow">Niveau 1 · bit 1</p>
+    <h2>Décode l’image</h2>
+    <div class="consigne"><p>L’ordinateur a reçu ce code : <b>1</b> = pixel noir, <b>0</b> = pixel blanc. Clique sur les cases pour colorier la grille, puis vérifie.</p></div>
+    <div class="duo">
+      <div class="panneau"><h3>Le code reçu</h3><div class="code-lignes" id="n1-code"></div></div>
+      <div class="panneau"><h3>Ta grille</h3><div class="grille" id="n1-grille" aria-label="Grille à colorier"></div>
+        <div class="rangee" style="margin-top:12px"><button class="bouton" id="n1-verif">Vérifier</button><button class="bouton second" id="n1-reset">Effacer</button></div>
+        <div class="retour info" id="n1-retour">Les cases fausses seront entourées en rouge.</div></div>
+    </div>
+  </section>
+
+  <!-- 2 Encoder -->
+  <section class="niveau" data-nom="Encoder" hidden>
+    <p class="eyebrow">Niveau 2 · bit 2</p>
+    <h2>Encode l’image</h2>
+    <div class="consigne"><p>À l’envers, maintenant&nbsp;! Écris le code de chaque ligne : 8 chiffres, <b>1</b> pour noir, <b>0</b> pour blanc.</p></div>
+    <div class="duo">
+      <div class="panneau"><h3>L’image</h3><div class="grille lecture" id="n2-grille"></div></div>
+      <div class="panneau"><h3>Ton code</h3><div class="lignes-saisie" id="n2-saisie"></div>
+        <div class="rangee" style="margin-top:12px"><button class="bouton" id="n2-verif">Vérifier</button></div>
+        <div class="retour info" id="n2-retour">Astuce : une ligne = 8 bits = 1 octet.</div></div>
+    </div>
+  </section>
+
+  <!-- 3 Définition -->
+  <section class="niveau" data-nom="Définition" hidden>
+    <p class="eyebrow">Niveau 3 · bit 3</p>
+    <h2>Mesure l’image</h2>
+    <div class="consigne"><p>La <b>définition</b>, c’est largeur × hauteur, en pixels. Compte les pixels de chaque image. Réussis les 3 images pour allumer le bit.</p></div>
+    <div class="duo">
+      <div class="panneau"><div class="serie" id="n3-serie"></div><div class="grille lecture" id="n3-grille"></div></div>
+      <div class="panneau">
+        <div class="definition-q">
+          <label>Largeur (pixels)<input type="number" id="n3-l" min="1" max="99"></label>
+          <label>Hauteur (pixels)<input type="number" id="n3-h" min="1" max="99"></label>
+          <label>Total de pixels<input type="number" id="n3-t" min="1" max="9999"></label>
+        </div>
+        <div class="rangee" style="margin-top:12px"><button class="bouton" id="n3-verif">Vérifier</button></div>
+        <div class="retour info" id="n3-retour">Chaque case = 1 pixel.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 Palette -->
+  <section class="niveau" data-nom="Palette" hidden>
+    <p class="eyebrow">Niveau 4 · bit 4</p>
+    <h2>Quatre couleurs, deux bits</h2>
+    <div class="consigne"><p>Avec <b>2 bits</b> par pixel, on a 4 couleurs. Lis la légende, choisis une couleur dans la palette et colorie la grille selon le code.</p></div>
+    <div class="duo">
+      <div class="panneau"><h3>Le code reçu</h3>
+        <div class="legende"><span><i style="background:#FFFFFF"></i>00 blanc</span><span><i style="background:#FFD23F"></i>01 jaune</span><span><i style="background:#E5383B"></i>10 rouge</span><span><i style="background:#1B1030"></i>11 noir</span></div>
+        <div class="code-paire" id="n4-code"></div></div>
+      <div class="panneau"><h3>Ta grille</h3>
+        <div class="palette" id="n4-palette"></div>
+        <div class="grille" id="n4-grille" aria-label="Grille à colorier en 4 couleurs"></div>
+        <div class="rangee" style="margin-top:12px"><button class="bouton" id="n4-verif">Vérifier</button><button class="bouton second" id="n4-reset">Effacer</button></div>
+        <div class="retour info" id="n4-retour">36 pixels × 2 bits = 72 bits = 9 octets.</div></div>
+    </div>
+  </section>
+
+  <!-- 5 Octet -->
+  <section class="niveau" data-nom="Octet" hidden>
+    <p class="eyebrow">Niveau 5 · bit 5</p>
+    <h2>Lis et écris un octet</h2>
+    <div class="consigne"><p>Chaque bit a un poids : 128, 64, 32, 16, 8, 4, 2, 1. On additionne les poids des bits à <b>1</b>. Résous les 4 défis.</p></div>
+    <div class="duo">
+      <div class="panneau"><h3>Ton laboratoire</h3><p class="discret">Clique sur les interrupteurs pour tester.</p>
+        <div class="interr-poids"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
+        <div class="interr" id="n5-interr"></div>
+        <p style="font:800 34px var(--f-titre);color:var(--violet-texte);margin:0" id="n5-valeur">0</p></div>
+      <div class="panneau"><h3>Les défis</h3><div class="defis" id="n5-defis"></div>
+        <div class="rangee" style="margin-top:12px"><button class="bouton" id="n5-verif">Vérifier</button></div>
+        <div class="retour info" id="n5-retour">Utilise le laboratoire pour t’aider.</div></div>
+    </div>
+  </section>
+
+  <!-- 6 RVB -->
+  <section class="niveau" data-nom="RVB" hidden>
+    <p class="eyebrow">Niveau 6 · bit 6</p>
+    <h2>Devine la couleur</h2>
+    <div class="consigne"><p>Un pixel en couleurs = 3 octets : <b>R</b>ouge, <b>V</b>ert, <b>B</b>leu, chacun de 0 à 255. Trouve la bonne couleur 4 fois, puis fabrique les 2 couleurs demandées.</p></div>
+    <div class="duo">
+      <div class="panneau"><div class="serie" id="n6-serie"></div><p class="rvb-cible" id="n6-cible"></p><div class="nuanciers" id="n6-nuanciers"></div>
+        <div class="retour info" id="n6-retour">255 = lumière à fond, 0 = éteinte.</div></div>
+      <div class="panneau"><h3 id="n6-mix-titre">Fabrique du…</h3>
+        <div class="mix"><div class="curseurs">
+          <label for="m-r">R<input type="range" id="m-r" min="0" max="255" value="128"><span id="m-rv">128</span></label>
+          <label for="m-v">V<input type="range" id="m-v" min="0" max="255" value="128"><span id="m-vv">128</span></label>
+          <label for="m-b">B<input type="range" id="m-b" min="0" max="255" value="128"><span id="m-bv">128</span></label>
+        </div><div class="apercu" id="m-apercu"></div></div>
+        <div class="rangee" style="margin-top:12px"><button class="bouton" id="n6-mix-verif">Vérifier ma couleur</button></div>
+        <div class="retour info" id="n6-mix-retour">Mets chaque lumière à fond (255) ou éteinte (0).</div></div>
+    </div>
+  </section>
+
+  <!-- 7 Poids -->
+  <section class="niveau" data-nom="Poids" hidden>
+    <p class="eyebrow">Niveau 7 · bit 7</p>
+    <h2>Combien pèse l’image&nbsp;?</h2>
+    <div class="consigne"><p>Poids = largeur × hauteur × bits par pixel, puis ÷ 8 pour avoir des octets. 1 ko ≈ 1 000 octets, 1 Mo ≈ 1 000 ko. La calculatrice est permise&nbsp;!</p></div>
+    <div id="n7-problemes"></div>
+    <div class="rangee"><button class="bouton" id="n7-verif">Vérifier</button></div>
+    <div class="retour info" id="n7-retour">Attention au dernier problème : <b>b</b> minuscule = bit, <b>o</b> = octet.</div>
+  </section>
+
+  <!-- 8 Défi final -->
+  <section class="niveau" data-nom="Défi" hidden>
+    <p class="eyebrow">Niveau 8 · bit 8</p>
+    <h2>Défi final : la planète</h2>
+    <div class="consigne"><p>Reproduis la planète <b>exactement</b>, case par case, dans la grille 16 × 16. Choisis une couleur dans la palette, puis clique (ou glisse) sur les cases. Quand tu penses avoir fini, clique sur <b>Vérifier</b> : les cases fausses seront entourées en rouge.</p></div>
+    <div class="atelier">
+      <div class="panneau"><h3>Le modèle</h3><canvas id="n8-modele" width="16" height="16" aria-label="Modèle : une planète avec un anneau"></canvas>
+        <p class="discret" style="margin:8px 0 0;font-size:14px">Astuce : travaille ligne par ligne, de haut en bas.</p></div>
+      <div class="panneau">
+        <p class="discret" style="margin-bottom:6px">Ta palette : 5 couleurs</p>
+        <div class="palette" id="n8-palette"></div>
+        <div class="grille" id="n8-grille" aria-label="Ta grille 16 × 16"></div>
+        <div class="rangee" style="margin-top:12px"><button class="bouton" id="n8-verif">Vérifier</button><button class="bouton second" id="n8-reset">Effacer</button></div>
+        <div class="retour info" id="n8-retour">Le blanc sert de gomme.</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><span>Cases justes</span><b id="n8-justes">0 / 256</b></div>
+        <div class="stat"><span>Couleurs dans la palette</span><b>5</b></div>
+        <div class="stat"><span>Bits par pixel nécessaires</span><b>3</b></div>
+        <div class="stat"><span>Poids (256 × 3 ÷ 8)</span><b>96 octets</b></div>
+        <div class="stat"><span>En 24 bits</span><b>768 octets</b></div>
+        <div class="stat"><span>Ta planète (taille réelle × 6)</span><canvas class="apercu-png" id="n8-canvas" width="16" height="16"></canvas></div>
+        <p class="discret" style="margin:4px 0 0;font-size:14px">Pourquoi 3 bits ? 2 bits ne donnent que 4 couleurs. Avec 3 bits, on en a 8 : assez pour 5.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 Fin -->
+  <section class="niveau fin" data-nom="Bilan" hidden>
+    <p class="eyebrow">Ton octet</p>
+    <div class="gros" id="fin-val">0</div>
+    <p id="fin-bin" style="font:700 22px var(--f-code);margin:6px auto 0"></p>
+    <p id="fin-msg" style="margin:10px auto"></p>
+    <div class="secret" id="secret" hidden><p class="eyebrow">Mot secret</p><p class="mot" id="mot-secret"></p><p class="discret" style="margin:0">Communique ce mot à ton professeur pour valider ta quête.</p></div>
+    <div class="resume" id="resume-fin"></div>
+    <p class="discret" id="fin-aide">Note la valeur de ton octet dans ton carnet.</p>
+    <button class="bouton second" id="btn-recommencer">Tout recommencer</button>
+    <p class="credit">Pixel Quest · ressource eSCIENCES.be · CC BY-NC-SA · Toutes les images sont des dessins originaux.</p>
+  </section>
+
+  </main>
+
+  <footer class="bas">
+    <button class="bouton second" id="prec">← Précédent</button>
+    <span class="num"><span id="num"></span><button type="button" class="cle-prof" id="cle-prof" aria-label="Accès enseignant" title="Accès enseignant">⚙</button></span>
+    <button class="bouton" id="suiv">Suivant →</button>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var NOMS = ['Décoder l’image', 'Encoder l’image', 'Mesurer l’image', 'Quatre couleurs, deux bits', 'Lire et écrire un octet', 'Deviner la couleur', 'Peser une image', 'Défi final : la planète'];
+  var bits = [0, 0, 0, 0, 0, 0, 0, 0];
+  try { var sv = JSON.parse(localStorage.getItem('pixelquest') || 'null'); if (sv && sv.length === 8) bits = sv.map(function (b) { return b ? 1 : 0; }); } catch (e) {}
+  function sauver() { try { localStorage.setItem('pixelquest', JSON.stringify(bits)); } catch (e) {} }
+  function valeur() { return bits.reduce(function (a, b) { return a * 2 + b; }, 0); }
+
+  var debug = false; try { debug = localStorage.getItem('pixelquest-prof') === '1'; } catch (e) {}
+  function debloque(i) { if (debug || i <= 1) return true; if (i === 9) return bits[7] === 1; return bits[i - 2] === 1; }
+  /* Mode prof : 5 clics sur « OCTET · Pixel Quest », puis le code */
+  var clics = 0, dernier = 0;
+  document.getElementById('marque').addEventListener('click', function () {
+    var t = Date.now(); clics = (t - dernier < 1500) ? clics + 1 : 1; dernier = t;
+    if (clics >= 5) { clics = 0; var bo = document.getElementById('debug-boite'); bo.hidden = !bo.hidden; if (!bo.hidden) document.getElementById('debug-code').focus(); }
+  });
+  function majDebug() { document.getElementById('debug-on').hidden = !debug; try { localStorage.setItem('pixelquest-prof', debug ? '1' : '0'); } catch (e) {} majOctet(); if (cur === 0) resume(document.getElementById('resume-accueil')); }
+  document.getElementById('cle-prof').addEventListener('click', function () { clearTimeout(window.__dbgT); document.getElementById('debug-msg').textContent = debug ? 'Mode prof actif' : ''; var bo = document.getElementById('debug-boite'); bo.hidden = !bo.hidden; if (!bo.hidden) { document.getElementById('debug-code').focus(); window.scrollTo({ top: 0 }); } });
+  document.getElementById('debug-ok').addEventListener('click', function () {
+    var c = document.getElementById('debug-code'); var code = String.fromCharCode.apply(null, [80,82,79,70,50,53,53]);
+    var msg = document.getElementById('debug-msg');
+    if (c.value.trim().toUpperCase() === code) { debug = !debug; majDebug(); c.value = ''; msg.textContent = debug ? 'Mode prof activé' : 'Mode prof désactivé'; clearTimeout(window.__dbgT); window.__dbgT = setTimeout(function () { document.getElementById('debug-boite').hidden = true; msg.textContent = ''; }, 1200); }
+    else { c.value = ''; msg.textContent = 'Code incorrect'; c.focus(); }
+  });
+  /* autre accès : taper « prof » au clavier, hors d’un champ */
+  var tape = '';
+  document.addEventListener('keydown', function (e) { var t = e.target.tagName; if (t === 'INPUT' || t === 'SELECT') return; if (e.key && e.key.length === 1) { tape = (tape + e.key.toLowerCase()).slice(-4); if (tape === 'prof') { var bo = document.getElementById('debug-boite'); bo.hidden = false; document.getElementById('debug-code').focus(); tape = ''; } } });
+  document.getElementById('debug-code').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('debug-ok').click(); });
+  var niveaux = Array.prototype.slice.call(document.querySelectorAll('.niveau'));
+  var cur = 0, ob = document.getElementById('octet-bits');
+  bits.forEach(function (_, i) {
+    var b = document.createElement('button'); b.textContent = i + 1; b.setAttribute('aria-label', 'Niveau ' + (i + 1));
+    b.addEventListener('click', function () { if (debloque(i + 1)) aller(i + 1); }); ob.appendChild(b);
+  });
+  function majOctet() {
+    Array.prototype.forEach.call(ob.children, function (b, i) { b.classList.toggle('on', bits[i] === 1); b.classList.toggle('ici', cur === i + 1); b.classList.toggle('verrou', !debloque(i + 1)); b.textContent = debloque(i + 1) ? (i + 1) : '🔒'; });
+    document.getElementById('suiv').disabled = cur === niveaux.length - 1 || !debloque(cur + 1);
+    document.getElementById('suiv').textContent = (cur > 0 && cur < 9 && !debloque(cur + 1)) ? 'Réussis ce niveau pour continuer' : 'Suivant →';
+    document.getElementById('octet-val').innerHTML = bits.join('') + ' = <b>' + valeur() + '</b>';
+    sauver();
+  }
+  function resume(el) {
+    el.innerHTML = NOMS.map(function (n, i) { return '<div><i class="' + (bits[i] ? 'ok' : (debloque(i + 1) ? '' : 'verrou')) + '"></i>' + (i + 1) + '. ' + n + (debloque(i + 1) ? '' : ' 🔒') + '</div>'; }).join('');
+  }
+  function aller(i) {
+    if (!debloque(i)) return;
+    cur = Math.max(0, Math.min(niveaux.length - 1, i));
+    niveaux.forEach(function (s, k) { s.hidden = k !== cur; });
+    document.getElementById('num').textContent = cur === 0 ? 'Accueil' : (cur === 9 ? 'Bilan' : 'Niveau ' + cur + ' / 8');
+    document.getElementById('prec').disabled = cur === 0;
+    if (cur === 0) resume(document.getElementById('resume-accueil'));
+    if (cur === 9) {
+      document.getElementById('fin-val').textContent = valeur();
+      document.getElementById('fin-bin').textContent = bits.join(' ');
+      var v = valeur();
+      document.getElementById('fin-msg').innerHTML = v === 255 ? '<span class="badge">Octet complet ! Tu es un vrai maître des pixels.</span>' : 'Il te reste ' + bits.filter(function (b) { return !b; }).length + ' bit(s) à allumer.';
+      document.getElementById('secret').hidden = v !== 255;
+      document.getElementById('fin-aide').hidden = v === 255;
+      if (v === 255) document.getElementById('mot-secret').textContent = String.fromCharCode.apply(null, [77,201,71,65,80,73,88,69,76]);
+      resume(document.getElementById('resume-fin'));
+    }
+    majOctet();
+    window.scrollTo({ top: 0 });
+  }
+  function reussi(i, retourEl, msg) {
+    bits[i] = 1; majOctet();
+    retourEl.className = 'retour ok'; retourEl.innerHTML = '<span class="etoile">★</span> ' + msg + ' Bit ' + (i + 1) + ' allumé ! <button type="button" class="bouton suite" style="margin-left:10px" onclick="document.getElementById(&quot;suiv&quot;).click()">' + (i === 7 ? 'Voir mon bilan →' : 'Niveau ' + (i + 2) + ' →') + '</button>';
+  }
+  function rate(retourEl, msg) { retourEl.className = 'retour ko'; retourEl.innerHTML = msg; }
+  document.getElementById('prec').addEventListener('click', function () { aller(cur - 1); });
+  document.getElementById('suiv').addEventListener('click', function () { aller(cur + 1); });
+  document.getElementById('btn-go').addEventListener('click', function () { aller(1); });
+  document.getElementById('btn-recommencer').addEventListener('click', function () { bits = [0, 0, 0, 0, 0, 0, 0, 0]; sauver(); try { history.replaceState(null, '', location.pathname); } catch (e) {} location.reload(); });
+  document.addEventListener('keydown', function (e) {
+    var t = e.target.tagName; if (t === 'INPUT' || t === 'SELECT') return;
+    if (e.key === 'ArrowRight') aller(cur + 1); if (e.key === 'ArrowLeft') aller(cur - 1);
+  });
+
+  /* ---------- outils grille ---------- */
+  function grille(el, w, h, cell, onClick) {
+    el.innerHTML = ''; el.style.gridTemplateColumns = 'repeat(' + w + ', ' + cell + 'px)'; el.style.setProperty('--c', cell + 'px');
+    var cases = [];
+    for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) {
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'ligne ' + (y + 1) + ', colonne ' + (x + 1));
+      (function (b, x, y) { if (onClick) b.addEventListener('click', function () { onClick(b, x, y); }); })(b, x, y);
+      el.appendChild(b); cases.push(b);
+    }
+    return cases;
+  }
+  function melange(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  var N = '#1B1030', B = '#FFFFFF';
+
+  /* ---------- Niveau 1 : décoder ---------- */
+  var IMG1 = ['00011000', '00111100', '00111100', '01111110', '01111110', '11111111', '10100101', '00100100']; // fusée
+  document.getElementById('n1-code').innerHTML = IMG1.map(function (l) { return l.replace(/1/g, '<b>1</b>'); }).join('<br>');
+  var c1 = grille(document.getElementById('n1-grille'), 8, 8, 34, function (b) { b.classList.remove('err'); b.style.background = b.dataset.on === '1' ? B : N; b.dataset.on = b.dataset.on === '1' ? '0' : '1'; });
+  document.getElementById('n1-reset').addEventListener('click', function () { c1.forEach(function (b) { b.dataset.on = '0'; b.style.background = B; b.classList.remove('err'); }); });
+  document.getElementById('n1-verif').addEventListener('click', function () {
+    var err = 0;
+    c1.forEach(function (b, k) { var ok = (b.dataset.on === '1') === (IMG1[Math.floor(k / 8)][k % 8] === '1'); b.classList.toggle('err', !ok); if (!ok) err++; });
+    if (err === 0) reussi(0, document.getElementById('n1-retour'), 'Une fusée ! Image décodée.');
+    else rate(document.getElementById('n1-retour'), err + ' case' + (err > 1 ? 's' : '') + ' à corriger (entourée' + (err > 1 ? 's' : '') + ' en rouge). Compare ligne par ligne.');
+  });
+
+  /* ---------- Niveau 2 : encoder ---------- */
+  var IMG2 = ['00111100', '01000010', '10100101', '10000001', '10100101', '10011001', '01000010', '00111100']; // smiley
+  var c2 = grille(document.getElementById('n2-grille'), 8, 8, 34);
+  c2.forEach(function (b, k) { b.style.background = IMG2[Math.floor(k / 8)][k % 8] === '1' ? N : B; b.tabIndex = -1; });
+  var s2 = document.getElementById('n2-saisie');
+  IMG2.forEach(function (_, y) { s2.innerHTML += '<label>L' + (y + 1) + '<input type="text" id="n2-l' + y + '" maxlength="8" inputmode="numeric" pattern="[01]*" placeholder="00000000" autocomplete="off"></label>'; });
+  document.getElementById('n2-verif').addEventListener('click', function () {
+    var err = 0;
+    IMG2.forEach(function (l, y) { var inp = document.getElementById('n2-l' + y); var ok = inp.value.trim() === l; inp.className = ok ? 'bon' : 'faux'; if (!ok) err++; });
+    if (err === 0) reussi(1, document.getElementById('n2-retour'), 'Le smiley est encodé : 8 octets exactement.');
+    else rate(document.getElementById('n2-retour'), err + ' ligne' + (err > 1 ? 's' : '') + ' fausse' + (err > 1 ? 's' : '') + '. Vérifie que chaque ligne a bien 8 chiffres.');
+  });
+
+  /* ---------- Niveau 3 : définition ---------- */
+  var n3 = { tour: 0, w: 0, h: 0, ok: [] };
+  function n3Nouveau() {
+    n3.w = 5 + Math.floor(Math.random() * 8); n3.h = 4 + Math.floor(Math.random() * 7);
+    var c = grille(document.getElementById('n3-grille'), n3.w, n3.h, 26);
+    var cols = ['#6C2BD9', '#F5A623', '#22C55E', '#D9248F'];
+    c.forEach(function (b, k) { var x = k % n3.w, y = Math.floor(k / n3.w); b.style.background = ((x + y) % 3 === 0 || Math.random() < .25) ? cols[(x * 3 + y) % 4] : B; b.tabIndex = -1; });
+    document.getElementById('n3-serie').innerHTML = 'Image ' + (n3.tour + 1) + ' / 3 &nbsp; <span class="points">' + [0, 1, 2].map(function (i) { return '<i class="' + (n3.ok[i] ? 'ok' : '') + '"></i>'; }).join('') + '</span>';
+    ['n3-l', 'n3-h', 'n3-t'].forEach(function (id) { var e = document.getElementById(id); e.value = ''; e.className = ''; });
+  }
+  n3Nouveau();
+  document.getElementById('n3-verif').addEventListener('click', function () {
+    var L = document.getElementById('n3-l'), H = document.getElementById('n3-h'), T = document.getElementById('n3-t'), r = document.getElementById('n3-retour');
+    var okL = +L.value === n3.w, okH = +H.value === n3.h, okT = +T.value === n3.w * n3.h;
+    L.className = okL ? 'bon' : 'faux'; H.className = okH ? 'bon' : 'faux'; T.className = okT ? 'bon' : 'faux';
+    if (okL && okH && okT) {
+      n3.ok[n3.tour] = true; n3.tour++;
+      if (n3.tour >= 3) { reussi(2, r, 'Trois images mesurées sans erreur.'); n3.tour = 0; n3.ok = []; }
+      else { r.className = 'retour ok'; r.textContent = 'Exact : ' + n3.w + ' × ' + n3.h + ' = ' + (n3.w * n3.h) + ' pixels. Image suivante !'; setTimeout(n3Nouveau, 900); }
+    } else rate(r, (!okL || !okH) ? 'Recompte les colonnes (largeur) et les lignes (hauteur).' : 'Le total, c’est largeur × hauteur.');
+  });
+
+  /* ---------- Niveau 4 : palette 2 bits ---------- */
+  var PAL4 = ['#FFFFFF', '#FFD23F', '#E5383B', '#1B1030'];
+  var IMG4 = ['000330', '011300', '022220', '222222', '222222', '022220']; // pomme
+  document.getElementById('n4-code').innerHTML = IMG4.map(function (l) { return l.split('').map(function (d) { return ('0' + (+d).toString(2)).slice(-2); }).join(' '); }).join('<br>');
+  var n4col = 3, p4 = document.getElementById('n4-palette');
+  PAL4.forEach(function (c, i) { var b = document.createElement('button'); b.type = 'button'; b.style.background = c; b.setAttribute('aria-label', 'couleur ' + ('0' + i.toString(2)).slice(-2)); b.addEventListener('click', function () { n4col = i; Array.prototype.forEach.call(p4.children, function (x, k) { x.classList.toggle('actif', k === i); }); }); p4.appendChild(b); });
+  p4.children[3].classList.add('actif');
+  var c4 = grille(document.getElementById('n4-grille'), 6, 6, 40, function (b) { b.dataset.v = n4col; b.style.background = PAL4[n4col]; b.classList.remove('err'); });
+  c4.forEach(function (b) { b.dataset.v = 0; });
+  document.getElementById('n4-reset').addEventListener('click', function () { c4.forEach(function (b) { b.dataset.v = 0; b.style.background = B; b.classList.remove('err'); }); });
+  document.getElementById('n4-verif').addEventListener('click', function () {
+    var err = 0;
+    c4.forEach(function (b, k) { var ok = +b.dataset.v === +IMG4[Math.floor(k / 6)][k % 6]; b.classList.toggle('err', !ok); if (!ok) err++; });
+    if (err === 0) reussi(3, document.getElementById('n4-retour'), 'Une pomme ! 9 octets suffisent pour la stocker.');
+    else rate(document.getElementById('n4-retour'), err + ' pixel' + (err > 1 ? 's' : '') + ' à corriger. Relis la légende : 10 = rouge, 11 = noir.');
+  });
+
+  /* ---------- Niveau 5 : octet ---------- */
+  var labo = [0, 0, 0, 0, 0, 0, 0, 0], li = document.getElementById('n5-interr');
+  function majLabo() { var v = 0; Array.prototype.forEach.call(li.children, function (b, i) { b.textContent = labo[i]; b.classList.toggle('un', labo[i] === 1); v = v * 2 + labo[i]; }); document.getElementById('n5-valeur').textContent = v; }
+  labo.forEach(function (_, i) { var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'bit de poids ' + Math.pow(2, 7 - i)); b.addEventListener('click', function () { labo[i] = 1 - labo[i]; majLabo(); }); li.appendChild(b); });
+  majLabo();
+  var defis5 = [
+    { q: 'Que vaut <code>00000101</code> ?', r: 5 }, { q: 'Que vaut <code>10000001</code> ?', r: 129 },
+    { q: 'Écris 10 en binaire (8 bits).', r: '00001010' }, { q: 'Écris 255 en binaire (8 bits).', r: '11111111' }
+  ];
+  var d5 = document.getElementById('n5-defis');
+  defis5.forEach(function (d, i) { d5.innerHTML += '<div class="defi" id="n5-d' + i + '"><span>' + d.q + '</span><input type="text" id="n5-i' + i + '" autocomplete="off" inputmode="numeric" maxlength="8"' + (typeof d.r === 'string' ? ' style="width:130px;letter-spacing:.15em"' : '') + '></div>'; });
+  document.getElementById('n5-verif').addEventListener('click', function () {
+    var err = 0;
+    defis5.forEach(function (d, i) { var inp = document.getElementById('n5-i' + i); var ok = inp.value.trim() === String(d.r); inp.className = ok ? 'bon' : 'faux'; document.getElementById('n5-d' + i).classList.toggle('ok', ok); if (!ok) err++; });
+    if (err === 0) reussi(4, document.getElementById('n5-retour'), 'Tu lis le binaire comme un ordinateur.');
+    else rate(document.getElementById('n5-retour'), err + ' défi' + (err > 1 ? 's' : '') + ' à revoir. Reproduis le code sur les interrupteurs du laboratoire.');
+  });
+
+  /* ---------- Niveau 6 : RVB ---------- */
+  var COULEURS = [[255, 0, 0, 'rouge'], [0, 255, 0, 'vert'], [0, 0, 255, 'bleu'], [255, 255, 0, 'jaune'], [255, 0, 255, 'magenta'], [0, 255, 255, 'cyan'], [255, 255, 255, 'blanc'], [0, 0, 0, 'noir'], [255, 128, 0, 'orange'], [128, 0, 128, 'violet']];
+  var n6 = { tour: 0, cible: null, ok: 0 };
+  function rgb(c) { return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'; }
+  function n6Nouveau() {
+    var m = melange(COULEURS).slice(0, 4); n6.cible = m[0];
+    document.getElementById('n6-serie').innerHTML = 'Couleur ' + (n6.tour + 1) + ' / 4 &nbsp; <span class="points">' + [0, 1, 2, 3].map(function (i) { return '<i class="' + (i < n6.ok ? 'ok' : '') + '"></i>'; }).join('') + '</span>';
+    document.getElementById('n6-cible').innerHTML = 'Quelle couleur donne <span class="r">R ' + n6.cible[0] + '</span>, <span class="v">V ' + n6.cible[1] + '</span>, <span class="b">B ' + n6.cible[2] + '</span> ?';
+    var z = document.getElementById('n6-nuanciers'); z.innerHTML = '';
+    melange(m).forEach(function (c) { var b = document.createElement('button'); b.type = 'button'; b.style.background = rgb(c); b.setAttribute('aria-label', c[3]);
+      b.addEventListener('click', function () {
+        var r = document.getElementById('n6-retour');
+        if (c === n6.cible) { b.classList.add('bon'); n6.ok++; n6.tour++; r.className = 'retour ok'; r.textContent = 'Oui, c’est du ' + c[3] + ' !';
+          if (n6.tour >= 4) { n6.tour = 0; n6.ok = 0; n6.part1 = true; n6Fini(); } setTimeout(n6Nouveau, 800); }
+        else { b.classList.add('faux'); rate(r, 'Non, ça c’est du ' + c[3] + '. Regarde quelles lumières sont à 255.'); }
+      }); z.appendChild(b); });
+  }
+  var MIX = [[255, 255, 255, 'blanc'], [255, 255, 0, 'jaune'], [255, 0, 255, 'magenta'], [0, 255, 255, 'cyan']];
+  n6.mix = melange(MIX).slice(0, 2); n6.mixTour = 0; n6.part1 = false; n6.part2 = false;
+  function n6MixTitre() { document.getElementById('n6-mix-titre').textContent = n6.part2 ? 'Mélanges réussis !' : 'Fabrique du ' + n6.mix[n6.mixTour][3] + ' (' + (n6.mixTour + 1) + ' / 2)'; }
+  n6MixTitre();
+  ['r', 'v', 'b'].forEach(function (k) { document.getElementById('m-' + k).addEventListener('input', majMix); });
+  function majMix() { var r = +document.getElementById('m-r').value, v = +document.getElementById('m-v').value, b = +document.getElementById('m-b').value; document.getElementById('m-rv').textContent = r; document.getElementById('m-vv').textContent = v; document.getElementById('m-bv').textContent = b; document.getElementById('m-apercu').style.background = 'rgb(' + r + ',' + v + ',' + b + ')'; }
+  majMix();
+  document.getElementById('n6-mix-verif').addEventListener('click', function () {
+    if (n6.part2) return;
+    var c = n6.mix[n6.mixTour], r = document.getElementById('n6-mix-retour');
+    var vals = ['r', 'v', 'b'].map(function (k) { return +document.getElementById('m-' + k).value; });
+    var ok = vals.every(function (x, i) { return Math.abs(x - c[i]) <= 20; });
+    if (ok) { n6.mixTour++; r.className = 'retour ok'; r.textContent = 'Du ' + c[3] + ' : ' + c[0] + ', ' + c[1] + ', ' + c[2] + '. Bravo !'; if (n6.mixTour >= 2) { n6.part2 = true; n6Fini(); } n6MixTitre(); }
+    else rate(r, 'Pas encore du ' + c[3] + '. Indice : chaque lumière doit être à 0 ou à 255.');
+  });
+  function n6Fini() { if (n6.part1 && n6.part2) reussi(5, document.getElementById('n6-retour'), 'Tu maîtrises le RVB.'); }
+  n6Nouveau();
+
+  /* ---------- Niveau 7 : poids ---------- */
+  var PB = [
+    { e: 'Ton pixel art Minecraft en noir et blanc : 16 × 16 pixels, 1 bit par pixel.', u: 'octets', r: 32 },
+    { e: 'L’écran de la Game Boy : 160 × 144 pixels, 2 bits par pixel.', u: 'octets', r: 5760 },
+    { e: 'Une icône en vraies couleurs : 64 × 64 pixels, 24 bits par pixel.', u: 'ko', r: 12.3, tol: .3 },
+    { e: 'Une photo de smartphone : 4 000 × 3 000 pixels, 24 bits par pixel.', u: 'Mo', r: 36, tol: .5 },
+    { e: 'Ta connexion Internet télécharge 80 Mb par seconde (Mb = mégabits). Combien de Mo par seconde ?', u: 'Mo', r: 10, tol: .1 }
+  ];
+  var z7 = document.getElementById('n7-problemes');
+  PB.forEach(function (p, i) { z7.innerHTML += '<div class="probleme" id="n7-p' + i + '"><div class="enonce">' + (i + 1) + '. ' + p.e + '</div><div class="calc"><span>Réponse :</span><input type="text" inputmode="decimal" autocomplete="off" id="n7-i' + i + '"><span>' + p.u + '</span></div></div>'; });
+  document.getElementById('n7-verif').addEventListener('click', function () {
+    var err = 0;
+    PB.forEach(function (p, i) { var inp = document.getElementById('n7-i' + i); var v = parseFloat(String(inp.value).replace(',', '.')); var ok = !isNaN(v) && Math.abs(v - p.r) <= (p.tol || 0); inp.className = ok ? 'bon' : 'faux'; document.getElementById('n7-p' + i).classList.toggle('ok', ok); if (!ok) err++; });
+    if (err === 0) reussi(6, document.getElementById('n7-retour'), 'Tu sais peser une image, en octets, en ko et en Mo.');
+    else rate(document.getElementById('n7-retour'), err + ' réponse' + (err > 1 ? 's' : '') + ' à revoir. Étapes : pixels, puis × bits, puis ÷ 8, puis ÷ 1 000 pour les ko.');
+  });
+
+  /* ---------- Niveau 8 : défi final (planète) ---------- */
+  var PAL8 = { '0': ['#FFFFFF', 'blanc'], '1': ['#1B1030', 'noir'], '5': ['#F77F00', 'orange'], '6': ['#FFD23F', 'jaune'], 'c': ['#6C2BD9', 'violet'] };
+  var CLES8 = ['0', '1', '5', '6', 'c'];
+  var PLANETE = ["0000000000000000", "0000000000000000", "0000000000000000", "0000011661100000", "0000155555510000", "0001666666661000", "00cc66666666cc00", "0cc5555555555cc0", "0cc6666666666cc0", "00cccccccccccc00", "0001555555551000", "0000166666610000", "0000011661100000", "0000000000000000", "0000000000000000", "0000000000000000"];
+  var n8 = { col: '1', grille: [], peint: false };
+  for (var q = 0; q < 256; q++) n8.grille.push('0');
+  var cm = document.getElementById('n8-modele').getContext('2d');
+  PLANETE.forEach(function (r, y) { r.split('').forEach(function (c, x) { cm.fillStyle = PAL8[c][0]; cm.fillRect(x, y, 1, 1); }); });
+  var p8 = document.getElementById('n8-palette'), cv = document.getElementById('n8-canvas').getContext('2d');
+  CLES8.forEach(function (k) {
+    var b = document.createElement('button'); b.type = 'button'; b.style.background = PAL8[k][0]; b.title = PAL8[k][1]; b.setAttribute('aria-label', PAL8[k][1]);
+    b.classList.toggle('actif', k === n8.col);
+    b.addEventListener('click', function () { n8.col = k; Array.prototype.forEach.call(p8.children, function (x) { x.classList.toggle('actif', x === b); }); });
+    p8.appendChild(b);
+  });
+  var c8 = grille(document.getElementById('n8-grille'), 16, 16, 22);
+  document.getElementById('n8-grille').style.removeProperty('--c'); document.getElementById('n8-grille').style.gridTemplateColumns = '';
+  function peindre(k) { n8.grille[k] = n8.col; c8[k].style.background = PAL8[n8.col][0]; c8[k].classList.remove('err'); n8Stats(); }
+  c8.forEach(function (b, k) {
+    b.addEventListener('pointerdown', function (e) { e.preventDefault(); n8.peint = true; peindre(k); });
+    b.addEventListener('pointerenter', function () { if (n8.peint) peindre(k); });
+    b.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); peindre(k); } });
+  });
+  document.addEventListener('pointerup', function () { n8.peint = false; });
+  function n8Stats() {
+    var justes = 0;
+    n8.grille.forEach(function (v, k) { if (v === PLANETE[Math.floor(k / 16)][k % 16]) justes++; cv.fillStyle = PAL8[v][0]; cv.fillRect(k % 16, Math.floor(k / 16), 1, 1); });
+    document.getElementById('n8-justes').textContent = justes + ' / 256';
+  }
+  document.getElementById('n8-reset').addEventListener('click', function () { n8.grille = n8.grille.map(function () { return '0'; }); c8.forEach(function (b) { b.style.background = '#FFFFFF'; b.classList.remove('err'); }); n8Stats(); });
+  document.getElementById('n8-verif').addEventListener('click', function () {
+    var err = 0;
+    c8.forEach(function (b, k) { var ok = n8.grille[k] === PLANETE[Math.floor(k / 16)][k % 16]; b.classList.toggle('err', !ok); if (!ok) err++; });
+    if (err === 0) reussi(7, document.getElementById('n8-retour'), 'Planète parfaite : 256 pixels justes, 96 octets.');
+    else rate(document.getElementById('n8-retour'), err + ' case' + (err > 1 ? 's' : '') + ' à corriger (entourée' + (err > 1 ? 's' : '') + ' en rouge).');
+  });
+  n8Stats();
+
+  aller(0);
+})();
+</script>
