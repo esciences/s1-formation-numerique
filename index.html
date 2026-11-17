@@ -99,6 +99,51 @@ h1 .neon { background: linear-gradient(transparent 58%, var(--neon) 58%, var(--n
 .vide p { margin: 0; font-size: 15px; }
 .rien { display: none; padding: 12px 16px; border-radius: 10px; background: var(--fond); color: var(--discret); font-size: 15px; }
 
+/* Consignes du jour */
+.consignes { margin: 0 0 20px; border: 3px solid var(--violet-texte); border-radius: 14px; background: var(--surface); overflow: hidden; }
+.consignes > header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; background: var(--neon); color: #1B1030; }
+.consignes > header h2 { margin: 0; font: 800 22px var(--f-titre); }
+.consignes > header .date { font: 600 16px var(--f-titre); }
+.consignes ol { list-style: none; margin: 0; padding: 16px 20px 20px; display: grid; gap: 14px; counter-reset: c; }
+.consignes li { display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; font: 700 clamp(19px, 2.4vw, 24px)/1.4 var(--f-corps); }
+.consignes li::before { counter-increment: c; content: counter(c); width: 42px; height: 42px; display: grid; place-items: center; background: var(--violet); color: #FFFFFF; border-radius: 6px; font: 800 22px var(--f-titre); }
+.brouillon { font: 700 12px var(--f-code); background: #1B1030; color: var(--neon); padding: 3px 10px; border-radius: 999px; }
+
+/* Espace prof */
+.prof { margin: 0 0 20px; padding: 16px 18px; border-radius: 14px; border: 2px dashed var(--ambre-texte); background: var(--ambre-clair); }
+.prof h2 { margin: 0 0 4px; font: 700 18px var(--f-titre); color: var(--ambre-texte); }
+.prof .ligne { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+.prof label { font: 600 14px var(--f-titre); }
+.prof input[type=date], .prof textarea { font: 16px var(--f-corps); padding: 8px 10px; border: 2px solid var(--filet); border-radius: 8px; background: var(--surface); color: var(--encre); }
+.prof .edit { display: grid; gap: 8px; margin: 10px 0; }
+.prof .edit-ligne { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: start; }
+.prof .edit-ligne span { width: 34px; height: 34px; display: grid; place-items: center; background: var(--violet); color: #fff; border-radius: 6px; font: 800 16px var(--f-titre); }
+.prof textarea { width: 100%; min-height: 42px; resize: vertical; }
+.prof button { font: 700 14px var(--f-titre); border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 2px solid var(--violet-texte); background: transparent; color: var(--violet-texte); }
+.prof button.plein { background: var(--violet); border-color: var(--violet); color: #fff; }
+.prof button.suppr { padding: 6px 10px; border-color: var(--filet); color: var(--discret); }
+.prof .etapes-pub { margin: 10px 0 0; padding: 10px 14px; border-radius: 10px; background: var(--surface); font-size: 15px; }
+.prof .etapes-pub ol { margin: 6px 0 0; padding-left: 20px; }
+.prof .etapes-pub a { color: var(--violet-texte); font-weight: 700; }
+.prof .msg { font-size: 14px; color: var(--discret); }
+.code-prof { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0 0 16px; font-size: 14px; }
+.code-prof input { font: 15px var(--f-code); padding: 6px 8px; border: 2px solid var(--filet); border-radius: 8px; background: var(--surface); color: var(--encre); width: 130px; }
+.code-prof button { font: 700 13px var(--f-titre); padding: 6px 12px; border-radius: 8px; border: 2px solid var(--violet-texte); background: transparent; color: var(--violet-texte); cursor: pointer; }
+.roue { border: 0; background: transparent; color: var(--discret); opacity: .3; cursor: pointer; font-size: 14px; padding: 2px 4px; }
+.roue:hover, .roue:focus-visible { opacity: 1; }
+
+/* Outils */
+.outils { margin-top: 26px; }
+.outils h2 { font: 700 16px var(--f-titre); letter-spacing: .08em; text-transform: uppercase; color: var(--discret); margin: 0 0 10px; }
+.outils .liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.outil { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1.5px solid var(--filet); text-decoration: none; color: var(--encre); }
+.outil:hover, .outil:focus-visible { border-color: var(--violet-texte); }
+.outil .ico { width: 44px; height: 44px; flex: none; border-radius: 10px; display: grid; place-items: center; background: var(--violet-clair); color: var(--violet-texte); }
+.outil .ico svg { width: 24px; height: 24px; }
+.outil b { display: block; font: 700 17px var(--f-titre); }
+.outil span.txt { font-size: 14px; color: var(--discret); }
+.outil .ext { margin-left: auto; color: var(--violet-texte); font-weight: 700; }
+
 footer { margin-top: 30px; padding-top: 14px; border-top: 1.5px solid var(--filet); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--discret); }
 footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(--violet-texte); margin-right: 6px; }
 </style>
@@ -114,6 +159,31 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
     <h1>Mes ressources <span class="neon">numériques</span></h1>
     <p class="intro">Tous les supports du cours, rangés par champ. L’étiquette de chaque support te dit à quoi il sert : comprendre une notion, t’exercer ou créer.</p>
   </header>
+
+  <div class="code-prof" id="code-prof" hidden><label for="code-input">Code enseignant :</label><input type="password" id="code-input" autocomplete="off"><button type="button" id="code-ok">OK</button><span id="code-msg" class="msg"></span></div>
+
+  <section class="prof" id="prof" hidden aria-label="Espace enseignant">
+    <h2>Espace prof · consignes du jour</h2>
+    <p class="msg" style="margin:0">Écris tes consignes, elles s’affichent en grand en haut de la page. Seul toi vois ce cadre.</p>
+    <div class="ligne"><label for="c-date">Date</label><input type="date" id="c-date"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="c-visible" checked> Afficher aux élèves</label></div>
+    <div class="edit" id="c-edit"></div>
+    <div class="ligne"><button type="button" id="c-ajout">+ Ajouter une consigne</button><button type="button" id="c-vider">Tout effacer</button><button type="button" class="plein" id="c-publier">Publier pour les élèves</button><button type="button" id="c-quitter">Quitter le mode prof</button></div>
+    <div class="etapes-pub" id="c-etapes" hidden>
+      <b>Dernière étape, sur GitHub :</b>
+      <ol>
+        <li>Le texte des consignes est copié. <a id="c-lien" href="https://github.com/esciences/s1-formation-numerique/edit/main/consignes.json" target="_blank" rel="noopener">Ouvre le fichier des consignes sur GitHub ↗</a></li>
+        <li>Dans l’éditeur, sélectionne tout (Ctrl + A) puis colle (Ctrl + V).</li>
+        <li>Clique sur <b>Commit changes</b>, puis encore <b>Commit changes</b>.</li>
+        <li>Une minute plus tard, les élèves voient les consignes (Ctrl + F5 pour actualiser).</li>
+      </ol>
+      <textarea id="c-json" readonly style="width:100%;min-height:70px;margin-top:8px;font:13px var(--f-code)" aria-label="Texte à coller dans GitHub"></textarea>
+    </div>
+  </section>
+
+  <section class="consignes" id="consignes" hidden aria-live="polite">
+    <header><h2>Consignes du jour</h2><span class="date" id="consignes-date"></span><span class="brouillon" id="consignes-brouillon" hidden>Aperçu prof, pas encore publié</span></header>
+    <ol id="consignes-liste"></ol>
+  </section>
 
   <div class="filtre" role="group" aria-label="Afficher les supports">
     <span>Afficher :</span>
@@ -192,8 +262,16 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
 
   </main>
 
+  <section class="outils" aria-labelledby="outils-titre">
+    <h2 id="outils-titre">Outils</h2>
+    <div class="liste">
+      <a class="outil" href="https://esciences.be/lexique-numerique/" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13M9 7h6M9 11h4"/></svg></span><span><b>Lexique numérique</b><span class="txt">Tous les mots du cours, expliqués simplement.</span></span><span class="ext" aria-hidden="true">↗</span></a>
+      <a class="outil" href="https://studio.code.org/fr/users/sign_in" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></span><span><b>Code.org</b><span class="txt">Connecte-toi pour programmer.</span></span><span class="ext" aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+
   <footer>
-    <span><span class="logo">OCTET</span>Ressources créées par Tommy Berben · <a href="https://www.esciences.be">eSCIENCES.be</a></span>
+    <span><span class="logo">OCTET</span>Ressources créées par Tommy Berben · <a href="https://www.esciences.be">eSCIENCES.be</a><button type="button" class="roue" id="roue" aria-label="Accès enseignant" title="Accès enseignant">⚙</button></span>
     <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">Licence CC BY-NC-SA 4.0</a>
   </footer>
 </div>
@@ -220,6 +298,83 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
   }
   document.querySelectorAll('.filtre button').forEach(function (b) { b.addEventListener('click', function () { filtrer(b.dataset.filtre); }); });
   compter();
+
+  /* ---------- Consignes du jour ---------- */
+  var publie = null, brouillon = null, prof = false;
+  try { prof = localStorage.getItem('s1-prof') === '1'; brouillon = JSON.parse(localStorage.getItem('s1-consignes') || 'null'); } catch (e) {}
+  var JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'], MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  function dateFr(iso) { if (!iso) return ''; var d = new Date(iso + 'T12:00:00'); if (isNaN(d)) return ''; return JOURS[d.getDay()] + ' ' + d.getDate() + ' ' + MOIS[d.getMonth()]; }
+  function aujourdhui() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function propre(c) { return { date: c && c.date || '', visible: !c || c.visible !== false, consignes: (c && c.consignes || []).map(function (t) { return String(t).trim(); }).filter(Boolean) }; }
+  function afficher() {
+    var c = prof && brouillon ? propre(brouillon) : (publie ? propre(publie) : null);
+    var bloc = document.getElementById('consignes');
+    if (!c || !c.visible || !c.consignes.length) { bloc.hidden = true; return; }
+    var ol = document.getElementById('consignes-liste'); ol.innerHTML = '';
+    c.consignes.forEach(function (t) { var li = document.createElement('li'); var sp = document.createElement('span'); sp.textContent = t; li.appendChild(sp); ol.appendChild(li); });
+    document.getElementById('consignes-date').textContent = dateFr(c.date);
+    document.getElementById('consignes-brouillon').hidden = !(prof && brouillon && JSON.stringify(propre(brouillon)) !== JSON.stringify(publie ? propre(publie) : null));
+    bloc.hidden = false;
+  }
+  function charger() {
+    fetch('consignes.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { publie = j; if (prof && !brouillon && j) { brouillon = JSON.parse(JSON.stringify(j)); remplirEditeur(); } afficher(); }).catch(function () { afficher(); });
+  }
+  /* éditeur */
+  var edit = document.getElementById('c-edit');
+  function sauverBrouillon() {
+    brouillon = { date: document.getElementById('c-date').value, visible: document.getElementById('c-visible').checked, consignes: Array.prototype.map.call(edit.querySelectorAll('textarea'), function (t) { return t.value; }) };
+    try { localStorage.setItem('s1-consignes', JSON.stringify(brouillon)); } catch (e) {}
+    document.getElementById('c-etapes').hidden = true;
+    afficher();
+  }
+  function ligne(texte) {
+    var d = document.createElement('div'); d.className = 'edit-ligne';
+    d.innerHTML = '<span></span><textarea rows="1" aria-label="Consigne"></textarea><button type="button" class="suppr" aria-label="Supprimer cette consigne">✕</button>';
+    d.querySelector('textarea').value = texte || '';
+    d.querySelector('textarea').addEventListener('input', sauverBrouillon);
+    d.querySelector('button').addEventListener('click', function () { d.remove(); numeroter(); sauverBrouillon(); });
+    edit.appendChild(d); numeroter(); return d;
+  }
+  function numeroter() { Array.prototype.forEach.call(edit.querySelectorAll('.edit-ligne span'), function (s, i) { s.textContent = i + 1; }); }
+  function remplirEditeur() {
+    var c = brouillon || { date: aujourdhui(), visible: true, consignes: ['', '', ''] };
+    document.getElementById('c-date').value = c.date || aujourdhui();
+    document.getElementById('c-visible').checked = c.visible !== false;
+    edit.innerHTML = ''; (c.consignes.length ? c.consignes : ['', '', '']).forEach(function (t) { ligne(t); });
+  }
+  document.getElementById('c-date').addEventListener('change', sauverBrouillon);
+  document.getElementById('c-visible').addEventListener('change', sauverBrouillon);
+  document.getElementById('c-ajout').addEventListener('click', function () { ligne('').querySelector('textarea').focus(); sauverBrouillon(); });
+  document.getElementById('c-vider').addEventListener('click', function () { edit.innerHTML = ''; ligne(''); document.getElementById('c-date').value = aujourdhui(); sauverBrouillon(); });
+  document.getElementById('c-publier').addEventListener('click', function () {
+    sauverBrouillon();
+    var json = JSON.stringify(propre(brouillon), null, 2) + '\n';
+    var ta = document.getElementById('c-json'); ta.value = json;
+    document.getElementById('c-etapes').hidden = false;
+    var copie = function () { ta.focus(); ta.select(); try { document.execCommand('copy'); } catch (e) {} };
+    if (navigator.clipboard) navigator.clipboard.writeText(json).catch(copie); else copie();
+  });
+  /* mode prof : roue dentée + code */
+  function majProf() {
+    document.getElementById('prof').hidden = !prof;
+    try { localStorage.setItem('s1-prof', prof ? '1' : '0'); } catch (e) {}
+    if (prof) remplirEditeur();
+    afficher();
+  }
+  document.getElementById('roue').addEventListener('click', function () {
+    if (prof) { document.getElementById('prof').scrollIntoView({ behavior: 'smooth' }); return; }
+    var b = document.getElementById('code-prof'); b.hidden = !b.hidden; if (!b.hidden) { window.scrollTo({ top: 0 }); document.getElementById('code-input').focus(); }
+  });
+  function valider() {
+    var i = document.getElementById('code-input'), m = document.getElementById('code-msg');
+    if (i.value.trim().toUpperCase() === String.fromCharCode.apply(null, [80, 82, 79, 70, 50, 53, 53])) { prof = true; i.value = ''; m.textContent = ''; document.getElementById('code-prof').hidden = true; majProf(); }
+    else { i.value = ''; m.textContent = 'Code incorrect'; i.focus(); }
+  }
+  document.getElementById('code-ok').addEventListener('click', valider);
+  document.getElementById('code-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') valider(); });
+  document.getElementById('c-quitter').addEventListener('click', function () { prof = false; majProf(); });
+  majProf();
+  charger();
 })();
 </script>
 </body>
