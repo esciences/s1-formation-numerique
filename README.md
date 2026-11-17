@@ -11,6 +11,7 @@ Page d'accueil pour les élèves : `index.html` (publiée avec GitHub Pages).
 | `pixel/` | `sequence-pixel.pdf` | Carnet de la séquence « C'est quoi, un pixel ? » et mission Pixel Art dans Minecraft Education (5 pages A4) |
 | `pixel/` | `du-pixel-a-l-octet.html` | Présentation interactive : pixel, bitmap, octet, poids d'une image |
 | `pixel/` | `pixel-quest.html` | Pixel Quest : 8 niveaux d'exercices interactifs à faire en autonomie |
+| `monument/` | `mon-monument-en-diapos.pdf` | Travail commun avec la FHGES : recherche sur un monument antique et présentation Canva (consignes, fiche de recherche, exemples de diapos, grille d'évaluation, 5 pages A4) |
 
 Chaque ressource est un fichier autonome : il s'ouvre dans n'importe quel navigateur, sans installation.
 
