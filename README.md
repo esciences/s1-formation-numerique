@@ -8,6 +8,7 @@ Page d'accueil pour les élèves : `index.html` (publiée avec GitHub Pages).
 
 | Dossier | Ressource | Pour quoi faire |
 | --- | --- | --- |
+| `pixel/` | `du-pixel-a-l-octet.html` | Présentation interactive : pixel, bitmap, octet, poids d'une image |
 | `pixel/` | `pixel-quest.html` | Pixel Quest : 8 niveaux d'exercices interactifs à faire en autonomie |
 
 Chaque ressource est un fichier autonome : il s'ouvre dans n'importe quel navigateur, sans installation.
