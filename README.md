@@ -8,6 +8,7 @@ Page d'accueil pour les élèves : `index.html` (publiée avec GitHub Pages).
 
 | Dossier | Ressource | Pour quoi faire |
 | --- | --- | --- |
+| `pixel/` | `sequence-pixel.pdf` | Carnet de la séquence « C'est quoi, un pixel ? » et mission Pixel Art dans Minecraft Education (5 pages A4) |
 | `pixel/` | `du-pixel-a-l-octet.html` | Présentation interactive : pixel, bitmap, octet, poids d'une image |
 | `pixel/` | `pixel-quest.html` | Pixel Quest : 8 niveaux d'exercices interactifs à faire en autonomie |
 
