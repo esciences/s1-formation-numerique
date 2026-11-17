@@ -170,37 +170,14 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
 
   <section class="prof" id="prof" hidden aria-label="Espace enseignant">
     <h2>Espace prof · consignes du jour</h2>
-    <p class="msg" style="margin:0">Écris tes consignes, elles s’affichent en grand en haut de la page. Seul toi vois ce cadre.</p>
-    <div class="ligne"><label for="c-date">Date</label><input type="date" id="c-date"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="c-visible" checked> Afficher aux élèves</label></div>
+    <p class="msg" style="margin:0">Écris tes consignes : elles s’affichent en grand en haut de la page, <b>sur cet ordinateur uniquement</b> (l’écran de la classe). Elles restent affichées quand tu quittes le mode prof, même après avoir fermé la page.</p>
+    <div class="ligne"><label for="c-date">Date</label><input type="date" id="c-date"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="c-visible" checked> Afficher à l’écran</label></div>
     <div class="edit" id="c-edit"></div>
-    <div class="ligne"><button type="button" id="c-ajout">+ Ajouter une consigne</button><button type="button" id="c-vider">Tout effacer</button><button type="button" class="plein" id="c-publier">Publier pour les élèves</button><button type="button" id="c-quitter">Quitter le mode prof</button></div>
-    <p class="statut" id="c-statut" aria-live="polite"></p>
-    <details id="c-direct">
-      <summary>Publier en un clic (facultatif)</summary>
-      <p style="margin:6px 0">Avec un jeton GitHub enregistré sur cet ordinateur, « Publier pour les élèves » envoie directement les consignes, sans copier-coller.</p>
-      <ol>
-        <li>Sur GitHub (compte esciences) : <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">crée un jeton « Fine-grained » ↗</a>.</li>
-        <li><b>Repository access</b> : <i>Only select repositories</i> → <b>s1-formation-numerique</b>.</li>
-        <li><b>Permissions</b> → <b>Contents</b> : <i>Read and write</i>. Rien d’autre.</li>
-        <li>Copie le jeton et colle-le ici.</li>
-      </ol>
-      <div class="ligne"><input type="password" id="c-jeton" autocomplete="off" placeholder="github_pat_…" aria-label="Jeton GitHub"><button type="button" id="c-jeton-ok">Enregistrer</button><button type="button" id="c-jeton-oubli">Oublier le jeton</button><span class="msg" id="c-jeton-msg"></span></div>
-      <p class="msg" style="margin:4px 0 0">N’enregistre le jeton que sur ton ordinateur à toi, pas sur un poste élève.</p>
-    </details>
-    <div class="etapes-pub" id="c-etapes" hidden>
-      <b>Dernière étape, sur GitHub :</b>
-      <ol>
-        <li>Le texte des consignes est copié. <a id="c-lien" href="https://github.com/esciences/s1-formation-numerique/edit/main/consignes.json" target="_blank" rel="noopener">Ouvre le fichier des consignes sur GitHub ↗</a></li>
-        <li>Dans l’éditeur, sélectionne tout (Ctrl + A) puis colle (Ctrl + V).</li>
-        <li>Clique sur <b>Commit changes</b>, puis encore <b>Commit changes</b>.</li>
-        <li>Une minute plus tard, les élèves voient les consignes (Ctrl + F5 pour actualiser).</li>
-      </ol>
-      <textarea id="c-json" readonly style="width:100%;min-height:70px;margin-top:8px;font:13px var(--f-code)" aria-label="Texte à coller dans GitHub"></textarea>
-    </div>
+    <div class="ligne"><button type="button" id="c-ajout">+ Ajouter une consigne</button><button type="button" id="c-vider">Tout effacer</button><button type="button" class="plein" id="c-quitter">Terminer et quitter le mode prof</button></div>
   </section>
 
   <section class="consignes" id="consignes" hidden aria-live="polite">
-    <header><h2>Consignes du jour</h2><span class="date" id="consignes-date"></span><span class="brouillon" id="consignes-brouillon" hidden>Aperçu prof, pas encore publié</span></header>
+    <header><h2>Consignes du jour</h2><span class="date" id="consignes-date"></span></header>
     <ol id="consignes-liste"></ol>
   </section>
 
@@ -318,95 +295,54 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
   document.querySelectorAll('.filtre button').forEach(function (b) { b.addEventListener('click', function () { filtrer(b.dataset.filtre); }); });
   compter();
 
-  /* ---------- Consignes du jour ---------- */
-  var publie = null, brouillon = null, prof = false;
-  try { prof = localStorage.getItem('s1-prof') === '1'; brouillon = JSON.parse(localStorage.getItem('s1-consignes') || 'null'); } catch (e) {}
+  /* ---------- Consignes du jour (affichage local, écran de la classe) ---------- */
+  var consignes = null, prof = false;
+  try { prof = localStorage.getItem('s1-prof') === '1'; consignes = JSON.parse(localStorage.getItem('s1-consignes') || 'null'); } catch (e) {}
   var JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'], MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
   function dateFr(iso) { if (!iso) return ''; var d = new Date(iso + 'T12:00:00'); if (isNaN(d)) return ''; return JOURS[d.getDay()] + ' ' + d.getDate() + ' ' + MOIS[d.getMonth()]; }
   function aujourdhui() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-  function propre(c) { return { date: c && c.date || '', visible: !c || c.visible !== false, consignes: (c && c.consignes || []).map(function (t) { return String(t).trim(); }).filter(Boolean) }; }
   function afficher() {
-    var c = brouillon ? propre(brouillon) : (publie ? propre(publie) : null);
     var bloc = document.getElementById('consignes');
-    if (!c || !c.visible || !c.consignes.length) { bloc.hidden = true; return; }
+    var liste = consignes ? (consignes.consignes || []).map(function (t) { return String(t).trim(); }).filter(Boolean) : [];
+    if (!consignes || consignes.visible === false || !liste.length) { bloc.hidden = true; return; }
     var ol = document.getElementById('consignes-liste'); ol.innerHTML = '';
-    c.consignes.forEach(function (t) { var li = document.createElement('li'); var sp = document.createElement('span'); sp.textContent = t; li.appendChild(sp); ol.appendChild(li); });
-    document.getElementById('consignes-date').textContent = dateFr(c.date);
-    document.getElementById('consignes-brouillon').hidden = !(prof && !estPublie());
+    liste.forEach(function (t) { var li = document.createElement('li'); var sp = document.createElement('span'); sp.textContent = t; li.appendChild(sp); ol.appendChild(li); });
+    document.getElementById('consignes-date').textContent = dateFr(consignes.date);
     bloc.hidden = false;
   }
-  function estPublie() { return !brouillon || JSON.stringify(propre(brouillon)) === JSON.stringify(publie ? propre(publie) : null); }
-  function majStatut() {
-    var st = document.getElementById('c-statut'); if (!st) return;
-    if (estPublie()) { st.className = 'statut ok'; st.textContent = '✓ Publié : les élèves voient ces consignes.'; }
-    else { st.className = 'statut attente'; st.textContent = 'Pas encore publié : ces consignes ne s’affichent que sur cet ordinateur.'; }
-  }
-  function charger() {
-    fetch('consignes.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { publie = j; if (prof && !brouillon && j) { brouillon = JSON.parse(JSON.stringify(j)); remplirEditeur(); } afficher(); majStatut(); }).catch(function () { afficher(); majStatut(); });
-  }
-  /* éditeur */
   var edit = document.getElementById('c-edit');
-  function sauverBrouillon() {
-    brouillon = { date: document.getElementById('c-date').value, visible: document.getElementById('c-visible').checked, consignes: Array.prototype.map.call(edit.querySelectorAll('textarea'), function (t) { return t.value; }) };
-    try { localStorage.setItem('s1-consignes', JSON.stringify(brouillon)); } catch (e) {}
-    document.getElementById('c-etapes').hidden = true;
-    afficher(); majStatut();
+  function enregistrer() {
+    consignes = { date: document.getElementById('c-date').value, visible: document.getElementById('c-visible').checked, consignes: Array.prototype.map.call(edit.querySelectorAll('textarea'), function (t) { return t.value; }) };
+    try { localStorage.setItem('s1-consignes', JSON.stringify(consignes)); } catch (e) {}
+    afficher();
   }
   function ligne(texte) {
     var d = document.createElement('div'); d.className = 'edit-ligne';
     d.innerHTML = '<span></span><textarea rows="1" aria-label="Consigne"></textarea><button type="button" class="suppr" aria-label="Supprimer cette consigne">✕</button>';
     d.querySelector('textarea').value = texte || '';
-    d.querySelector('textarea').addEventListener('input', sauverBrouillon);
-    d.querySelector('button').addEventListener('click', function () { d.remove(); numeroter(); sauverBrouillon(); });
+    d.querySelector('textarea').addEventListener('input', enregistrer);
+    d.querySelector('button').addEventListener('click', function () { d.remove(); numeroter(); enregistrer(); });
     edit.appendChild(d); numeroter(); return d;
   }
   function numeroter() { Array.prototype.forEach.call(edit.querySelectorAll('.edit-ligne span'), function (s, i) { s.textContent = i + 1; }); }
   function remplirEditeur() {
-    var c = brouillon || { date: aujourdhui(), visible: true, consignes: ['', '', ''] };
+    var c = consignes || { date: aujourdhui(), visible: true, consignes: [] };
     document.getElementById('c-date').value = c.date || aujourdhui();
     document.getElementById('c-visible').checked = c.visible !== false;
-    edit.innerHTML = ''; (c.consignes.length ? c.consignes : ['', '', '']).forEach(function (t) { ligne(t); });
+    edit.innerHTML = '';
+    var l = (c.consignes || []).slice(); while (l.length < 3) l.push('');
+    l.forEach(function (t) { ligne(t); });
   }
-  document.getElementById('c-date').addEventListener('change', sauverBrouillon);
-  document.getElementById('c-visible').addEventListener('change', sauverBrouillon);
-  document.getElementById('c-ajout').addEventListener('click', function () { ligne('').querySelector('textarea').focus(); sauverBrouillon(); });
-  document.getElementById('c-vider').addEventListener('click', function () { edit.innerHTML = ''; ligne(''); document.getElementById('c-date').value = aujourdhui(); sauverBrouillon(); });
-  var API = 'https://api.github.com/repos/esciences/s1-formation-numerique/contents/consignes.json';
-  function jeton() { try { return localStorage.getItem('s1-jeton') || ''; } catch (e) { return ''; } }
-  function b64(txt) { var b = new TextEncoder().encode(txt), s = ''; b.forEach(function (x) { s += String.fromCharCode(x); }); return btoa(s); }
-  function publierDirect(json) {
-    var st = document.getElementById('c-statut'); st.className = 'statut attente'; st.textContent = 'Publication en cours…';
-    var h = { 'Authorization': 'Bearer ' + jeton(), 'Accept': 'application/vnd.github+json' };
-    return fetch(API + '?ref=main', { headers: h, cache: 'no-store' }).then(function (r) { if (!r.ok) throw r.status; return r.json(); })
-      .then(function (f) { return fetch(API, { method: 'PUT', headers: h, body: JSON.stringify({ message: 'Consignes du jour', content: b64(json), sha: f.sha, branch: 'main' }) }); })
-      .then(function (r) { if (!r.ok) throw r.status; publie = JSON.parse(json); afficher(); st.className = 'statut ok'; st.textContent = '✓ Publié ! Les élèves verront les consignes d’ici une minute (Ctrl + F5).'; })
-      .catch(function (e) { st.className = 'statut attente'; st.textContent = (e === 401 || e === 403 || e === 404) ? 'Le jeton est refusé (expiré ou sans droit « Contents »). Utilise le copier-coller ci-dessous.' : 'Publication impossible (connexion ?). Utilise le copier-coller ci-dessous.'; copierColler(json); });
-  }
-  function copierColler(json) {
-    var ta = document.getElementById('c-json'); ta.value = json;
-    document.getElementById('c-etapes').hidden = false;
-    var copie = function () { ta.focus(); ta.select(); try { document.execCommand('copy'); } catch (e) {} };
-    if (navigator.clipboard) navigator.clipboard.writeText(json).catch(copie); else copie();
-  }
-  document.getElementById('c-jeton-ok').addEventListener('click', function () {
-    var v = document.getElementById('c-jeton').value.trim(), m = document.getElementById('c-jeton-msg');
-    if (!v) { m.textContent = 'Colle d’abord le jeton.'; return; }
-    try { localStorage.setItem('s1-jeton', v); } catch (e) {}
-    document.getElementById('c-jeton').value = ''; m.textContent = 'Jeton enregistré sur cet ordinateur ✓';
-  });
-  document.getElementById('c-jeton-oubli').addEventListener('click', function () { try { localStorage.removeItem('s1-jeton'); } catch (e) {} document.getElementById('c-jeton-msg').textContent = 'Jeton effacé.'; });
-  document.getElementById('c-publier').addEventListener('click', function () {
-    sauverBrouillon();
-    var json = JSON.stringify(propre(brouillon), null, 2) + '\n';
-    if (jeton()) { document.getElementById('c-etapes').hidden = true; publierDirect(json); return; }
-    copierColler(json);
-  });
+  document.getElementById('c-date').addEventListener('change', enregistrer);
+  document.getElementById('c-visible').addEventListener('change', enregistrer);
+  document.getElementById('c-ajout').addEventListener('click', function () { ligne('').querySelector('textarea').focus(); });
+  document.getElementById('c-vider').addEventListener('click', function () { edit.innerHTML = ''; ligne(''); ligne(''); ligne(''); document.getElementById('c-date').value = aujourdhui(); enregistrer(); });
   /* mode prof : roue dentée + code */
   function majProf() {
     document.getElementById('prof').hidden = !prof;
     try { localStorage.setItem('s1-prof', prof ? '1' : '0'); } catch (e) {}
-    if (prof) { remplirEditeur(); document.getElementById('c-jeton-msg').textContent = jeton() ? 'Un jeton est enregistré ✓' : ''; }
-    afficher(); majStatut();
+    if (prof) remplirEditeur();
+    afficher();
   }
   document.getElementById('roue').addEventListener('click', function () {
     if (prof) { document.getElementById('prof').scrollIntoView({ behavior: 'smooth' }); return; }
@@ -419,9 +355,8 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
   }
   document.getElementById('code-ok').addEventListener('click', valider);
   document.getElementById('code-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') valider(); });
-  document.getElementById('c-quitter').addEventListener('click', function () { prof = false; majProf(); });
+  document.getElementById('c-quitter').addEventListener('click', function () { enregistrer(); prof = false; majProf(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
   majProf();
-  charger();
 })();
 </script>
 </body>
