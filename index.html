@@ -126,6 +126,12 @@ h1 .neon { background: linear-gradient(transparent 58%, var(--neon) 58%, var(--n
 .prof .etapes-pub ol { margin: 6px 0 0; padding-left: 20px; }
 .prof .etapes-pub a { color: var(--violet-texte); font-weight: 700; }
 .prof .msg { font-size: 14px; color: var(--discret); }
+.statut { margin: 6px 0 0; padding: 8px 12px; border-radius: 8px; font: 600 14px var(--f-titre); background: var(--surface); }
+.statut.ok { color: #15803D; } .statut.attente { color: var(--ambre-texte); }
+.prof details { margin-top: 10px; background: var(--surface); border-radius: 10px; padding: 8px 14px; font-size: 14px; }
+.prof details summary { cursor: pointer; font: 700 14px var(--f-titre); color: var(--violet-texte); }
+.prof details ol { margin: 6px 0; padding-left: 20px; }
+.prof details input { font: 14px var(--f-code); padding: 6px 8px; border: 2px solid var(--filet); border-radius: 8px; background: var(--surface); color: var(--encre); width: min(100%, 360px); }
 .code-prof { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0 0 16px; font-size: 14px; }
 .code-prof input { font: 15px var(--f-code); padding: 6px 8px; border: 2px solid var(--filet); border-radius: 8px; background: var(--surface); color: var(--encre); width: 130px; }
 .code-prof button { font: 700 13px var(--f-titre); padding: 6px 12px; border-radius: 8px; border: 2px solid var(--violet-texte); background: transparent; color: var(--violet-texte); cursor: pointer; }
@@ -168,6 +174,19 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
     <div class="ligne"><label for="c-date">Date</label><input type="date" id="c-date"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="c-visible" checked> Afficher aux élèves</label></div>
     <div class="edit" id="c-edit"></div>
     <div class="ligne"><button type="button" id="c-ajout">+ Ajouter une consigne</button><button type="button" id="c-vider">Tout effacer</button><button type="button" class="plein" id="c-publier">Publier pour les élèves</button><button type="button" id="c-quitter">Quitter le mode prof</button></div>
+    <p class="statut" id="c-statut" aria-live="polite"></p>
+    <details id="c-direct">
+      <summary>Publier en un clic (facultatif)</summary>
+      <p style="margin:6px 0">Avec un jeton GitHub enregistré sur cet ordinateur, « Publier pour les élèves » envoie directement les consignes, sans copier-coller.</p>
+      <ol>
+        <li>Sur GitHub (compte esciences) : <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">crée un jeton « Fine-grained » ↗</a>.</li>
+        <li><b>Repository access</b> : <i>Only select repositories</i> → <b>s1-formation-numerique</b>.</li>
+        <li><b>Permissions</b> → <b>Contents</b> : <i>Read and write</i>. Rien d’autre.</li>
+        <li>Copie le jeton et colle-le ici.</li>
+      </ol>
+      <div class="ligne"><input type="password" id="c-jeton" autocomplete="off" placeholder="github_pat_…" aria-label="Jeton GitHub"><button type="button" id="c-jeton-ok">Enregistrer</button><button type="button" id="c-jeton-oubli">Oublier le jeton</button><span class="msg" id="c-jeton-msg"></span></div>
+      <p class="msg" style="margin:4px 0 0">N’enregistre le jeton que sur ton ordinateur à toi, pas sur un poste élève.</p>
+    </details>
     <div class="etapes-pub" id="c-etapes" hidden>
       <b>Dernière étape, sur GitHub :</b>
       <ol>
@@ -307,17 +326,23 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
   function aujourdhui() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function propre(c) { return { date: c && c.date || '', visible: !c || c.visible !== false, consignes: (c && c.consignes || []).map(function (t) { return String(t).trim(); }).filter(Boolean) }; }
   function afficher() {
-    var c = prof && brouillon ? propre(brouillon) : (publie ? propre(publie) : null);
+    var c = brouillon ? propre(brouillon) : (publie ? propre(publie) : null);
     var bloc = document.getElementById('consignes');
     if (!c || !c.visible || !c.consignes.length) { bloc.hidden = true; return; }
     var ol = document.getElementById('consignes-liste'); ol.innerHTML = '';
     c.consignes.forEach(function (t) { var li = document.createElement('li'); var sp = document.createElement('span'); sp.textContent = t; li.appendChild(sp); ol.appendChild(li); });
     document.getElementById('consignes-date').textContent = dateFr(c.date);
-    document.getElementById('consignes-brouillon').hidden = !(prof && brouillon && JSON.stringify(propre(brouillon)) !== JSON.stringify(publie ? propre(publie) : null));
+    document.getElementById('consignes-brouillon').hidden = !(prof && !estPublie());
     bloc.hidden = false;
   }
+  function estPublie() { return !brouillon || JSON.stringify(propre(brouillon)) === JSON.stringify(publie ? propre(publie) : null); }
+  function majStatut() {
+    var st = document.getElementById('c-statut'); if (!st) return;
+    if (estPublie()) { st.className = 'statut ok'; st.textContent = '✓ Publié : les élèves voient ces consignes.'; }
+    else { st.className = 'statut attente'; st.textContent = 'Pas encore publié : ces consignes ne s’affichent que sur cet ordinateur.'; }
+  }
   function charger() {
-    fetch('consignes.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { publie = j; if (prof && !brouillon && j) { brouillon = JSON.parse(JSON.stringify(j)); remplirEditeur(); } afficher(); }).catch(function () { afficher(); });
+    fetch('consignes.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { publie = j; if (prof && !brouillon && j) { brouillon = JSON.parse(JSON.stringify(j)); remplirEditeur(); } afficher(); majStatut(); }).catch(function () { afficher(); majStatut(); });
   }
   /* éditeur */
   var edit = document.getElementById('c-edit');
@@ -325,7 +350,7 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
     brouillon = { date: document.getElementById('c-date').value, visible: document.getElementById('c-visible').checked, consignes: Array.prototype.map.call(edit.querySelectorAll('textarea'), function (t) { return t.value; }) };
     try { localStorage.setItem('s1-consignes', JSON.stringify(brouillon)); } catch (e) {}
     document.getElementById('c-etapes').hidden = true;
-    afficher();
+    afficher(); majStatut();
   }
   function ligne(texte) {
     var d = document.createElement('div'); d.className = 'edit-ligne';
@@ -346,20 +371,42 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
   document.getElementById('c-visible').addEventListener('change', sauverBrouillon);
   document.getElementById('c-ajout').addEventListener('click', function () { ligne('').querySelector('textarea').focus(); sauverBrouillon(); });
   document.getElementById('c-vider').addEventListener('click', function () { edit.innerHTML = ''; ligne(''); document.getElementById('c-date').value = aujourdhui(); sauverBrouillon(); });
-  document.getElementById('c-publier').addEventListener('click', function () {
-    sauverBrouillon();
-    var json = JSON.stringify(propre(brouillon), null, 2) + '\n';
+  var API = 'https://api.github.com/repos/esciences/s1-formation-numerique/contents/consignes.json';
+  function jeton() { try { return localStorage.getItem('s1-jeton') || ''; } catch (e) { return ''; } }
+  function b64(txt) { var b = new TextEncoder().encode(txt), s = ''; b.forEach(function (x) { s += String.fromCharCode(x); }); return btoa(s); }
+  function publierDirect(json) {
+    var st = document.getElementById('c-statut'); st.className = 'statut attente'; st.textContent = 'Publication en cours…';
+    var h = { 'Authorization': 'Bearer ' + jeton(), 'Accept': 'application/vnd.github+json' };
+    return fetch(API + '?ref=main', { headers: h, cache: 'no-store' }).then(function (r) { if (!r.ok) throw r.status; return r.json(); })
+      .then(function (f) { return fetch(API, { method: 'PUT', headers: h, body: JSON.stringify({ message: 'Consignes du jour', content: b64(json), sha: f.sha, branch: 'main' }) }); })
+      .then(function (r) { if (!r.ok) throw r.status; publie = JSON.parse(json); afficher(); st.className = 'statut ok'; st.textContent = '✓ Publié ! Les élèves verront les consignes d’ici une minute (Ctrl + F5).'; })
+      .catch(function (e) { st.className = 'statut attente'; st.textContent = (e === 401 || e === 403 || e === 404) ? 'Le jeton est refusé (expiré ou sans droit « Contents »). Utilise le copier-coller ci-dessous.' : 'Publication impossible (connexion ?). Utilise le copier-coller ci-dessous.'; copierColler(json); });
+  }
+  function copierColler(json) {
     var ta = document.getElementById('c-json'); ta.value = json;
     document.getElementById('c-etapes').hidden = false;
     var copie = function () { ta.focus(); ta.select(); try { document.execCommand('copy'); } catch (e) {} };
     if (navigator.clipboard) navigator.clipboard.writeText(json).catch(copie); else copie();
+  }
+  document.getElementById('c-jeton-ok').addEventListener('click', function () {
+    var v = document.getElementById('c-jeton').value.trim(), m = document.getElementById('c-jeton-msg');
+    if (!v) { m.textContent = 'Colle d’abord le jeton.'; return; }
+    try { localStorage.setItem('s1-jeton', v); } catch (e) {}
+    document.getElementById('c-jeton').value = ''; m.textContent = 'Jeton enregistré sur cet ordinateur ✓';
+  });
+  document.getElementById('c-jeton-oubli').addEventListener('click', function () { try { localStorage.removeItem('s1-jeton'); } catch (e) {} document.getElementById('c-jeton-msg').textContent = 'Jeton effacé.'; });
+  document.getElementById('c-publier').addEventListener('click', function () {
+    sauverBrouillon();
+    var json = JSON.stringify(propre(brouillon), null, 2) + '\n';
+    if (jeton()) { document.getElementById('c-etapes').hidden = true; publierDirect(json); return; }
+    copierColler(json);
   });
   /* mode prof : roue dentée + code */
   function majProf() {
     document.getElementById('prof').hidden = !prof;
     try { localStorage.setItem('s1-prof', prof ? '1' : '0'); } catch (e) {}
-    if (prof) remplirEditeur();
-    afficher();
+    if (prof) { remplirEditeur(); document.getElementById('c-jeton-msg').textContent = jeton() ? 'Un jeton est enregistré ✓' : ''; }
+    afficher(); majStatut();
   }
   document.getElementById('roue').addEventListener('click', function () {
     if (prof) { document.getElementById('prof').scrollIntoView({ behavior: 'smooth' }); return; }
