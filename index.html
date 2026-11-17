@@ -36,7 +36,13 @@ a { color: inherit; }
 .bandeau { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 12px; background: var(--violet); color: #FFFFFF;
   font: 600 14px var(--f-titre); letter-spacing: .08em; text-transform: uppercase; flex-wrap: wrap; }
 .bandeau .sep { width: 2px; height: 18px; background: currentColor; opacity: .45; }
-.bandeau .octet { margin-left: auto; display: flex; gap: 5px; }
+.actualiser { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font: 700 13px var(--f-titre); letter-spacing: .04em; text-transform: none; background: transparent; color: #FFFFFF; border: 2px solid rgba(255,255,255,.6); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.actualiser:hover, .actualiser:focus-visible { background: #FFFFFF; color: var(--violet); }
+.actualiser svg { width: 15px; height: 15px; }
+.actualiser.tourne svg { animation: tourne .8s linear infinite; }
+@keyframes tourne { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .actualiser.tourne svg { animation: none; } }
+.bandeau .octet { margin-left: 6px; display: flex; gap: 5px; }
 .bandeau .octet i { width: 13px; height: 13px; border: 2px solid var(--neon); border-radius: 3px; }
 .bandeau .octet i.on { background: var(--neon); }
 
@@ -158,6 +164,7 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
 <div class="page">
 
   <div class="bandeau"><span>Formation numérique</span><span class="sep"></span><span>1re secondaire</span>
+    <button type="button" class="actualiser" id="actualiser" title="Afficher les derniers documents ajoutés"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg>Actualiser</button>
     <span class="octet" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></span></div>
 
   <header class="titre">
@@ -273,6 +280,19 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
 </div>
 
 <script>
+(function () {
+  /* Actualiser : recharge la page en contournant le cache, et transmet la même « version » aux documents liés */
+  var v = new URLSearchParams(location.search).get('v');
+  if (v) document.querySelectorAll('a[href]').forEach(function (a) {
+    var h = a.getAttribute('href');
+    if (/^(https?:|mailto:|#)/.test(h)) return;
+    a.setAttribute('href', h + (h.indexOf('?') < 0 ? '?' : '&') + 'v=' + encodeURIComponent(v));
+  });
+  document.getElementById('actualiser').addEventListener('click', function () {
+    this.classList.add('tourne');
+    location.replace(location.pathname + '?v=' + Date.now().toString(36) + location.hash);
+  });
+})();
 (function () {
   var champs = document.querySelectorAll('.champ');
   function compter() {
