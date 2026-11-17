@@ -12,6 +12,7 @@ Page d'accueil pour les élèves : `index.html` (publiée avec GitHub Pages).
 | `pixel/` | `du-pixel-a-l-octet.html` | Présentation interactive : pixel, bitmap, octet, poids d'une image |
 | `pixel/` | `pixel-quest.html` | Pixel Quest : 8 niveaux d'exercices interactifs à faire en autonomie |
 | `monument/` | `mon-monument-en-diapos.pdf` | Travail commun avec la FHGES : recherche sur un monument antique et présentation Canva (consignes, fiche de recherche, exemples de diapos, grille d'évaluation, 5 pages A4) |
+| `gta/` | `index.html` | GTA · Gère. Traque. Agis. : parcours interactif de missions (±90 min) autour de la sortie de GTA VI : stockage, faux sites, rumeurs, compte piraté. Guide enseignant dans `gta/README.md` |
 
 Chaque ressource est un fichier autonome : il s'ouvre dans n'importe quel navigateur, sans installation.
 
