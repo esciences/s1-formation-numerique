@@ -178,7 +178,7 @@
       <section class="title-screen">
         ${V.titleScene()}
         <div class="title-inner">
-          <div class="t-kicker"><span></span>${esc(D.meta.course)}<span></span></div>
+          <div class="t-kicker"><span></span><b style="text-transform:none">eSCIENCES</b> · ${esc(D.meta.course)}<span></span></div>
           <h1 class="t-logo" aria-label="GTA : Gère. Traque. Agis."><span class="tl-vice">GTA</span><span class="tl-check">${D.meta.verbs.map((v) => `<b>${esc(v.word)}.</b>`).join("")}</span></h1>
           <p class="t-pitch">${esc(D.meta.pitch)}</p>
           <ul class="t-verbs">${D.meta.verbs.map((v) => `<li><span class="tv-l" aria-hidden="true">${v.id}</span><span><b>${esc(v.word)}</b> ${esc(v.text)}</span></li>`).join("")}</ul>
@@ -190,7 +190,7 @@
           <div class="t-meta"><span>⏱ ${esc(D.meta.duration)}</span><span>👥 seul·e ou à 2-3</span><span>💾 progression gardée sur cet ordinateur</span></div>
           <div class="t-links"><button class="link" id="t-teacher">Espace enseignant</button><button class="link" id="t-settings">Accessibilité</button></div>
         </div>
-        <p class="t-legal">Parcours pédagogique non officiel, sans lien avec Rockstar Games. Aucune image du jeu : illustrations originales. Le jeu est classé PEGI 18 : on ne joue pas, on enquête.</p>
+        <p class="t-legal">Une ressource eSCIENCES. Parcours pédagogique non officiel, sans lien avec Rockstar Games. Aucune image du jeu : illustrations originales. Le jeu est classé PEGI 18 : on ne joue pas, on enquête.</p>
       </section>`;
     const st = $("#t-start"), ct = $("#t-continue"), nw = $("#t-new");
     if (st) st.addEventListener("click", () => startMission("m0"));
@@ -376,7 +376,8 @@
           step.notion ? `<button class="btn ghost sm fb-notion">📖 Revoir la notion</button>` : "");
         save();
       },
-      info(html) { ctx.feedback("info", html); },
+      // Une fois l'exercice réussi, une info (ex. clic sur un leurre) garde le bouton « Continuer ».
+      info(html) { ctx.feedback("info", html, ctx.solved ? `<button class="btn primary fb-next">Continuer ➜</button>` : ""); },
     };
     const sk = S.skills[step.skill];
     const hintBtn = $('[data-x="hint"]', root);
@@ -722,7 +723,7 @@
           ${gauge("🎮 Console de Sam", kept, step.capacity, { segments: segs, marker: ((step.capacity - step.need) / step.capacity) * 100,
             foot: `<div class="g-foot ${ok ? "ok" : ""}"><span>Libre : <b>${num(free)} Go</b></span><span>Besoin : <b>${step.need} Go</b> <span class="tag t-off">OFFICIEL</span></span><span>${ok ? "✔ assez de place" : "✘ pas assez"}</span></div>` })}
           <div class="g-legend"><span><i class="seg-system"></i>système</span><span><i class="seg-game"></i>jeux</span><span><i class="seg-media"></i>photos, vidéos</span><span><i class="seg-app"></i>applis</span><span class="g-mk">▏zone à libérer</span></div>
-          <div class="g-two">${gauge("💽 Disque externe", sum("ext"), step.destinations.ext.capacity)}${gauge("☁️ Cloud gratuit", sum("cloud"), step.destinations.cloud.capacity)}</div>
+          <div class="g-two">${gauge("💽 Disque dur externe", sum("ext"), step.destinations.ext.capacity)}${gauge("☁️ Cloud gratuit", sum("cloud"), step.destinations.cloud.capacity)}</div>
         </div>
         <div class="sp-table" role="table" aria-label="Contenu de la console">
           <div class="sp-row sp-headrow" role="row"><span role="columnheader">Élément</span><span role="columnheader">Taille</span><span role="columnheader">Que faire ?</span></div>

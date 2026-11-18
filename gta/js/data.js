@@ -76,7 +76,7 @@ window.VC = window.VC || {};
         id: "m0", code: "00", kind: "prologue",
         title: "Bienvenue à la Brigade",
         place: "QG de la Brigade · Vice City", time: "18:00", minutes: 5,
-        objective: "Découvrir ta mission, ton téléphone et les règles du jeu.",
+        objective: "Découvrir ta mission, ton smartphone et les règles du jeu.",
         skills: ["pegi"], reward: 200, badge: null,
         map: { x: 548, y: 300, icon: "★" },
         unlocks: ["m1"],
@@ -89,23 +89,23 @@ window.VC = window.VC || {};
             { from: "dee", text: "Salut, recrue 👋 Bienvenue à la Brigade numérique de Vice City." },
             { from: "dee", text: "Ce soir à minuit, le jeu le plus attendu de la décennie sort. Tout Leonida est surexcité." },
             { from: "dee", text: "Et les Requins du Net, un gang de cyber-escrocs, comptent bien en profiter 🦈" },
-            { from: "dee", text: "Ta mission : protéger la ville jusqu'à minuit. Je t'envoie tes ordres sur ce téléphone." },
+            { from: "dee", text: "Ta mission : protéger la ville jusqu'à minuit. Je t'envoie tes ordres sur ce smartphone." },
           ], cta: "C'est parti" },
           { type: "learn", id: "n-pegi", kicker: "Avant de commencer", title: "Un jeu qui n'est pas pour toi",
             slides: [
               { visual: "pegiLabel", html: `<p>Le jeu dont tout le monde parle est classé <strong>PEGI 18</strong>. PEGI est la signalétique européenne des jeux vidéo.</p>
                 <ul><li>Le <strong>chiffre</strong> donne l'âge conseillé : 3, 7, 12, 16 ou 18 ans.</li>
-                <li>Les <strong>pictogrammes</strong> expliquent pourquoi : violence, langage grossier, peur, achats en jeu…</li>
+                <li>Les <strong>pictogrammes</strong> expliquent pourquoi. Pour ce jeu : <strong>violence</strong>, <strong>sexe</strong>, <strong>drogues</strong> et <strong>achats en jeu</strong>.</li>
                 <li>Ce n'est <strong>pas une note de qualité</strong>.</li></ul>
                 <p class="callout">Ici, on n'y joue pas. On enquête sur tout ce qui se passe <strong>autour</strong> de sa sortie : téléchargements, arnaques, rumeurs, comptes piratés.</p>` },
-              { visual: "hudGuide", html: `<p>En haut de l'écran, ton <strong>HUD</strong> (l'affichage du jeu) :</p>
+              { visual: "hudGuide", html: `<p>En haut de l'écran, une <strong>barre d'infos</strong> te suit pendant tout le jeu. Dans les jeux vidéo, on l'appelle le <strong>HUD</strong>. Voici ce qu'elle affiche :</p>
                 <ul><li><strong>Étoiles de recherche</strong> : une erreur ajoute une étoile. Pas de panique : un indice ou une bonne correction en enlève une. Tu n'es <strong>jamais bloqué·e</strong>.</li>
                 <li><strong>Portefeuille</strong> : chaque mission réussie rapporte des dollars (fictifs, bien sûr).</li>
                 <li><strong>Horloge</strong> : l'heure avance à chaque mission. Minuit = sortie du jeu.</li>
                 <li><strong>Carnet</strong> 📖 : tu peux y relire toutes les notions découvertes.</li></ul>` },
             ] },
           { type: "choice", id: "c-pegi", skill: "pegi", notion: "n-pegi",
-            prompt: "Test du HUD. Que t'apprend l'étiquette « PEGI 18 » sur la boîte d'un jeu ?",
+            prompt: "Petit test pour voir ta barre d'infos en action. Que t'apprend l'étiquette « PEGI 18 » sur la boîte d'un jeu ?",
             tip: "Astuce : tu peux essayer une mauvaise réponse pour voir comment réagissent les étoiles.",
             options: [
               { id: "a", html: "Le jeu est conseillé à partir de 18 ans.", correct: true, fb: "Exact : c'est un âge conseillé, pour protéger les plus jeunes." },
@@ -130,7 +130,7 @@ window.VC = window.VC || {};
         map: { x: 372, y: 196, icon: "💾" },
         unlocks: ["m2", "mB"],
         recap: [
-          "1 octet = 8 bits. ko → Mo → Go → To : environ ×1 000 à chaque marche.",
+          "1 octet = 8 bits. ko → Mo → Go → To : ×1 000 à chaque marche.",
           "La mémoire vive (RAM) sert pendant l'utilisation et se vide à l'extinction. Le stockage garde les fichiers.",
           "Stockage interne, externe ou en ligne : je choisis l'espace adapté à chaque fichier.",
           "Avant de supprimer, je me demande si c'est irremplaçable. Si oui, je déplace au lieu de supprimer.",
@@ -149,8 +149,8 @@ window.VC = window.VC || {};
               { visual: "bitsToA", html: `<p>Un ordinateur ne connaît que deux états : <strong>0</strong> ou <strong>1</strong>. C'est un <strong>bit</strong>.</p>
                 <p>On regroupe <strong>8 bits</strong> pour former <strong>1 octet</strong>. Un octet suffit pour coder une lettre, comme « A ».</p>` },
               { visual: "unitLadder", html: `<p>Les fichiers sont énormes : on utilise donc des multiples de l'octet.</p>
-                <p class="callout">Chaque marche est environ <strong>1 000 fois</strong> plus grande que la précédente.</p>
-                <p class="small">Le savais-tu ? Les informaticiens comptent parfois par 1 024. C'est pour ça qu'un disque vendu « 1 To » affiche environ 931 Go. Ici, on compte par 1 000.</p>` },
+                <p class="callout">Chaque marche est <strong>1 000 fois</strong> plus grande que la précédente.</p>
+                <p class="small">Le savais-tu ? Les ordinateurs calculent avec des 0 et des 1 : ils préfèrent donc compter par <strong>1 024</strong> (2 × 2 × 2… dix fois) plutôt que par 1 000. Le fabricant d'un disque « 1 To » compte par 1 000 : 1 000 000 000 000 octets. La console, elle, divise par 1 024 à chaque marche : elle affiche donc environ <strong>931 Go</strong>. Rien n'a disparu, c'est juste une autre façon de compter ! Dans ce jeu, on compte toujours par 1 000.</p>` },
               { visual: "unitCompare", html: `<p>Pour comparer deux tailles, <strong>ramène-les à la même unité</strong>.</p>
                 <ul><li>1,2 Go = 1 200 Mo, donc <strong>plus</strong> que 950 Mo.</li>
                 <li>900 ko, c'est <strong>moins</strong> que 1 Mo.</li></ul>
@@ -160,19 +160,19 @@ window.VC = window.VC || {};
           { type: "order", id: "o-sizes", skill: "unites", notion: "n-units",
             prompt: "Range ces fichiers du plus léger (en haut) au plus lourd (en bas).",
             items: [
-              { id: "clip",  html: "🎬 Clip de but en 4K <b>· 1,2 Go</b>" },
+              { id: "clip",  html: "🎬 Film de vacances en 4K <b>· 1,2 Go</b>" },
               { id: "vocal", html: "🎙️ Message vocal de Sam <b>· 900 ko</b>" },
               { id: "game",  html: "🎮 Le jeu, préchargement <b>· 212 Go</b>", tag: "officiel" },
               { id: "patch", html: "🩹 Mise à jour d'une appli <b>· 950 Mo</b>" },
-              { id: "disk",  html: "💽 Disque externe vide <b>· 1 To</b>" },
+              { id: "disk",  html: "💽 Disque dur externe (USB) vide <b>· 1,5 To</b>" },
               { id: "photo", html: "📸 Photo de vacances <b>· 3 Mo</b>" },
             ],
             rules: [
               { before: "vocal", after: "photo", msg: "900 ko, c'est moins que 1 Mo : le message vocal est plus léger que la photo de 3 Mo." },
               { before: "photo", after: "patch", msg: "3 Mo, c'est beaucoup moins que 950 Mo." },
-              { before: "patch", after: "clip",  msg: "Piège ! 1,2 Go = 1 200 Mo. La mise à jour de 950 Mo est donc plus légère que le clip." },
+              { before: "patch", after: "clip",  msg: "Piège ! 1,2 Go = 1 200 Mo. La mise à jour de 950 Mo est donc plus légère que le film." },
               { before: "clip",  after: "game",  msg: "1,2 Go, c'est bien moins que 212 Go." },
-              { before: "game",  after: "disk",  msg: "1 To = 1 000 Go : le disque vide peut contenir plus que les 212 Go du jeu." },
+              { before: "game",  after: "disk",  msg: "1,5 To = 1 500 Go : le disque dur externe peut contenir bien plus que les 212 Go du jeu." },
             ],
             hints: ["Commence par repérer l'unité de chaque fichier : ko, Mo, Go ou To.", "Compare 950 Mo et 1,2 Go : convertis 1,2 Go en Mo (× 1 000)."],
             success: "Tu as comparé des tailles exprimées dans des unités différentes. C'est exactement ce qu'il faut faire avant de télécharger." },
@@ -184,9 +184,9 @@ window.VC = window.VC || {};
                 <li>La <strong>mémoire vive (RAM)</strong>, c'est le <strong>plan de travail</strong> : on y pose seulement ce qu'on utilise maintenant. Plus il est grand, plus on peut faire de choses en même temps.</li></ul>
                 <p class="callout">Quand on lance le jeu, une partie est copiée du stockage vers la RAM. Quand on éteint, la RAM se vide.</p>` },
               { visual: "storageTypes", html: `<p>Il existe plusieurs <strong>espaces de stockage</strong> :</p>
-                <ul><li><strong>Interne</strong> : dans l'appareil (le SSD de la console). C'est là qu'un jeu doit être installé pour être joué.</li>
-                <li><strong>Externe</strong> : un support qu'on branche (disque dur USB, clé USB).</li>
-                <li><strong>En ligne (cloud)</strong> : sur les serveurs d'une entreprise, accessible avec Internet. Souvent limité en place.</li></ul>
+                <ul><li><strong>Interne</strong> : dans l'appareil (le SSD de la console). Un <strong>SSD</strong> est un stockage sans pièce qui bouge, fait de puces électroniques : il est beaucoup plus rapide qu'un disque dur classique. C'est là qu'un jeu doit être installé pour être joué.</li>
+                <li><strong>Externe</strong> : un support qu'on branche (disque dur externe, clé USB).</li>
+                <li><strong>En ligne (cloud)</strong> : sur les serveurs d'une entreprise, accessible avec Internet (par exemple Google Drive). Souvent limité en place.</li></ul>
                 <p class="callout">Bien organiser ses données, c'est choisir l'espace <strong>adapté</strong> à chaque fichier.</p>` },
             ] },
 
@@ -204,7 +204,7 @@ window.VC = window.VC || {};
               { id: "i4", html: "Le SSD de 1 To vissé à l'intérieur de la console.", bin: "int", fb: "Il est à l'intérieur de l'appareil : c'est du stockage interne." },
               { id: "i5", html: "L'endroit où le jeu doit être installé pour qu'on puisse y jouer.", bin: "int", fb: "Pour être joué, le jeu doit être installé dans le stockage interne de la console." },
               { id: "i6", html: "Une clé USB de 64 Go pour transporter ton exposé.", bin: "ext", fb: "On la branche et on l'emporte : stockage externe." },
-              { id: "i7", html: "Un espace en ligne, accessible avec Internet.", bin: "ext", fb: "C'est le cloud : un stockage en ligne, en dehors de ton appareil." },
+              { id: "i7", html: "Un espace en ligne, accessible avec Internet.", bin: "ext", fb: "C'est le cloud (comme Google Drive) : un stockage en ligne, en dehors de ton appareil." },
               { id: "i8", html: "Un disque dur USB pour archiver des vidéos.", bin: "ext", fb: "Il se branche de l'extérieur : stockage externe." },
             ],
             hints: ["Pose-toi la question : est-ce que ça se vide à l'extinction ? Si oui, c'est la RAM.", "Interne = dans l'appareil. Externe ou en ligne = en dehors (branché ou via Internet)."],
@@ -212,22 +212,22 @@ window.VC = window.VC || {};
 
           { type: "space", id: "sp-sam", skill: "stockage", notion: "n-memory",
             prompt: "Libère au moins 212 Go sur la console de Sam. Pour chaque élément, choisis : garder, déplacer ou supprimer.",
-            brief: { from: "sam", text: "Je joue au foot tous les week-ends et je suis au milieu du jeu d'aventure. Je tiens à mes vidéos de buts et aux photos avec mamie. Le jeu de course, j'y ai plus touché depuis un an. La démo, jamais lancée." },
+            brief: { from: "sam", text: "Sur ma console, je joue à Goal Rush 26 tous les week-ends et je suis au milieu des Ombres d'Eldoria. Je tiens aux vidéos de mes lives sur Skydrop Royale et aux photos avec mamie. Turbo Drift, j'y ai plus touché depuis un an. La démo de Galaxy Critters, jamais lancée." },
             capacity: 500, need: 212,
             destinations: {
               keep:  { label: "Garder", icon: "🎮" },
-              ext:   { label: "Disque externe", icon: "💽", capacity: 1000 },
+              ext:   { label: "Disque dur externe", icon: "💽", capacity: 1000 },
               cloud: { label: "Cloud", icon: "☁️", capacity: 50 },
               del:   { label: "Supprimer", icon: "🗑️" },
             },
             items: [
               { id: "sys",     name: "Système de la console", icon: "⚙️", size: 50,   unit: "Go", kind: "system" },
-              { id: "foot",    name: "Jeu de foot (joué chaque week-end)", icon: "⚽", size: 110, unit: "Go", kind: "game", tag: "playing" },
-              { id: "aventure",name: "Jeu d'aventure (en cours, chapitre 6)", icon: "🗺️", size: 85, unit: "Go", kind: "game", tag: "playing" },
-              { id: "course",  name: "Jeu de course (plus lancé depuis 1 an)", icon: "🏎️", size: 95, unit: "Go", kind: "game" },
-              { id: "buts",    name: "Vidéos 4K de ses meilleurs buts", icon: "🎬", size: 60000, unit: "Mo", kind: "media", tag: "irreplaceable" },
+              { id: "foot",    name: "Goal Rush 26, jeu de foot (joué chaque week-end)", icon: "⚽", size: 110, unit: "Go", kind: "game", tag: "playing" },
+              { id: "aventure",name: "Les Ombres d'Eldoria, jeu d'aventure (en cours, chapitre 6)", icon: "🗺️", size: 85, unit: "Go", kind: "game", tag: "playing" },
+              { id: "course",  name: "Turbo Drift, jeu de course (plus lancé depuis 1 an)", icon: "🏎️", size: 95, unit: "Go", kind: "game" },
+              { id: "buts",    name: "Vidéos 4K de ses lives sur Skydrop Royale", icon: "🎬", size: 60000, unit: "Mo", kind: "media", tag: "irreplaceable" },
               { id: "photos",  name: "Photos de vacances avec mamie", icon: "📸", size: 8000, unit: "Mo", kind: "media", tag: "irreplaceable" },
-              { id: "demo",    name: "Démo jamais lancée", icon: "🧪", size: 22, unit: "Go", kind: "game" },
+              { id: "demo",    name: "Démo de Galaxy Critters (jamais lancée)", icon: "🧪", size: 22, unit: "Go", kind: "game" },
               { id: "appli",   name: "Appli de streaming vidéo", icon: "📺", size: 2, unit: "Go", kind: "app" },
               { id: "captures",name: "Captures d'écran de parties", icon: "🖼️", size: 1500, unit: "Mo", kind: "media" },
             ],
@@ -235,7 +235,7 @@ window.VC = window.VC || {};
               system: "Le système fait fonctionner la console : impossible de le déplacer ou de le supprimer.",
               irreplaceable_del: "« {name} » : c'est irremplaçable ! Une fois supprimé, c'est perdu pour toujours. Déplace-le plutôt vers un stockage externe ou en ligne.",
               playing_del: "« {name} » : Sam y joue encore ! Le supprimer l'obligerait à tout retélécharger. Cherche de la place ailleurs.",
-              game_cloud: "« {name} » : un jeu ne se range pas dans un cloud de photos et de documents. Pour l'archiver, utilise le disque externe.",
+              game_cloud: "« {name} » : un jeu ne se range pas dans un cloud de photos et de documents. Pour l'archiver, utilise le disque dur externe.",
               cloud_full: "Le cloud gratuit n'offre que 50 Go et tu y as mis {used} Go. Choisis un autre espace pour certains fichiers.",
               not_enough: "Il manque encore {missing} Go : l'espace libre est de {free} Go, il en faut au moins 212.",
               playing_move: "« {name} » déplacé : c'est possible, mais Sam devra le recopier sur la console pour y rejouer.",
@@ -243,22 +243,22 @@ window.VC = window.VC || {};
             hints: [
               "Commence par ce que Sam n'utilise plus du tout : il peut le supprimer sans regret (un jeu acheté peut être retéléchargé).",
               "Ce qui est irremplaçable (photos, vidéos personnelles) ne se supprime pas : on le déplace.",
-              "Le cloud gratuit est petit (50 Go) : les grosses vidéos iront plutôt sur le disque externe.",
+              "Le cloud gratuit est petit (50 Go) : les grosses vidéos iront plutôt sur le disque dur externe.",
             ],
-            solutionText: "Une solution : supprimer le jeu de course (95 Go) et la démo (22 Go), déplacer les vidéos de buts (60 Go) sur le disque externe et les photos (8 Go) dans le cloud. Espace libre : 251,5 Go.",
+            solutionText: "Une solution : supprimer Turbo Drift (95 Go) et la démo de Galaxy Critters (22 Go), déplacer les vidéos des lives (60 Go) sur le disque dur externe et les photos (8 Go) dans le cloud. Espace libre : 251,5 Go.",
             success: "Il y a plusieurs bonnes solutions : la tienne en est une ! Tu as choisi un espace adapté à chaque fichier, sans rien perdre d'important." },
 
           { type: "choice", id: "c-config", skill: "memoire", notion: "n-memory",
-            prompt: "Le grand frère de Sam choisit un PC portable. Le jeu qu'il veut (exemple fictif) demande <b>16 Go de mémoire vive</b> minimum et <b>150 Go d'espace libre</b>. Quel PC convient ?",
+            prompt: "Le grand frère de Sam choisit un PC portable. Le jeu qu'il veut (exemple fictif) demande au minimum : un <b>processeur à 6 cœurs</b>, <b>16 Go de mémoire vive</b> et <b>150 Go d'espace libre</b>. Quel PC convient ?<br><span class='small'>Le processeur, c'est le « cerveau » qui fait les calculs. Plus il a de cœurs, plus il peut faire de calculs en même temps.</span>",
             layout: "cards",
             options: [
-              { id: "a", html: V.spec("PC Néon", [["Mémoire vive", "32 Go"], ["Stockage", "SSD 128 Go"]]), fb: "Beaucoup de RAM… mais 128 Go de stockage : le jeu (150 Go) ne rentre même pas !" },
-              { id: "b", html: V.spec("PC Palmier", [["Mémoire vive", "16 Go"], ["Stockage", "SSD 1 To"]]), correct: true, fb: "16 Go de RAM (le minimum demandé) et 1 To de stockage : largement assez." },
-              { id: "c", html: V.spec("PC Océan", [["Mémoire vive", "8 Go"], ["Stockage", "HDD 2 To"]]), fb: "Énorme stockage, mais seulement 8 Go de RAM : moins que les 16 Go demandés. Ne confonds pas les deux mémoires !" },
-              { id: "d", html: V.spec("PC Flamant", [["Mémoire vive", "16 Go"], ["Stockage", "SSD 256 Go, dont 200 Go déjà occupés"]]), fb: "256 − 200 = 56 Go libres seulement. Il en faut 150." },
+              { id: "a", html: V.spec("PC Néon", [["Processeur", "4 cœurs"], ["Mémoire vive", "32 Go"], ["Stockage", "SSD 1 To"]]), fb: "Beaucoup de RAM et de stockage… mais un processeur à 4 cœurs seulement : il en faut au moins 6." },
+              { id: "b", html: V.spec("PC Palmier", [["Processeur", "8 cœurs"], ["Mémoire vive", "16 Go"], ["Stockage", "SSD 1 To"]]), correct: true, fb: "8 cœurs (plus que les 6 demandés), 16 Go de RAM (le minimum demandé) et 1 To de stockage : tout est bon." },
+              { id: "c", html: V.spec("PC Océan", [["Processeur", "6 cœurs"], ["Mémoire vive", "8 Go"], ["Stockage", "HDD 2 To"]]), fb: "Énorme stockage, mais seulement 8 Go de RAM : moins que les 16 Go demandés. Ne confonds pas les deux mémoires !" },
+              { id: "d", html: V.spec("PC Flamant", [["Processeur", "6 cœurs"], ["Mémoire vive", "16 Go"], ["Stockage", "SSD 256 Go, dont 200 Go déjà occupés"]]), fb: "256 − 200 = 56 Go libres seulement. Il en faut 150." },
             ],
-            hints: ["Vérifie les DEUX conditions : la RAM ET l'espace libre.", "Attention au PC Flamant : calcule l'espace qui reste vraiment libre."],
-            success: "Tu as vérifié deux caractéristiques différentes sans les confondre : la mémoire vive et l'espace de stockage." },
+            hints: ["Vérifie les TROIS conditions : le processeur, la RAM ET l'espace libre.", "Attention au PC Flamant : calcule l'espace qui reste vraiment libre."],
+            success: "Tu as vérifié trois caractéristiques différentes sans les confondre : le processeur, la mémoire vive et l'espace de stockage." },
         ],
       },
 
@@ -612,7 +612,7 @@ window.VC = window.VC || {};
             success: "Le propriétaire est day1-patch.net : ce n'est pas l'éditeur. Cadenas 3 ouvert !" },
 
           { type: "choice", id: "L4", lock: 4, skill: "pegi", notion: "n-pegi",
-            prompt: `La boîte du jeu de foot de Sam affiche cette signalétique. <b>Que signifie-t-elle ?</b>${V.pegiMini(3, ["💳 Achats en jeu"])}`,
+            prompt: `La boîte de Goal Rush 26, le jeu de foot de Sam, affiche cette signalétique. <b>Que signifie-t-elle ?</b>${V.pegiMini(3, ["💳 Achats en jeu"])}`,
             options: [
               { id: "a", html: "Le jeu convient dès 3 ans, mais il propose des achats avec de l'argent réel.", correct: true, fb: "Bien décodé : l'âge ET le pictogramme." },
               { id: "b", html: "Le jeu est gratuit.", fb: "Le pictogramme indique des achats possibles, pas la gratuité." },
@@ -649,6 +649,7 @@ window.VC = window.VC || {};
         unlocks: [],
         recap: [
           "Le débit se donne en Mbit/s. Pour obtenir des Mo par seconde, on divise par 8.",
+          "Règle de trois : je ramène d'abord à 1 (par exemple 1 seconde), puis je multiplie.",
           "212 Go à 100 Mbit/s : environ 4 h 43. D'où l'intérêt du préchargement !",
         ],
         steps: [
@@ -657,14 +658,15 @@ window.VC = window.VC || {};
               { visual: "debitVisual", html: `<p>La vitesse d'une connexion (le <strong>débit</strong>) se donne en <strong>Mbit/s</strong> : mégabits par seconde.</p>
                 <p>Or les fichiers se mesurent en <strong>octets</strong>. Et 1 octet = 8 bits.</p>
                 <p class="callout">Mbit/s ÷ 8 = Mo/s<br>Exemple : 80 Mbit/s ÷ 8 = 10 Mo par seconde.</p>
-                <p>Temps = taille (en Mo) ÷ vitesse (en Mo/s).</p>` },
+                <p>Temps = taille (en Mo) ÷ vitesse (en Mo/s).</p>
+                <p class="callout">La règle de trois : on passe toujours par <strong>1</strong>.<br>40 Mo en 4 secondes → en 1 seconde : 40 ÷ 4 = 10 Mo → en 60 secondes : 10 × 60 = 600 Mo.</p>` },
             ] },
           { type: "input", id: "d1", skill: "debit", notion: "n-debit",
-            prompt: "La connexion de Sam affiche <b>100 Mbit/s</b>. <b>Combien de Mo arrivent chaque seconde ?</b>",
+            prompt: "Pendant le téléchargement, la console de Sam affiche : « <b>750 Mo reçus en 1 minute</b> ». <b>Combien de Mo arrivent chaque seconde ?</b>",
             fields: [{ id: "x", label: "Vitesse", suffix: "Mo/s", kind: "number", value: 12.5, tol: 0.001 }],
-            wrong: { 100: "100, ce sont des mégabits. Il faut diviser par 8 pour avoir des mégaoctets.", 800: "Tu as multiplié par 8 : il faut diviser." },
-            hints: ["Mbit/s ÷ 8 = Mo/s."],
-            success: "100 ÷ 8 = 12,5 Mo/s." },
+            wrong: { 750: "750 Mo, c'est pour 1 minute entière. Ramène à 1 seconde : 1 minute = 60 secondes.", 45000: "Tu as multiplié par 60 : pour passer à 1 seconde, il faut diviser.", 75: "Attention : 1 minute = 60 secondes, pas 10." },
+            hints: ["1 minute = 60 secondes.", "60 secondes → 750 Mo. Donc 1 seconde → 750 ÷ 60."],
+            success: "750 ÷ 60 = 12,5 Mo/s. C'est exactement ce que donne une connexion de 100 Mbit/s (100 ÷ 8 = 12,5) !" },
           { type: "input", id: "d2", skill: "debit", notion: "n-debit",
             prompt: "À 12,5 Mo/s, combien de temps faut-il pour télécharger <b>212 Go</b> (212 000 Mo) ? <span class='small'>Réponds en heures et minutes, par exemple <code>3h20</code>.</span>",
             fields: [{ id: "x", label: "Durée", kind: "duration", seconds: 16960, tol: 180, placeholder: "ex. 3h20" }],

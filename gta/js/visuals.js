@@ -121,9 +121,9 @@ window.VC = window.VC || {};
 
   vis.pegiLabel = () => `<div class="vis-pegi">
       <div class="vp-label"><div class="vp-age"><b>18</b><span>ÂGE CONSEILLÉ</span></div></div>
-      <div class="vp-pics">${[["👊", "Violence"], ["🤬", "Langage grossier"], ["😱", "Peur"], ["💊", "Drogues"], ["🔞", "Sexe"], ["🎲", "Jeux de hasard"], ["⚖️", "Discrimination"], ["💳", "Achats en jeu"]]
-        .map(([i, t]) => `<div class="vp-pic"><span aria-hidden="true">${i}</span>${t}</div>`).join("")}</div>
-      <small>Âges possibles : 3 · 7 · 12 · 16 · 18. Illustration simplifiée.</small></div>`;
+      <div class="vp-pics">${[["👊", "Violence", 1], ["⚥", "Sexe", 1], ["💉", "Drogues", 1], ["💳", "Achats en jeu", 1], ["🤬", "Langage grossier"], ["😱", "Peur"], ["🎲", "Jeux de hasard"], ["⚖️", "Discrimination"]]
+        .map(([i, t, on]) => `<div class="vp-pic${on ? " on" : " off"}"><span aria-hidden="true">${i}</span>${t}</div>`).join("")}</div>
+      <small>Signalétique PEGI de GTA VI : 18 ans + violence, sexe, drogues et achats en jeu. Les pictogrammes grisés ne concernent pas ce jeu. Âges possibles : 3 · 7 · 12 · 16 · 18.</small></div>`;
 
   vis.hudGuide = () => `<div class="vis-hud">
       <div class="vh-bar"><span class="vh-clock">🕖 19:00</span><span class="vh-money">$ 1 500</span><span class="vh-stars"><i class="on">★</i><i class="on">★</i><i>★</i><i>★</i><i>★</i></span></div>
@@ -140,7 +140,7 @@ window.VC = window.VC || {};
 
   vis.unitCompare = () => `<div class="vis-compare">
       <div class="vc-row"><span>Mise à jour</span><div class="vc-bar" style="--w:47.5%">950 Mo</div></div>
-      <div class="vc-row"><span>Clip 4K</span><div class="vc-bar hot" style="--w:60%">1,2 Go = 1 200 Mo</div></div>
+      <div class="vc-row"><span>Vidéo 4K</span><div class="vc-bar hot" style="--w:60%">1,2 Go = 1 200 Mo</div></div>
       <div class="vc-row"><span>1 Go</span><div class="vc-bar ref" style="--w:50%">1 000 Mo</div></div></div>`;
 
   vis.ramVsStorage = () => `<svg class="vis-svg" viewBox="0 0 460 260" role="img" aria-label="Schéma : armoires = stockage, plan de travail = mémoire vive">
@@ -159,9 +159,9 @@ window.VC = window.VC || {};
       <text x="370" y="60" text-anchor="middle" class="vs-s">⏻ éteint = plan vidé</text></svg>`;
 
   vis.storageTypes = () => `<div class="vis-tiles">
-      <div class="vt"><span class="vt-i">🎮</span><b>Interne</b><small>SSD dans la console</small></div>
-      <div class="vt"><span class="vt-i">💽</span><b>Externe</b><small>disque ou clé USB</small></div>
-      <div class="vt"><span class="vt-i">☁️</span><b>En ligne</b><small>cloud, avec Internet</small></div></div>`;
+      <div class="vt"><span class="vt-i">🎮</span><b>Interne</b><small>SSD dans la console (stockage rapide, sans pièce qui bouge)</small></div>
+      <div class="vt"><span class="vt-i">💽</span><b>Externe</b><small>disque dur externe ou clé USB</small></div>
+      <div class="vt"><span class="vt-i">☁️</span><b>En ligne</b><small>cloud, avec Internet (ex. Google Drive)</small></div></div>`;
 
   vis.urlAnatomy = () => `<div class="vis-url"><div class="vu-line">
       <span class="vu p">https://</span><span class="vu s">store.</span><span class="vu d">rockstargames.com</span><span class="vu c">/fr/VI</span></div>
@@ -199,7 +199,7 @@ window.VC = window.VC || {};
       <div class="vtr-fix">🧹 Se déconnecter · effacer les données · navigation privée</div></div>`;
 
   vis.lockVisual = () => `<div class="vis-lock"><div class="vlk-pass"><small>Phrase de passe</small><code>Palmier-Néon-Tortue-Saxo!7</code><div class="vlk-meter"><i></i></div></div>
-      <div class="vlk-phone"><small>Double authentification</small><div class="vlk-code">482 913</div><span>code reçu sur ton téléphone</span></div></div>`;
+      <div class="vlk-phone"><small>Double authentification</small><div class="vlk-code">482 913</div><span>code reçu sur ton smartphone</span></div></div>`;
 
   vis.debitVisual = () => `<div class="vis-debit"><div class="vd-pipe"><span>100 Mbit/s</span></div><div class="vd-op">÷ 8</div><div class="vd-pipe out"><span>12,5 Mo/s</span></div></div>`;
 
