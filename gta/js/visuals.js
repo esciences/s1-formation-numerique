@@ -121,9 +121,9 @@ window.VC = window.VC || {};
 
   vis.pegiLabel = () => `<div class="vis-pegi">
       <div class="vp-label"><div class="vp-age"><b>18</b><span>ÂGE CONSEILLÉ</span></div></div>
-      <div class="vp-pics">${[["👊", "Violence", 1], ["⚥", "Sexe", 1], ["💉", "Drogues", 1], ["💳", "Achats en jeu", 1], ["🤬", "Langage grossier"], ["😱", "Peur"], ["🎲", "Jeux de hasard"], ["⚖️", "Discrimination"]]
+      <div class="vp-pics">${[["👊", "Violence", 1], ["🗯️", "Langage grossier", 1], ["💉", "Drogues", 1], ["⚥", "Sexe", 1], ["💳", "Achats intégrés", 1], ["😱", "Peur"], ["🎲", "Jeux de hasard"], ["⚖️", "Discrimination"]]
         .map(([i, t, on]) => `<div class="vp-pic${on ? " on" : " off"}"><span aria-hidden="true">${i}</span>${t}</div>`).join("")}</div>
-      <small>Signalétique PEGI de GTA VI : 18 ans + violence, sexe, drogues et achats en jeu. Les pictogrammes grisés ne concernent pas ce jeu. Âges possibles : 3 · 7 · 12 · 16 · 18.</small></div>`;
+      <small>Signalétique PEGI de GTA VI : 18 ans + violence, langage grossier, drogues, sexe et achats intégrés. Les pictogrammes grisés ne concernent pas ce jeu. Âges possibles : 3 · 7 · 12 · 16 · 18.</small></div>`;
 
   vis.hudGuide = () => `<div class="vis-hud">
       <div class="vh-bar"><span class="vh-clock">🕖 19:00</span><span class="vh-money">$ 1 500</span><span class="vh-stars"><i class="on">★</i><i class="on">★</i><i>★</i><i>★</i><i>★</i></span></div>

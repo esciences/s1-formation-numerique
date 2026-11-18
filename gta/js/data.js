@@ -95,7 +95,7 @@ window.VC = window.VC || {};
             slides: [
               { visual: "pegiLabel", html: `<p>Le jeu dont tout le monde parle est classé <strong>PEGI 18</strong>. PEGI est la signalétique européenne des jeux vidéo.</p>
                 <ul><li>Le <strong>chiffre</strong> donne l'âge conseillé : 3, 7, 12, 16 ou 18 ans.</li>
-                <li>Les <strong>pictogrammes</strong> expliquent pourquoi. Pour ce jeu : <strong>violence</strong>, <strong>sexe</strong>, <strong>drogues</strong> et <strong>achats en jeu</strong>.</li>
+                <li>Les <strong>pictogrammes</strong> expliquent pourquoi. Pour ce jeu : <strong>violence</strong>, <strong>langage grossier</strong>, <strong>drogues</strong>, <strong>sexe</strong> et <strong>achats intégrés</strong>.</li>
                 <li>Ce n'est <strong>pas une note de qualité</strong>.</li></ul>
                 <p class="callout">Ici, on n'y joue pas. On enquête sur tout ce qui se passe <strong>autour</strong> de sa sortie : téléchargements, arnaques, rumeurs, comptes piratés.</p>` },
               { visual: "hudGuide", html: `<p>En haut de l'écran, une <strong>barre d'infos</strong> te suit pendant tout le jeu. Dans les jeux vidéo, on l'appelle le <strong>HUD</strong>. Voici ce qu'elle affiche :</p>
