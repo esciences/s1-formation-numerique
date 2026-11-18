@@ -56,7 +56,7 @@ Chaque mission contient une liste `steps`. Chaque étape a un `type` :
 | `branch` | scénario à embranchements | `nodes{ id: {scene, text, choices[{text, correct, fb, next}]}}` |
 | `toggles` | paramètres de confidentialité | `settings[{label, expect: true/false/null}]` (`null` = libre) |
 | `password` | atelier phrase de passe | `minLength`, `minWords`, `forbidden[]` |
-| `input` | calcul ou réponse tapée | `fields[{kind: number/text/duration, value, tol, accept[]}]`, `wrong{}` (messages pour erreurs typiques) |
+| `input` | calcul ou réponse tapée | `fields[{kind: number/text/duration/hours, value, tol, accept[]}]` (`hours` : heures à virgule, avec conversion en h et min affichée à côté), `wrong{}` (messages pour erreurs typiques) |
 
 Champs communs aux exercices : `prompt`, `skill` (compétence suivie dans le bilan), `notion` (fiche proposée en cas d'erreur), `hints[]` (indices progressifs), `success` (explication finale).
 

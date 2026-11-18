@@ -201,6 +201,8 @@ window.VC = window.VC || {};
   vis.lockVisual = () => `<div class="vis-lock"><div class="vlk-pass"><small>Phrase de passe</small><code>Palmier-Néon-Tortue-Saxo!7</code><div class="vlk-meter"><i></i></div></div>
       <div class="vlk-phone"><small>Double authentification</small><div class="vlk-code">482 913</div><span>code reçu sur ton smartphone</span></div></div>`;
 
+  vis.hoursVisual = () => `<div class="vis-debit"><div class="vd-pipe"><span>2,25 h</span></div><div class="vd-op">➜</div><div class="vd-pipe out"><span>2 h 15 min</span></div></div>`;
+
   vis.debitVisual = () => `<div class="vis-debit"><div class="vd-pipe"><span>100 Mbit/s</span></div><div class="vd-op">÷ 8</div><div class="vd-pipe out"><span>12,5 Mo/s</span></div></div>`;
 
   V.visual = (key) => (vis[key] ? vis[key]() : "");

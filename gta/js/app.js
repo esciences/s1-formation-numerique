@@ -309,6 +309,7 @@
           <div class="sb-obj"><span class="gps-i" aria-hidden="true">🧭</span><span><small>Objectif</small>${esc(m.objective)}</span></div>
           <div class="sb-dots" aria-label="Étape ${idx + 1} sur ${m.steps.length}">${dots}<span>Étape ${idx + 1}/${m.steps.length}</span></div>
         </div>
+        ${m.kind === "bonus" ? `<div class="sb-exit"><span>Mission facultative : tu peux la quitter quand tu veux, ta progression est gardée.</span><button class="btn ghost sm" data-act="map">↩ Retour aux missions principales</button></div>` : ""}
         <div class="step-body" id="step-body"></div>
       </section>`;
     const body = $("#step-body");
@@ -841,6 +842,18 @@
     if ((m = s.match(/^(\d+(?:\.\d+)?)$/))) return parseFloat(m[1]) >= 1000 ? parseFloat(m[1]) : "unit";
     return NaN;
   }
+  // Heures à virgule → décomposition écrite (ex. 4,71 h = 4 h + 0,71 × 60 min ≈ 4 h 43 min)
+  function hoursBreakdown(raw) {
+    const s = String(raw).replace(/\s/g, "").replace(".", ",");
+    if (!/^\d+(,\d+)?$/.test(s)) return `<p class="hc-help">Écris un nombre d'heures, par exemple <b>3,5</b>.<br>Ici, il sera converti en heures et minutes.</p>`;
+    const n = parseFloat(s.replace(",", ".")), h = Math.floor(n), decStr = s.includes(",") ? "0," + s.split(",")[1] : "0", dec = n - h;
+    let min = Math.round(dec * 60), hh = h; if (min === 60) { hh += 1; min = 0; }
+    const prod = num(dec * 60, 2), exact = Math.abs(dec * 60 - Math.round(dec * 60)) < 1e-9;
+    if (dec === 0) return `<p class="hc-res">${h} h = <b>${h} h 00 min</b></p>`;
+    return `<p>${s} h = ${h} h + ${decStr} h</p>
+      <p>${decStr} h = ${decStr} × 60 min = ${prod} min${exact ? "" : ` ≈ ${Math.round(dec * 60)} min`}</p>
+      <p class="hc-res">${s} h ${exact ? "=" : "≈"} <b>${hh} h ${String(min).padStart(2, "0")} min</b></p>`;
+  }
   const fmtDur = (sec) => `${Math.floor(sec / 3600)} h ${String(Math.round((sec % 3600) / 60)).padStart(2, "0")} min`;
   const normText = (v) => String(v).toLowerCase().trim().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/.*$/, "").replace(/\s/g, "");
   RENDER.input = (body, step, next) => {
@@ -864,6 +877,14 @@
             allOk = false;
             const sp = step.wrongText && Object.keys(step.wrongText).find((k) => normText(k) === t);
             msgs.push(sp ? step.wrongText[sp] : `« ${esc(raw)} » n'est pas le nom de domaine. Cherche le mot juste avant la première « / ».`);
+          } else if (f.kind === "hours") {
+            const n = /[a-z:]/i.test(raw) ? parseDuration(raw) / 3600 : parseNumber(raw);
+            if (isNaN(n)) { allOk = false; unitIssue = true; msgs.push("Écris un nombre d'heures avec une virgule, par exemple <code>3,5</code>."); return; }
+            if (Math.abs(n - f.value) <= (f.tol || 0)) return;
+            allOk = false;
+            if (Math.abs(n - f.value * 3600) <= f.value * 36) msgs.push(`${num(n, 2)}, ce sont des <b>secondes</b>. Pour avoir des heures : ÷ 3 600 (car 1 h = 60 × 60 s = 3 600 s).`);
+            else if (Math.abs(n - f.value * 60) <= f.value * 0.6) msgs.push(`${num(n, 2)}, ce sont des <b>minutes</b>. Pour avoir des heures : ÷ 60.`);
+            else msgs.push(`${num(n, 2)} h, ce n'est pas encore ça : ${n > f.value ? "c'est trop long" : "c'est trop court"}. Vérifie la division.`);
           } else if (f.kind === "duration") {
             const d = parseDuration(raw);
             if (d === "unit") { allOk = false; unitIssue = true; msgs.push("Précise l'unité, par exemple <code>4h20</code> ou <code>260 min</code>."); return; }
@@ -879,13 +900,15 @@
         ctx.fail(msgs.map((m) => `<span class="fb-line">✘ ${m}</span>`).join(""));
       },
       reveal() {
-        step.fields.forEach((f) => { $(`#in-${f.id}`, ctx.body).value = f.kind === "number" ? num(f.value, 3) : f.kind === "duration" ? fmtDur(f.seconds) : f.accept[0]; });
+        step.fields.forEach((f) => { $(`#in-${f.id}`, ctx.body).value = f.kind === "number" ? num(f.value, 3) : f.kind === "hours" ? num(f.value, 2) : f.kind === "duration" ? fmtDur(f.seconds) : f.accept[0]; });
+        $$("input", ctx.body).forEach((i) => i.dispatchEvent(new Event("input")));
         $$("input", ctx.body).forEach((i) => (i.disabled = true));
         return "";
       },
     });
     ctx.body.innerHTML = `<div class="inputs">${step.fields.map((f) => `<label class="in-f" for="in-${f.id}"><span>${esc(f.label)}</span>
-      <span class="in-w"><input id="in-${f.id}" type="text" inputmode="${f.kind === "number" ? "decimal" : "text"}" autocomplete="off" spellcheck="false" placeholder="${esc(f.placeholder || "ta réponse")}">${f.suffix ? `<em>${esc(f.suffix)}</em>` : ""}</span></label>`).join("")}</div>`;
+      <span class="in-w"><input id="in-${f.id}" type="text" inputmode="${f.kind === "number" || f.kind === "hours" ? "decimal" : "text"}" autocomplete="off" spellcheck="false" placeholder="${esc(f.placeholder || "ta réponse")}">${f.suffix ? `<em>${esc(f.suffix)}</em>` : ""}</span></label>${f.kind === "hours" ? `<div class="hours-conv" id="hc-${f.id}" aria-live="polite"><small>Conversion en heures et minutes</small><div class="hc-body">${hoursBreakdown("")}</div></div>` : ""}`).join("")}</div>`;
+    step.fields.filter((f) => f.kind === "hours").forEach((f) => $(`#in-${f.id}`, ctx.body).addEventListener("input", (e) => { $(`#hc-${f.id} .hc-body`, ctx.body).innerHTML = hoursBreakdown(e.target.value); }));
     $$("input", ctx.body).forEach((i) => i.addEventListener("keydown", (e) => { if (e.key === "Enter") $('[data-x="check"]', ctx.root).click(); }));
     $("input", ctx.body).focus();
   };

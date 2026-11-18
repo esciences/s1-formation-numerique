@@ -650,7 +650,8 @@ window.VC = window.VC || {};
         recap: [
           "Le débit se donne en Mbit/s. Pour obtenir des Mo par seconde, on divise par 8.",
           "Règle de trois : je ramène d'abord à 1 (par exemple 1 seconde), puis je multiplie.",
-          "212 Go à 100 Mbit/s : environ 4 h 43. D'où l'intérêt du préchargement !",
+          "Heures à virgule → minutes : je multiplie la partie après la virgule par 60. 2,25 h = 2 h + 0,25 × 60 min = 2 h 15 min.",
+          "212 Go à 100 Mbit/s : environ 4,71 h, soit 4 h 43 min. D'où l'intérêt du préchargement !",
         ],
         steps: [
           { type: "learn", id: "n-debit", kicker: "Bonus", title: "Mbit/s ou Mo/s ?",
@@ -660,6 +661,11 @@ window.VC = window.VC || {};
                 <p class="callout">Mbit/s ÷ 8 = Mo/s<br>Exemple : 80 Mbit/s ÷ 8 = 10 Mo par seconde.</p>
                 <p>Temps = taille (en Mo) ÷ vitesse (en Mo/s).</p>
                 <p class="callout">La règle de trois : on passe toujours par <strong>1</strong>.<br>40 Mo en 4 secondes → en 1 seconde : 40 ÷ 4 = 10 Mo → en 60 secondes : 10 × 60 = 600 Mo.</p>` },
+              { visual: "hoursVisual", html: `<p>Une durée en secondes est souvent énorme. Pour la lire, on la convertit en <strong>heures</strong> :</p>
+                <p class="callout">1 h = 60 min = 60 × 60 s = <strong>3 600 s</strong><br>Secondes → heures : ÷ 3 600</p>
+                <p>Le résultat a souvent une virgule. Exemple : 8 100 s ÷ 3 600 = <strong>2,25 h</strong>.</p>
+                <p class="callout">Ce n'est pas 2 h 25 min !<br>2,25 h = 2 h + 0,25 h<br>0,25 h = 0,25 × 60 min = 15 min<br>Donc 2,25 h = <strong>2 h 15 min</strong></p>
+                <p class="small">Dans les exercices, tu écris tes heures à virgule. Un cadre fait la conversion en heures et minutes pour toi.</p>` },
             ] },
           { type: "input", id: "d1", skill: "debit", notion: "n-debit",
             prompt: "Pendant le téléchargement, la console de Sam affiche : « <b>750 Mo reçus en 1 minute</b> ». <b>Combien de Mo arrivent chaque seconde ?</b>",
@@ -668,15 +674,15 @@ window.VC = window.VC || {};
             hints: ["1 minute = 60 secondes.", "60 secondes → 750 Mo. Donc 1 seconde → 750 ÷ 60."],
             success: "750 ÷ 60 = 12,5 Mo/s. C'est exactement ce que donne une connexion de 100 Mbit/s (100 ÷ 8 = 12,5) !" },
           { type: "input", id: "d2", skill: "debit", notion: "n-debit",
-            prompt: "À 12,5 Mo/s, combien de temps faut-il pour télécharger <b>212 Go</b> (212 000 Mo) ? <span class='small'>Réponds en heures et minutes, par exemple <code>3h20</code>.</span>",
-            fields: [{ id: "x", label: "Durée", kind: "duration", seconds: 16960, tol: 180, placeholder: "ex. 3h20" }],
-            hints: ["Temps en secondes = 212 000 ÷ 12,5.", "16 960 secondes ÷ 3 600 = nombre d'heures. Le reste ÷ 60 = minutes."],
-            success: "212 000 ÷ 12,5 = 16 960 s, soit environ 4 h 43 min." },
+            prompt: "À 12,5 Mo/s, combien de temps faut-il pour télécharger <b>212 Go</b> (212 000 Mo) ?<br><span class='small'>Réponds en heures, avec une virgule (par exemple 3,5). Le cadre à côté convertit en heures et minutes.</span>",
+            fields: [{ id: "x", label: "Durée", suffix: "h", kind: "hours", value: 16960 / 3600, tol: 0.02, placeholder: "ex. 3,5" }],
+            hints: ["Temps en secondes = 212 000 ÷ 12,5.", "Secondes → heures : ÷ 3 600 (car 1 h = 3 600 s). Tu peux arrondir à 1 ou 2 chiffres après la virgule."],
+            success: "212 000 ÷ 12,5 = 16 960 s<br>16 960 ÷ 3 600 ≈ 4,71 h<br>4,71 h = 4 h + 0,71 × 60 min ≈ <b>4 h 43 min</b>" },
           { type: "input", id: "d3", skill: "debit", notion: "n-debit",
-            prompt: "Chez Lina, la connexion plafonne à <b>30 Mbit/s</b>. Combien de temps pour les mêmes 212 Go ?",
-            fields: [{ id: "x", label: "Durée", kind: "duration", seconds: 56533, tol: 300, placeholder: "ex. 10h05" }],
-            hints: ["30 ÷ 8 = 3,75 Mo/s.", "212 000 ÷ 3,75 = nombre de secondes."],
-            success: "30 ÷ 8 = 3,75 Mo/s → 212 000 ÷ 3,75 ≈ 56 533 s, soit environ 15 h 42 min. Le préchargement, c'est malin !" },
+            prompt: "Chez Lina, la connexion plafonne à <b>30 Mbit/s</b>. Combien de temps pour les mêmes 212 Go ?<br><span class='small'>Réponds en heures, avec une virgule.</span>",
+            fields: [{ id: "x", label: "Durée", suffix: "h", kind: "hours", value: 56533.33 / 3600, tol: 0.02, placeholder: "ex. 10,5" }],
+            hints: ["30 ÷ 8 = 3,75 Mo/s.", "212 000 ÷ 3,75 = nombre de secondes.", "Puis secondes ÷ 3 600 = nombre d'heures."],
+            success: "30 ÷ 8 = 3,75 Mo/s<br>212 000 ÷ 3,75 ≈ 56 533 s<br>56 533 ÷ 3 600 ≈ 15,70 h<br>15,70 h = 15 h + 0,70 × 60 min = <b>15 h 42 min</b><br>Le préchargement, c'est malin !" },
         ],
       },
     ],
