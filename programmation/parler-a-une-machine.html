@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les bases de la programmation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Lexend:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Mise en page : diaporama 16:9 (1280×720) mis à l'échelle, papier quadrillé de cahier,
+   blocs néo-brutalistes (bordure 3 px, ombre dure) ; chaque notion a SA couleur, gardée tout le long. */
+:root{
+  color-scheme: light;
+  --paper:#F6F8FB;
+  --grid:#E2E8F1;
+  --ink:#172033;
+  --muted:#5B6579;
+  --line:#172033;
+  --card:#FFFFFF;
+  --mint:#6EE7B7;       /* accent eSCIENCES */
+  --algo:#1F9D63;       /* algorithme */
+  --algo-soft:#D7F5E6;
+  --seq:#2E6BE6;        /* séquence */
+  --seq-soft:#DCE7FD;
+  --loop:#E9821C;       /* boucle */
+  --loop-soft:#FDE9D3;
+  --cond:#0D9C9A;       /* condition */
+  --cond-soft:#D3F3F2;
+  --var:#D63C73;        /* variable */
+  --var-soft:#FADDE8;
+  --bug:#C2410C;
+  --ok:#15803D;
+  --ok-soft:#DCFCE7;
+  --ko:#B91C1C;
+  --ko-soft:#FEE2E2;
+  --f-display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --f-body:"Lexend", "Segoe UI", system-ui, sans-serif;
+  --f-code:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --shadow:5px 5px 0 var(--line);
+  --shadow-s:3px 3px 0 var(--line);
+}
+html,body{height:100%}
+body{
+  background:var(--ink); color:var(--ink); font-family:var(--f-body);
+  display:flex; flex-direction:column; overflow:hidden;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:12px;
+  box-sizing:border-box;
+}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid var(--seq);outline-offset:3px}
+
+#viewport{flex:1;position:relative;min-height:0}
+#stage{
+  position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;
+  border-radius:14px; overflow:hidden;
+}
+.slide{position:absolute;inset:0;padding:44px 60px 40px;display:flex;flex-direction:column;gap:22px}
+.slide[hidden],[hidden]{display:none!important}
+.slide.enter{animation:enter .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes enter{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.slide.enter{animation:none}*{transition:none!important;animation:none!important}}
+
+/* barre de contrôle */
+#bar{display:flex;align-items:center;gap:12px;padding-top:10px;color:#fff;flex-wrap:wrap}
+#bar button{background:#26314A;border:2px solid #3A4766;border-radius:10px;padding:8px 14px;color:#fff;font-weight:600}
+#bar button:hover{background:#33405F}
+#count{font-family:var(--f-code);font-size:14px;font-variant-numeric:tabular-nums;min-width:64px;text-align:center}
+#progress{flex:1;min-width:80px;height:8px;background:#26314A;border-radius:99px;overflow:hidden}
+#progress span{display:block;height:100%;background:var(--mint);width:0;transition:width .3s}
+#bar .hint{font-size:13px;color:#9AA6C0}
+@media (max-width:640px){#bar .hint{display:none}}
+
+/* typo */
+.head{display:flex;align-items:center;gap:18px}
+.tag{flex:none;white-space:nowrap;font-family:var(--f-code);font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:6px 14px;border:3px solid var(--line);border-radius:10px;box-shadow:var(--shadow-s);background:var(--card)}
+h1,h2{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:50px;line-height:1.05;font-weight:800}
+p{margin:0}
+.lead{font-size:27px;line-height:1.4;max-width:30em}
+.small{font-size:20px;color:var(--muted);line-height:1.4}
+.mono{font-family:var(--f-code)}
+.row{display:flex;gap:26px;min-height:0}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.grow{flex:1}
+
+.box{background:var(--card);border:3px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px 24px}
+.btn{border:3px solid var(--line);border-radius:12px;box-shadow:var(--shadow-s);background:var(--card);
+  padding:10px 18px;font-size:21px;font-weight:600;transition:transform .08s, box-shadow .08s}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--line)}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--line)}
+.btn.primary{background:var(--mint)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.feedback{font-size:22px;font-weight:600;min-height:1.5em;line-height:1.35}
+.feedback.ok{color:var(--ok)} .feedback.ko{color:var(--ko)}
+
+/* couleurs par notion */
+.c-algo{--c:var(--algo);--cs:var(--algo-soft)}
+.c-seq{--c:var(--seq);--cs:var(--seq-soft)}
+.c-loop{--c:var(--loop);--cs:var(--loop-soft)}
+.c-cond{--c:var(--cond);--cs:var(--cond-soft)}
+.c-var{--c:var(--var);--cs:var(--var-soft)}
+.c-bug{--c:var(--bug);--cs:var(--ko-soft)}
+.tag[class*="c-"]{background:var(--cs);color:var(--ink)}
+.tag[class*="c-"]::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--c);margin-right:10px;vertical-align:1px;border:2px solid var(--line)}
+.def{background:var(--cs);border-color:var(--line)}
+.def b{color:var(--ink)}
+.def .word{font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--c);display:block;margin-bottom:6px;filter:brightness(.85)}
+
+/* ------- 1. titre ------- */
+#s-title{justify-content:center;gap:0;padding:60px 80px}
+#s-title .logo{position:absolute;top:44px;left:60px;height:56px}
+#s-title .meta{position:absolute;top:56px;right:60px;font-family:var(--f-code);font-size:17px;font-weight:700;
+  padding:6px 14px;border:3px solid var(--line);border-radius:10px;background:var(--card);box-shadow:var(--shadow-s)}
+.title-wrap{display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:center}
+.kicker{font-family:var(--f-code);font-size:20px;font-weight:700;color:var(--muted);margin-bottom:14px}
+.big{font-size:104px;line-height:.95;font-weight:800}
+.big .hl{background:var(--mint);padding:0 12px;border:3px solid var(--line);border-radius:12px;box-shadow:var(--shadow);display:inline-block;transform:rotate(-1.5deg);margin-top:10px}
+.subtitle{font-size:30px;margin-top:28px;line-height:1.35;max-width:20em}
+.stack{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.blk{font-family:var(--f-code);font-weight:700;font-size:24px;padding:12px 20px;border:3px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow-s);background:var(--c);color:#fff;display:inline-flex;gap:12px;align-items:center;white-space:nowrap}
+.blk.in{margin-left:46px}
+.blk.loopwrap{flex-direction:column;align-items:flex-start;padding:12px 14px 14px 20px;gap:10px}
+.blk.loopwrap .inner{display:flex;flex-direction:column;gap:8px;margin-left:18px}
+.blk.small{font-size:20px;padding:8px 14px}
+.title-foot{position:absolute;bottom:40px;left:80px;right:60px;display:flex;justify-content:space-between;align-items:center;font-size:18px;color:var(--muted)}
+.cc{font-family:var(--f-code);font-weight:700;font-size:15px;border:2px solid var(--line);border-radius:8px;padding:4px 10px;background:var(--card);color:var(--ink)}
+
+/* ------- 2. programme ------- */
+.road{display:grid;grid-template-columns:2.1fr 1fr 1fr;gap:24px;flex:1;min-height:0}
+.road h3{font-family:var(--f-display);font-size:28px;margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:12px}
+.chip{font-size:22px;font-weight:600;padding:9px 16px;border:3px solid var(--line);border-radius:999px;background:var(--cs,var(--card))}
+.road .new{background:var(--var-soft)}
+.road .later{opacity:.75;border-style:dashed;box-shadow:none}
+.road .later .chip{border-style:dashed;background:var(--card)}
+
+/* ------- 3. ordinateur obéissant ------- */
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:26px;flex:1}
+.versus .box{display:flex;flex-direction:column;gap:14px}
+.versus h3{margin:0;font-family:var(--f-display);font-size:30px}
+.say{font-size:28px;font-weight:600;background:var(--paper);border:2px dashed var(--line);border-radius:12px;padding:12px 16px}
+.robot-says{font-family:var(--f-code);font-size:20px;line-height:1.5;padding:14px 16px;border-radius:12px;background:var(--ink);color:#E7ECF5}
+.robot-says .k{color:var(--mint)}
+.robot-says .err{color:#FCA5A5}
+
+/* ------- 4. ordre des étapes ------- */
+.order{display:grid;grid-template-columns:1fr 1fr;gap:26px;flex:1;min-height:0}
+.pool,.answer{display:flex;flex-direction:column;gap:10px}
+.step{font-size:23px;text-align:left;padding:12px 16px;border:3px solid var(--line);border-radius:12px;background:var(--card);box-shadow:var(--shadow-s)}
+.step.used{opacity:.25;pointer-events:none}
+.answer .step{display:flex;gap:14px;align-items:center;box-shadow:none;background:var(--algo-soft)}
+.answer .step .n{font-family:var(--f-code);font-weight:700;width:34px;height:34px;flex:none;border-radius:8px;background:var(--algo);color:#fff;display:grid;place-items:center;font-size:18px}
+.answer .step.bad{background:var(--ko-soft)}
+.answer .slot{height:56px;border:3px dashed #B8C2D3;border-radius:12px}
+.label{font-family:var(--f-code);font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* ------- 5. algo vs programme ------- */
+.compare{display:grid;grid-template-columns:1fr 90px 1fr;align-items:stretch;gap:0;flex:1}
+.compare .box{display:flex;flex-direction:column;gap:12px}
+.compare .arrow{display:grid;place-items:center}
+.compare h3{margin:0;font-family:var(--f-display);font-size:34px}
+.compare ul{margin:0;padding-left:24px;font-size:23px;line-height:1.5}
+pre.code{margin:0;font-family:var(--f-code);font-size:21px;line-height:1.55;background:var(--ink);color:#E7ECF5;border-radius:12px;padding:16px 18px;overflow-x:auto;border:3px solid var(--line)}
+.code .kw{color:#FDBA74}.code .fn{color:#93C5FD}.code .nb{color:#F9A8D4}.code .st{color:var(--mint)}.code .cm{color:#8A97B2}
+.code .ln{display:block;padding:0 6px;border-radius:6px;transition:background .2s}
+.code .ln.on{background:#3B4B70;box-shadow:inset 4px 0 0 var(--mint)}
+
+/* ------- 6. langages ------- */
+.langs{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.langs .box{display:flex;flex-direction:column;gap:14px}
+.langs h3{margin:0;font-family:var(--f-display);font-size:28px}
+.fr{font-size:25px;line-height:1.45;font-weight:500}
+.tools{display:flex;gap:12px;flex-wrap:wrap}
+.tool{font-size:19px;font-weight:600;padding:6px 12px;border:2px solid var(--line);border-radius:8px;background:var(--card)}
+
+/* ------- 7. logigramme ------- */
+.shapes{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.shape{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.shape svg{height:96px;width:100%}
+.shape h3{margin:0;font-family:var(--f-display);font-size:27px}
+.shape p{font-size:20px;line-height:1.35}
+.which{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.which .q{font-size:25px;font-weight:600}
+
+/* ------- 8. robot ------- */
+.robot-zone{display:grid;grid-template-columns:auto 1fr;gap:30px;flex:1;min-height:0}
+.grid{position:relative;display:grid;gap:0;border:3px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card);box-shadow:var(--shadow);align-self:start}
+.cell{width:68px;height:68px;border-right:1px solid var(--grid);border-bottom:1px solid var(--grid)}
+.cell.wall{background:repeating-linear-gradient(45deg,#3A4766 0 8px,#26314A 8px 16px)}
+.cell.start{background:var(--seq-soft)}
+.sprite{position:absolute;width:68px;height:68px;display:grid;place-items:center;transition:left .35s ease, top .35s ease}
+.sprite.bump{animation:bump .35s}
+@keyframes bump{30%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+.goal{position:absolute;width:68px;height:68px;display:grid;place-items:center}
+.cmds{display:flex;gap:10px;flex-wrap:wrap}
+.cmd{background:var(--seq);color:#fff;font-family:var(--f-code);font-weight:700;font-size:20px;padding:10px 14px}
+.prog{display:flex;flex-wrap:wrap;gap:8px;min-height:120px;align-content:flex-start;padding:14px;border:3px dashed #B8C2D3;border-radius:12px;background:var(--card)}
+.prog .pc{font-family:var(--f-code);font-weight:700;font-size:18px;padding:6px 10px;background:var(--seq-soft);border:2px solid var(--line);border-radius:8px;cursor:pointer}
+.prog .pc.on{background:var(--mint)}
+.prog .pc.err{background:var(--ko-soft);border-color:var(--ko)}
+.prog .empty{color:var(--muted);font-size:20px}
+
+/* ------- 9. boucle ------- */
+.loop-zone{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.listing{display:flex;flex-direction:column;gap:6px;transition:opacity .3s}
+.listing .blk{font-size:19px;padding:5px 14px}
+.counter{font-family:var(--f-code);font-weight:700;font-size:20px}
+.kinds{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.kinds .box{padding:16px 18px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow-s)}
+.kinds b{font-family:var(--f-code);font-size:20px}
+.kinds span{font-size:19px;line-height:1.35;color:var(--muted)}
+.pair-a{outline:4px solid #FDE68A;outline-offset:2px}
+.pair-b{outline:4px solid #A5F3FC;outline-offset:2px}
+
+/* ------- 10. condition ------- */
+.cond-zone{display:grid;grid-template-columns:1.05fr 1fr;gap:30px;flex:1;min-height:0}
+.toggle{display:flex;gap:12px}
+.toggle .btn.on{background:var(--cond);color:#fff}
+svg text{font-family:var(--f-body)}
+.fl-node{fill:var(--card);stroke:var(--line);stroke-width:3}
+.fl-node.fl-var{fill:var(--var-soft)}.fl-node.fl-cond{fill:var(--cond-soft)}
+.fl-node.on{fill:var(--mint)}
+.fl-edge{stroke:var(--line);stroke-width:3;fill:none}
+.fl-edge.on{stroke:var(--cond);stroke-width:6}
+.fl-txt{font-size:20px;font-weight:600;fill:var(--ink)}
+.fl-lbl{font-size:18px;font-weight:700;fill:var(--muted);font-family:var(--f-code)}
+.fl-head{fill:var(--line)}
+
+/* ------- 11. variable ------- */
+.var-zone{display:grid;grid-template-columns:1fr 1.1fr;gap:34px;flex:1;min-height:0;align-items:center}
+.vbox{position:relative;width:320px;height:230px;margin:30px auto 0}
+.vbox .lid{position:absolute;left:-10px;right:-10px;top:-22px;height:30px;background:var(--var);border:3px solid var(--line);border-radius:8px;transform-origin:left bottom;transition:transform .3s}
+.vbox.open .lid{transform:rotate(-14deg)}
+.vbox .body{position:absolute;inset:0;background:var(--var-soft);border:3px solid var(--line);border-radius:0 0 18px 18px;box-shadow:var(--shadow);display:grid;place-items:center}
+.vbox .val{font-family:var(--f-code);font-weight:700;font-size:96px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.vbox .name{position:absolute;left:50%;bottom:-24px;transform:translateX(-50%) rotate(-2deg);background:var(--card);border:3px solid var(--line);border-radius:8px;padding:4px 16px;font-family:var(--f-code);font-weight:700;font-size:24px;box-shadow:var(--shadow-s)}
+.vbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+.rules{display:flex;flex-direction:column;gap:14px}
+.rule{display:flex;gap:16px;align-items:flex-start;font-size:23px;line-height:1.4}
+.rule .k{flex:none;font-family:var(--f-code);font-weight:700;font-size:18px;background:var(--var);color:#fff;border:2px solid var(--line);border-radius:8px;padding:4px 10px;min-width:92px;text-align:center}
+.notation{font-family:var(--f-code);font-size:24px;font-weight:700;background:var(--card);border:3px solid var(--line);border-radius:12px;padding:12px 16px}
+
+/* ------- 12. tout ensemble ------- */
+.all-zone{display:grid;grid-template-columns:600px 1fr;gap:26px;flex:1;min-height:0}
+.all-right{display:flex;flex-direction:column;gap:14px;min-width:0}
+.cake{display:flex;align-items:flex-end;gap:16px}
+.mini-var{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mini-var .v{font-family:var(--f-code);font-weight:700;font-size:44px;width:96px;height:76px;display:grid;place-items:center;background:var(--var-soft);border:3px solid var(--line);border-radius:10px;box-shadow:var(--shadow-s);font-variant-numeric:tabular-nums}
+.mini-var .n{font-family:var(--f-code);font-weight:700;font-size:17px}
+.candles{display:flex;gap:10px;align-items:flex-end;padding:0 14px 0;height:86px;border-bottom:16px solid #C08457;border-radius:0 0 8px 8px;min-width:140px}
+.candle{width:16px;height:48px;background:repeating-linear-gradient(180deg,var(--seq) 0 8px,#fff 8px 16px);border:2px solid var(--line);border-radius:3px;position:relative}
+.candle::after{content:"";position:absolute;left:50%;top:-24px;width:12px;height:18px;transform:translateX(-50%);background:#FBBF24;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;border:2px solid #B45309;transition:opacity .25s}
+.candle.out::after{opacity:0}
+.narr{font-size:22px;line-height:1.4;font-weight:500;background:var(--card);border:3px solid var(--line);border-radius:12px;padding:12px 16px;min-height:96px}
+.ctrls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ctrls .btn{font-size:19px;padding:8px 14px}
+
+/* ------- 13. bug ------- */
+.bug-zone{display:grid;grid-template-columns:1fr 1fr;gap:30px;flex:1;min-height:0}
+.lines{display:flex;flex-direction:column;gap:8px}
+.lines button{text-align:left;font-family:var(--f-code);font-size:23px;font-weight:700;padding:10px 16px;background:var(--card);border:3px solid var(--line);border-radius:10px;box-shadow:var(--shadow-s)}
+.lines button.indent{margin-left:46px}
+.lines button.wrong{background:var(--ko-soft);animation:bump .35s}
+.lines button.right{background:var(--ok-soft)}
+.cycle{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:21px;font-weight:600}
+.cycle span.s{padding:6px 12px;border:2px solid var(--line);border-radius:999px;background:var(--card)}
+
+/* ------- 14. quiz ------- */
+.quiz{display:flex;flex-direction:column;gap:18px;flex:1}
+.quiz .q{font-size:32px;font-weight:600;font-family:var(--f-display)}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{text-align:left;font-size:24px;padding:12px 18px;border:3px solid var(--line);border-radius:12px;background:var(--card);box-shadow:var(--shadow-s);display:flex;gap:14px;align-items:center}
+.opt .l{font-family:var(--f-code);font-weight:700;width:36px;height:36px;flex:none;display:grid;place-items:center;border:2px solid var(--line);border-radius:8px;background:var(--paper)}
+.opt.good{background:var(--ok-soft)} .opt.bad{background:var(--ko-soft)}
+.opt[disabled]{cursor:default}
+.qdots{display:flex;gap:8px}
+.qdots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);background:var(--card)}
+.qdots i.ok{background:var(--ok)} .qdots i.ko{background:var(--ko)} .qdots i.cur{background:var(--mint)}
+.expl{font-size:21px;line-height:1.4;color:var(--ink);background:var(--card);border:2px dashed var(--line);border-radius:12px;padding:10px 14px}
+
+/* ------- 15. à retenir ------- */
+.memo{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.memo .box{padding:18px 18px;min-height:150px;box-shadow:var(--shadow-s);display:flex;flex-direction:column;gap:6px;background:var(--cs)}
+.memo b{font-family:var(--f-display);font-size:27px}
+.memo span{font-size:19px;line-height:1.4}
+.credits{display:flex;gap:24px;align-items:center;margin-top:auto;border-top:3px solid var(--line);padding-top:18px}
+.credits img{height:46px}
+.credits p{font-size:16px;line-height:1.5;color:var(--muted)}
+.credits p b{color:var(--ink)}
+
+/* badge référentiel */
+.niv{margin-left:auto;flex:none;font-family:var(--f-code);font-size:15px;font-weight:700;padding:4px 10px;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--muted)}
+.niv b{color:var(--ink)}
+/* progression */
+.road4{display:grid;grid-template-columns:1fr 1fr 1fr .62fr;gap:20px;flex:1;min-height:0}
+.road4 .box{display:flex;flex-direction:column;gap:12px;padding:18px 18px}
+.road4 h3{font-family:var(--f-display);font-size:30px;margin:0;display:flex;align-items:baseline;gap:10px}
+.road4 h3 small{font-family:var(--f-body);font-size:17px;font-weight:500;color:var(--muted)}
+.road4 .chip{font-size:19px;padding:6px 12px}
+.road4 .chips{gap:8px}
+.road4 .new{background:var(--var-soft)}
+.road4 .later{opacity:.75;border-style:dashed;box-shadow:none}
+.road4 .later .chip{border-style:dashed;background:var(--card)}
+/* devine l'activité */
+.guess{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;flex:1}
+.guess .box{display:flex;flex-direction:column;gap:12px}
+.guess ol{margin:0;padding-left:28px;font-size:22px;line-height:1.55}
+.guess .ans{font-family:var(--f-display);font-weight:800;font-size:28px;background:var(--algo-soft);border:3px solid var(--line);border-radius:12px;padding:8px 14px;text-align:center}
+.guess .btn{margin-top:auto}
+/* robot : logigramme horizontal */
+.prog .ov{font-family:var(--f-code);font-weight:700;font-size:17px;padding:5px 14px;background:var(--algo-soft);border:2px solid var(--line);border-radius:999px}
+.prog .ar{font-weight:700;color:var(--muted);align-self:center}
+/* lire un logigramme */
+.read-zone{display:grid;grid-template-columns:300px auto 1fr;gap:24px;flex:1;min-height:0;align-items:start}
+.grid.small .cell{width:72px;height:72px}
+.grid .mark{position:absolute;width:72px;height:72px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--ink)}
+.grid .mark span{width:44px;height:44px;border-radius:50%;border:3px dashed var(--line);display:grid;place-items:center;background:#FFF7D6}
+.grid .trail{position:absolute;width:72px;height:72px;background:var(--seq-soft)}
+.answers{display:flex;gap:12px}
+.answers .btn.good{background:var(--ok-soft)}.answers .btn.bad{background:var(--ko-soft)}
+.blocks-out{display:flex;flex-wrap:wrap;gap:6px;align-items:center;max-width:380px}
+.blocks-out .label{flex-basis:100%}
+.blocks-out .blk{font-size:18px;padding:5px 14px}
+/* feu */
+.feu{width:86px;padding:10px;background:#2B3446;border:3px solid var(--line);border-radius:16px;display:flex;flex-direction:column;gap:10px;align-items:center;box-shadow:var(--shadow-s)}
+.feu i{width:52px;height:52px;border-radius:50%;background:#4B5568;border:3px solid #111827;display:grid;place-items:center}
+.feu i svg{opacity:.35}
+.feu.rouge i.r{background:#EF4444}.feu.rouge i.r svg{opacity:1}
+.feu.vert i.v{background:#22C55E}.feu.vert i.v svg{opacity:1}
+.fl-edge.loopy{stroke:var(--loop)}
+.fl-edge.loopy.on{stroke:var(--loop);stroke-width:6}
+/* optimiser */
+.opt-zone{display:grid;grid-template-columns:1fr 300px 1fr;gap:24px;flex:1;min-height:0;align-items:start}
+.longprog{display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;font-family:var(--f-code);font-size:15px;font-weight:700}
+.longprog span{padding:3px 8px;border:2px solid var(--line);border-radius:6px;background:var(--seq-soft);white-space:nowrap}
+.sides{display:flex;gap:8px;flex-wrap:wrap}
+.sides .btn{font-size:19px;padding:6px 14px}
+.sides .btn.on{background:var(--var);color:#fff}
+.tally{display:flex;gap:14px}
+.tally div{flex:1;border:3px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--card);text-align:center}
+.tally b{display:block;font-family:var(--f-display);font-size:40px;line-height:1.1;font-variant-numeric:tabular-nums}
+.tally span{font-size:16px;color:var(--muted)}
+</style>
+<style>body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+
+
+<div id="viewport">
+<div id="stage" role="region" aria-roledescription="diaporama" aria-label="Les bases de la programmation">
+
+<!-- 1 · TITRE -->
+<section class="slide" id="s-title" data-name="Titre">
+  <img class="logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTYwIiB6b29tQW5kUGFuPSJtYWduaWZ5IiB2aWV3Qm94PSIwIDAgNDIwIDEzNS4wMDAwMDMiIGhlaWdodD0iMTgwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB2ZXJzaW9uPSIxLjAiPjxkZWZzPjxnLz48Y2xpcFBhdGggaWQ9ImViN2UyYTYzOGIiPjxwYXRoIGQ9Ik0gNTcgNjkgTCAxMTYgNjkgTCAxMTYgMTA2LjExMzI4MSBMIDU3IDEwNi4xMTMyODEgWiBNIDU3IDY5ICIgY2xpcC1ydWxlPSJub256ZXJvIi8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9IjIzZGRmNTRmZWEiPjxwYXRoIGQ9Ik0gNTcgNjkuNzUgTCAxMTUuOTI5Njg4IDY5Ljc1IEwgMTE1LjkyOTY4OCAxMDYuMTEzMjgxIEwgNTcgMTA2LjExMzI4MSBaIE0gNTcgNjkuNzUgIiBjbGlwLXJ1bGU9Im5vbnplcm8iLz48L2NsaXBQYXRoPjxjbGlwUGF0aCBpZD0iZWYyODgwZDFkOCI+PHBhdGggZD0iTSA4NS41MzkwNjIgNzIuOTkyMTg4IEMgNzcuOTkyMTg4IDY3LjgzNTkzOCA2Ny44MDg1OTQgNjkuMDc0MjE5IDYxLjY5OTIxOSA3NS44OTA2MjUgQyA1NS41OTc2NTYgODIuNzA3MDMxIDU1LjQ0OTIxOSA5My4wMDc4MTIgNjEuMzU5Mzc1IDk5Ljk5NjA5NCBDIDY3LjE3OTY4OCAxMDMuODYzMjgxIDc0LjE2NDA2MiAxMDYuMTE3MTg4IDgxLjY3MTg3NSAxMDYuMTE3MTg4IEMgOTYuNjg3NSAxMDYuMTE3MTg4IDEwOS42MDkzNzUgOTcuMTAxNTYyIDExNS4zNTE1NjIgODQuMTY3OTY5IEwgMTE1LjU3NDIxOSA4My42NTYyNSBDIDExNS45OTYwOTQgODIuNDY4NzUgMTE1LjgyNDIxOSA4MS4xMzI4MTIgMTE1LjA5NzY1NiA4MC4wNzgxMjUgQyAxMTQuMjYxNzE5IDc4Ljg2NzE4OCAxMTIuODI0MjE5IDc4LjIyNjU2MiAxMTEuMzcxMDk0IDc4LjQxMDE1NiBDIDEwOS45MTc5NjkgNzguNTkzNzUgMTA4LjY4MzU5NCA3OS41NzQyMTkgMTA4LjE3MTg3NSA4MC45NTMxMjUgQyAxMDIuMjkyOTY5IDg5LjgzOTg0NCA4OS45ODQzNzUgODkuOTg0Mzc1IDgwLjgxMjUgODcuMjczNDM4IEMgNjguODk4NDM4IDgzLjc1IDcyLjIyNjU2MiA2OS40NDkyMTkgODUuNTM5MDYyIDcyLjk5MjE4OCAiIGNsaXAtcnVsZT0ibm9uemVybyIvPjwvY2xpcFBhdGg+PGNsaXBQYXRoIGlkPSIwNWMwYjA5N2FkIj48cGF0aCBkPSJNIDE2LjI2OTUzMSAyMS45ODQzNzUgTCAxMTMgMjEuOTg0Mzc1IEwgMTEzIDEwMCBMIDE2LjI2OTUzMSAxMDAgWiBNIDE2LjI2OTUzMSAyMS45ODQzNzUgIiBjbGlwLXJ1bGU9Im5vbnplcm8iLz48L2NsaXBQYXRoPjxjbGlwUGF0aCBpZD0iNjZhMzYyOTEyOSI+PHBhdGggZD0iTSAxNi4zMDA3ODEgMjEuOTg0Mzc1IEwgMTEzIDIxLjk4NDM3NSBMIDExMyAxMDAgTCAxNi4zMDA3ODEgMTAwIFogTSAxNi4zMDA3ODEgMjEuOTg0Mzc1ICIgY2xpcC1ydWxlPSJub256ZXJvIi8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9ImVlOWYxYzlhOWQiPjxwYXRoIGQ9Ik0gMzQuMTk1MzEyIDM3LjM4NjcxOSBDIDM3LjY0ODQzOCAzNy4zODY3MTkgNDAuNDQ1MzEyIDQwLjE5NTMxMiA0MC40NDUzMTIgNDMuNjYwMTU2IEMgNDAuNDQ1MzEyIDQ3LjEyNSAzNy42NDg0MzggNDkuOTMzNTk0IDM0LjE5NTMxMiA0OS45MzM1OTQgQyAzMC43NDYwOTQgNDkuOTMzNTk0IDI3Ljk0NTMxMiA0Ny4xMjUgMjcuOTQ1MzEyIDQzLjY2MDE1NiBDIDI3Ljk0MTQwNiA0MC4xOTUzMTIgMzAuNzQ2MDk0IDM3LjM4NjcxOSAzNC4xOTUzMTIgMzcuMzg2NzE5IE0gMjcuMDkzNzUgNjguNDY4NzUgQyAzMC41NDI5NjkgNjguNDY4NzUgMzMuMzM5ODQ0IDcxLjI3MzQzOCAzMy4zMzk4NDQgNzQuNzQyMTg4IEMgMzMuMzM5ODQ0IDc4LjIwNzAzMSAzMC41NDI5NjkgODEuMDExNzE5IDI3LjA5Mzc1IDgxLjAxMTcxOSBDIDIzLjY0MDYyNSA4MS4wMTE3MTkgMjAuODQzNzUgNzguMjAzMTI1IDIwLjg0Mzc1IDc0Ljc0MjE4OCBDIDIwLjg0Mzc1IDcxLjI3MzQzOCAyMy42NDA2MjUgNjguNDY4NzUgMjcuMDkzNzUgNjguNDY4NzUgWiBNIDIwLjI3MzQzOCA1MC43ODUxNTYgQyAyMi40NzI2NTYgNTAuNzg1MTU2IDI0LjI1IDUyLjU3NDIxOSAyNC4yNSA1NC43ODEyNSBDIDI0LjI1IDU2Ljk4NDM3NSAyMi40NzI2NTYgNTguNzczNDM4IDIwLjI3MzQzOCA1OC43NzM0MzggQyAxOC4wNzgxMjUgNTguNzczNDM4IDE2LjMwMDc4MSA1Ni45ODQzNzUgMTYuMzAwNzgxIDU0Ljc4MTI1IEMgMTYuMzAwNzgxIDUyLjU3NDIxOSAxOC4wODIwMzEgNTAuNzg1MTU2IDIwLjI3MzQzOCA1MC43ODUxNTYgWiBNIDQ1LjQxNDA2MiAyMS45ODQzNzUgQyA0Ny42MTMyODEgMjEuOTg0Mzc1IDQ5LjM5MDYyNSAyMy43NzM0MzggNDkuMzkwNjI1IDI1Ljk4MDQ2OSBDIDQ5LjM5MDYyNSAyOC4xODM1OTQgNDcuNjEzMjgxIDI5Ljk3MjY1NiA0NS40MTQwNjIgMjkuOTcyNjU2IEMgNDMuMjE0ODQ0IDI5Ljk3MjY1NiA0MS40Mzc1IDI4LjE4MzU5NCA0MS40Mzc1IDI1Ljk4MDQ2OSBDIDQxLjQzNzUgMjMuNzczNDM4IDQzLjIxNDg0NCAyMS45ODQzNzUgNDUuNDE0MDYyIDIxLjk4NDM3NSBaIE0gNjQuNjUyMzQ0IDczLjI0MjE4OCBDIDcwLjc1NzgxMiA2OC44NDc2NTYgNzkuMTA1NDY5IDY4LjU5NzY1NiA4NS41MzkwNjIgNzIuOTkyMTg4IEMgOTguMzc1IDc2LjQxNDA2MiAxMTMuMjE0ODQ0IDY4LjQ4MDQ2OSAxMTIuOTA2MjUgNTQuMzcxMDk0IEMgMTEyLjc1IDQ3LjA1MDc4MSAxMDguMzkwNjI1IDQyLjY5MTQwNiAxMDIuNjY0MDYyIDM4LjY5OTIxOSBDIDkwLjEzNjcxOSAyOS45NzI2NTYgNzMuNDY4NzUgMjkuOTE0MDYyIDYwLjg4MjgxMiAzOC41NTg1OTQgQyA2MS4yMTA5MzggMzQuNTY2NDA2IDU4LjA3NDIxOSAzMS4xNTIzNDQgNTQuMDg5ODQ0IDMxLjE1MjM0NCBDIDUwLjMyNDIxOSAzMS4xNTIzNDQgNDcuMjczNDM4IDM0LjIxNDg0NCA0Ny4yNzM0MzggMzcuOTk2MDk0IEMgNDcuMjczNDM4IDQxLjMxNjQwNiA0OS42Mjg5MDYgNDQuMDg1OTM4IDUyLjc1MzkwNiA0NC43MDcwMzEgTCA1Mi43NTc4MTIgNDQuNzA3MDMxIEMgNTMuMTM2NzE5IDQ0LjcwNzAzMSA1My41MDc4MTIgNDQuNzUgNTMuODU5Mzc1IDQ0LjgzNTkzOCBDIDU1Ljk5NjA5NCA0NS4zMzU5MzggNTcuNTgyMDMxIDQ3LjI1NzgxMiA1Ny41ODIwMzEgNDkuNTUwNzgxIEMgNTcuNTgyMDMxIDUzLjQxMDE1NiA1My4yNDYwOTQgNTUuNzg5MDYyIDQ5Ljk2NDg0NCA1My41IEMgNDguNDg0Mzc1IDUyLjQ2NDg0NCA0Ni41ODU5MzggNTEuODkwNjI1IDQ0LjczODI4MSA1MS44OTA2MjUgQyAzOS41ODU5MzggNTEuODkwNjI1IDM1LjQxMDE1NiA1Ni4wODIwMzEgMzUuNDEwMTU2IDYxLjI1MzkwNiBDIDM1LjQxMDE1NiA2Ni40MjU3ODEgMzkuNTg1OTM4IDcwLjYxNzE4OCA0NC43MzgyODEgNzAuNjE3MTg4IEwgNDQuODQzNzUgNzAuNTg1OTM4IEMgNDUuNDY0ODQ0IDcwLjQxNzk2OSA0Ni4xMTMyODEgNzAuMzQ3NjU2IDQ2Ljc2OTUzMSA3MC4zOTQ1MzEgQyA0OS43MzA0NjkgNzAuNjA1NDY5IDUyLjA2NjQwNiA3My4wNzgxMjUgNTIuMDY2NDA2IDc2LjEwMTU2MiBDIDUyLjA2NjQwNiA3OS43NzM0MzggNDguNzAzMTI1IDgyLjQxNzk2OSA0NS4yMjY1NjIgODEuNzA3MDMxIEMgNDUuMDA3ODEyIDgxLjY2NDA2MiA0NC43ODkwNjIgODEuNjA1NDY5IDQ0LjU3ODEyNSA4MS41MzkwNjIgQyA0NC4yMTA5MzggODEuNDYwOTM4IDQzLjgzMjAzMSA4MS40MjE4NzUgNDMuNDQxNDA2IDgxLjQyMTg3NSBDIDQwLjI5Mjk2OSA4MS40MjE4NzUgMzcuNzQyMTg4IDgzLjk4NDM3NSAzNy43NDIxODggODcuMTQ0NTMxIEMgMzcuNzQyMTg4IDkwLjMwNDY4OCA0MC4yOTI5NjkgOTIuODYzMjgxIDQzLjQ0MTQwNiA5Mi44NjMyODEgQyA0OS40ODQzNzUgOTIuODYzMjgxIDQ3LjkxNDA2MiA4NS4zODI4MTIgNTEuNzQyMTg4IDkwLjcxNDg0NCBDIDU0LjM1OTM3NSA5NC4zNjMyODEgNTcuNjIxMDk0IDk3LjUxMTcxOSA2MS4zNTkzNzUgOTkuOTk2MDk0IEMgNTguNjk1MzEyIDk2Ljg0Mzc1IDU3LjI2MTcxOSA5My4wMTU2MjUgNTcuMDUwNzgxIDg5LjE0MDYyNSBDIDU2Ljc0NjA5NCA4Ni44NTkzNzUgNTcuMTMyODEyIDg0LjA5NzY1NiA1OC4xODM1OTQgODEuNzA3MDMxIEMgNTcuMzAwNzgxIDg0LjA3NDIxOSA1Ni45MTc5NjkgODYuNTkzNzUgNTcuMDQ2ODc1IDg5LjA4OTg0NCBDIDUxLjk3MjY1NiAzMS44MDg1OTQgMTE1LjY2Nzk2OSA0NS43MzgyODEgOTQuNTE1NjI1IDYzLjI0MjE4OCBDIDkyLjg2MzI4MSA2NC42MDkzNzUgOTAuMjAzMTI1IDY0LjkyMTg3NSA4Ny4xNDA2MjUgNjQuODY3MTg4IEMgNzcuNDM3NSA2My4xOTkyMTkgNzAuNjk5MjE5IDY2Ljg0NzY1NiA2NC42NTIzNDQgNzMuMjQyMTg4IFogTSA2NC42NTIzNDQgNzMuMjQyMTg4ICIgY2xpcC1ydWxlPSJub256ZXJvIi8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9ImI5ZmJkMjk5YWMiPjxyZWN0IHg9IjAiIHdpZHRoPSIyODkiIHk9IjAiIGhlaWdodD0iODMiLz48L2NsaXBQYXRoPjwvZGVmcz48ZyBjbGlwLXBhdGg9InVybCgjZWI3ZTJhNjM4YikiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIGQ9Ik0gODUuNTM5MDYyIDcyLjk5MjE4OCBDIDc3Ljk5MjE4OCA2Ny44MzU5MzggNjcuODA4NTk0IDY5LjA3NDIxOSA2MS42OTkyMTkgNzUuODkwNjI1IEMgNTUuNTk3NjU2IDgyLjcwNzAzMSA1NS40NDkyMTkgOTMuMDA3ODEyIDYxLjM1OTM3NSA5OS45OTYwOTQgQyA2Ny4xNzk2ODggMTAzLjg2MzI4MSA3NC4xNjQwNjIgMTA2LjExNzE4OCA4MS42NzE4NzUgMTA2LjExNzE4OCBDIDk2LjY4NzUgMTA2LjExNzE4OCAxMDkuNjA5Mzc1IDk3LjEwMTU2MiAxMTUuMzUxNTYyIDg0LjE2Nzk2OSBMIDExNS41NzQyMTkgODMuNjU2MjUgQyAxMTUuOTk2MDk0IDgyLjQ2ODc1IDExNS44MjQyMTkgODEuMTMyODEyIDExNS4wOTc2NTYgODAuMDc4MTI1IEMgMTE0LjI2MTcxOSA3OC44NjcxODggMTEyLjgyNDIxOSA3OC4yMjY1NjIgMTExLjM3MTA5NCA3OC40MTAxNTYgQyAxMDkuOTE3OTY5IDc4LjU5Mzc1IDEwOC42ODM1OTQgNzkuNTc0MjE5IDEwOC4xNzE4NzUgODAuOTUzMTI1IEMgMTAyLjI5Mjk2OSA4OS44Mzk4NDQgODkuOTg0Mzc1IDg5Ljk4NDM3NSA4MC44MTI1IDg3LjI3MzQzOCBDIDY4Ljg5ODQzOCA4My43NSA3Mi4yMjY1NjIgNjkuNDQ5MjE5IDg1LjUzOTA2MiA3Mi45OTIxODggIiBmaWxsLW9wYWNpdHk9IjEiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48ZyBjbGlwLXBhdGg9InVybCgjMjNkZGY1NGZlYSkiPjxnIGNsaXAtcGF0aD0idXJsKCNlZjI4ODBkMWQ4KSI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTSA1NS40NTMxMjUgNjcuODM1OTM4IEwgMTE1Ljk5NjA5NCA2Ny44MzU5MzggTCAxMTUuOTk2MDk0IDEwNi4xMTcxODggTCA1NS40NTMxMjUgMTA2LjExNzE4OCBaIE0gNTUuNDUzMTI1IDY3LjgzNTkzOCAiIGZpbGwtb3BhY2l0eT0iMSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PC9nPjwvZz48ZyBjbGlwLXBhdGg9InVybCgjMDVjMGIwOTdhZCkiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIGQ9Ik0gMzQuMTk1MzEyIDM3LjM4NjcxOSBDIDM3LjY0ODQzOCAzNy4zODY3MTkgNDAuNDQ1MzEyIDQwLjE5NTMxMiA0MC40NDUzMTIgNDMuNjYwMTU2IEMgNDAuNDQ1MzEyIDQ3LjEyNSAzNy42NDg0MzggNDkuOTMzNTk0IDM0LjE5NTMxMiA0OS45MzM1OTQgQyAzMC43NDYwOTQgNDkuOTMzNTk0IDI3Ljk0NTMxMiA0Ny4xMjUgMjcuOTQ1MzEyIDQzLjY2MDE1NiBDIDI3Ljk0MTQwNiA0MC4xOTUzMTIgMzAuNzQ2MDk0IDM3LjM4NjcxOSAzNC4xOTUzMTIgMzcuMzg2NzE5IE0gMjcuMDkzNzUgNjguNDY4NzUgQyAzMC41NDI5NjkgNjguNDY4NzUgMzMuMzM5ODQ0IDcxLjI3MzQzOCAzMy4zMzk4NDQgNzQuNzQyMTg4IEMgMzMuMzM5ODQ0IDc4LjIwNzAzMSAzMC41NDI5NjkgODEuMDExNzE5IDI3LjA5Mzc1IDgxLjAxMTcxOSBDIDIzLjY0MDYyNSA4MS4wMTE3MTkgMjAuODQzNzUgNzguMjAzMTI1IDIwLjg0Mzc1IDc0Ljc0MjE4OCBDIDIwLjg0Mzc1IDcxLjI3MzQzOCAyMy42NDA2MjUgNjguNDY4NzUgMjcuMDkzNzUgNjguNDY4NzUgWiBNIDIwLjI3MzQzOCA1MC43ODUxNTYgQyAyMi40NzI2NTYgNTAuNzg1MTU2IDI0LjI1IDUyLjU3NDIxOSAyNC4yNSA1NC43ODEyNSBDIDI0LjI1IDU2Ljk4NDM3NSAyMi40NzI2NTYgNTguNzczNDM4IDIwLjI3MzQzOCA1OC43NzM0MzggQyAxOC4wNzgxMjUgNTguNzczNDM4IDE2LjMwMDc4MSA1Ni45ODQzNzUgMTYuMzAwNzgxIDU0Ljc4MTI1IEMgMTYuMzAwNzgxIDUyLjU3NDIxOSAxOC4wODIwMzEgNTAuNzg1MTU2IDIwLjI3MzQzOCA1MC43ODUxNTYgWiBNIDQ1LjQxNDA2MiAyMS45ODQzNzUgQyA0Ny42MTMyODEgMjEuOTg0Mzc1IDQ5LjM5MDYyNSAyMy43NzM0MzggNDkuMzkwNjI1IDI1Ljk4MDQ2OSBDIDQ5LjM5MDYyNSAyOC4xODM1OTQgNDcuNjEzMjgxIDI5Ljk3MjY1NiA0NS40MTQwNjIgMjkuOTcyNjU2IEMgNDMuMjE0ODQ0IDI5Ljk3MjY1NiA0MS40Mzc1IDI4LjE4MzU5NCA0MS40Mzc1IDI1Ljk4MDQ2OSBDIDQxLjQzNzUgMjMuNzczNDM4IDQzLjIxNDg0NCAyMS45ODQzNzUgNDUuNDE0MDYyIDIxLjk4NDM3NSBaIE0gNjQuNjUyMzQ0IDczLjI0MjE4OCBDIDcwLjc1NzgxMiA2OC44NDc2NTYgNzkuMTA1NDY5IDY4LjU5NzY1NiA4NS41MzkwNjIgNzIuOTkyMTg4IEMgOTguMzc1IDc2LjQxNDA2MiAxMTMuMjE0ODQ0IDY4LjQ4MDQ2OSAxMTIuOTA2MjUgNTQuMzcxMDk0IEMgMTEyLjc1IDQ3LjA1MDc4MSAxMDguMzkwNjI1IDQyLjY5MTQwNiAxMDIuNjY0MDYyIDM4LjY5OTIxOSBDIDkwLjEzNjcxOSAyOS45NzI2NTYgNzMuNDY4NzUgMjkuOTE0MDYyIDYwLjg4MjgxMiAzOC41NTg1OTQgQyA2MS4yMTA5MzggMzQuNTY2NDA2IDU4LjA3NDIxOSAzMS4xNTIzNDQgNTQuMDg5ODQ0IDMxLjE1MjM0NCBDIDUwLjMyNDIxOSAzMS4xNTIzNDQgNDcuMjczNDM4IDM0LjIxNDg0NCA0Ny4yNzM0MzggMzcuOTk2MDk0IEMgNDcuMjczNDM4IDQxLjMxNjQwNiA0OS42Mjg5MDYgNDQuMDg1OTM4IDUyLjc1MzkwNiA0NC43MDcwMzEgTCA1Mi43NTc4MTIgNDQuNzA3MDMxIEMgNTMuMTM2NzE5IDQ0LjcwNzAzMSA1My41MDc4MTIgNDQuNzUgNTMuODU5Mzc1IDQ0LjgzNTkzOCBDIDU1Ljk5NjA5NCA0NS4zMzU5MzggNTcuNTgyMDMxIDQ3LjI1NzgxMiA1Ny41ODIwMzEgNDkuNTUwNzgxIEMgNTcuNTgyMDMxIDUzLjQxMDE1NiA1My4yNDYwOTQgNTUuNzg5MDYyIDQ5Ljk2NDg0NCA1My41IEMgNDguNDg0Mzc1IDUyLjQ2NDg0NCA0Ni41ODU5MzggNTEuODkwNjI1IDQ0LjczODI4MSA1MS44OTA2MjUgQyAzOS41ODU5MzggNTEuODkwNjI1IDM1LjQxMDE1NiA1Ni4wODIwMzEgMzUuNDEwMTU2IDYxLjI1MzkwNiBDIDM1LjQxMDE1NiA2Ni40MjU3ODEgMzkuNTg1OTM4IDcwLjYxNzE4OCA0NC43MzgyODEgNzAuNjE3MTg4IEwgNDQuODQzNzUgNzAuNTg1OTM4IEMgNDUuNDY0ODQ0IDcwLjQxNzk2OSA0Ni4xMTMyODEgNzAuMzQ3NjU2IDQ2Ljc2OTUzMSA3MC4zOTQ1MzEgQyA0OS43MzA0NjkgNzAuNjA1NDY5IDUyLjA2NjQwNiA3My4wNzgxMjUgNTIuMDY2NDA2IDc2LjEwMTU2MiBDIDUyLjA2NjQwNiA3OS43NzM0MzggNDguNzAzMTI1IDgyLjQxNzk2OSA0NS4yMjY1NjIgODEuNzA3MDMxIEMgNDUuMDA3ODEyIDgxLjY2NDA2MiA0NC43ODkwNjIgODEuNjA1NDY5IDQ0LjU3ODEyNSA4MS41MzkwNjIgQyA0NC4yMTA5MzggODEuNDYwOTM4IDQzLjgzMjAzMSA4MS40MjE4NzUgNDMuNDQxNDA2IDgxLjQyMTg3NSBDIDQwLjI5Mjk2OSA4MS40MjE4NzUgMzcuNzQyMTg4IDgzLjk4NDM3NSAzNy43NDIxODggODcuMTQ0NTMxIEMgMzcuNzQyMTg4IDkwLjMwNDY4OCA0MC4yOTI5NjkgOTIuODYzMjgxIDQzLjQ0MTQwNiA5Mi44NjMyODEgQyA0OS40ODQzNzUgOTIuODYzMjgxIDQ3LjkxNDA2MiA4NS4zODI4MTIgNTEuNzQyMTg4IDkwLjcxNDg0NCBDIDU0LjM1OTM3NSA5NC4zNjMyODEgNTcuNjIxMDk0IDk3LjUxMTcxOSA2MS4zNTkzNzUgOTkuOTk2MDk0IEMgNTguNjk1MzEyIDk2Ljg0Mzc1IDU3LjI2MTcxOSA5My4wMTU2MjUgNTcuMDUwNzgxIDg5LjE0MDYyNSBDIDU2Ljc0NjA5NCA4Ni44NTkzNzUgNTcuMTMyODEyIDg0LjA5NzY1NiA1OC4xODM1OTQgODEuNzA3MDMxIEMgNTcuMzAwNzgxIDg0LjA3NDIxOSA1Ni45MTc5NjkgODYuNTkzNzUgNTcuMDQ2ODc1IDg5LjA4OTg0NCBDIDUxLjk3MjY1NiAzMS44MDg1OTQgMTE1LjY2Nzk2OSA0NS43MzgyODEgOTQuNTE1NjI1IDYzLjI0MjE4OCBDIDkyLjg2MzI4MSA2NC42MDkzNzUgOTAuMjAzMTI1IDY0LjkyMTg3NSA4Ny4xNDA2MjUgNjQuODY3MTg4IEMgNzcuNDM3NSA2My4xOTkyMTkgNzAuNjk5MjE5IDY2Ljg0NzY1NiA2NC42NTIzNDQgNzMuMjQyMTg4IFogTSA2NC42NTIzNDQgNzMuMjQyMTg4ICIgZmlsbC1vcGFjaXR5PSIxIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L2c+PGcgY2xpcC1wYXRoPSJ1cmwoIzY2YTM2MjkxMjkpIj48ZyBjbGlwLXBhdGg9InVybCgjZWU5ZjFjOWE5ZCkiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIGQ9Ik0gMTYuMzAwNzgxIDIxLjk4NDM3NSBMIDExNS42Njc5NjkgMjEuOTg0Mzc1IEwgMTE1LjY2Nzk2OSA5OS45OTYwOTQgTCAxNi4zMDA3ODEgOTkuOTk2MDk0IFogTSAxNi4zMDA3ODEgMjEuOTg0Mzc1ICIgZmlsbC1vcGFjaXR5PSIxIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48L2c+PC9nPjxnIHRyYW5zZm9ybT0ibWF0cml4KDEsIDAsIDAsIDEsIDEyMywgMzEpIj48ZyBjbGlwLXBhdGg9InVybCgjYjlmYmQyOTlhYykiPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMS4yNDI0MzUsIDY2Ljc2OTc4MykiPjxnPjxwYXRoIGQ9Ik0gMzEuNjI1IC0zNi44NzUgTCAyMS4zNDM3NSAtMzYuODc1IEwgMjEuMzQzNzUgLTQwLjgyODEyNSBDIDIxLjM0Mzc1IC00MS4yMzQzNzUgMjEuMTk1MzEyIC00MS41OTM3NSAyMC45MDYyNSAtNDEuOTA2MjUgQyAyMC42MjUgLTQyLjIxODc1IDIwLjI4MTI1IC00Mi4zNzUgMTkuODc1IC00Mi4zNzUgTCAxNS42MDkzNzUgLTQyLjM3NSBDIDE1LjIwMzEyNSAtNDIuMzc1IDE0Ljg1MTU2MiAtNDIuMjE4NzUgMTQuNTYyNSAtNDEuOTA2MjUgQyAxNC4yODEyNSAtNDEuNTkzNzUgMTQuMTQwNjI1IC00MS4yMzQzNzUgMTQuMTQwNjI1IC00MC44MjgxMjUgTCAxNC4xNDA2MjUgLTMxLjkzNzUgQyAxNC4xNDA2MjUgLTMxLjUxOTUzMSAxNC4yODEyNSAtMzEuMTU2MjUgMTQuNTYyNSAtMzAuODQzNzUgQyAxNC44NTE1NjIgLTMwLjUzOTA2MiAxNS4yMDMxMjUgLTMwLjM5MDYyNSAxNS42MDkzNzUgLTMwLjM5MDYyNSBMIDIyLjU3ODEyNSAtMzAuMzkwNjI1IEMgMjguOTYwOTM4IC0zMC4yODUxNTYgMzIuMTU2MjUgLTI2Ljg3ODkwNiAzMi4xNTYyNSAtMjAuMTcxODc1IEwgMzIuMTU2MjUgLTkuNDM3NSBDIDMyLjE1NjI1IC0yLjYzMjgxMiAyOC45NjA5MzggMC43NjU2MjUgMjIuNTc4MTI1IDAuNzY1NjI1IEwgMTMuNDUzMTI1IDAuNzY1NjI1IEMgNy4wNTQ2ODggMC43NjU2MjUgMy44NTkzNzUgLTIuNjMyODEyIDMuODU5Mzc1IC05LjQzNzUgTCAzLjg1OTM3NSAtMTQuNjA5Mzc1IEwgMTQuMTQwNjI1IC0xNC42MDkzNzUgTCAxNC4xNDA2MjUgLTkuMDQ2ODc1IEMgMTQuMTQwNjI1IC04LjYyODkwNiAxNC4yODEyNSAtOC4yNjU2MjUgMTQuNTYyNSAtNy45NTMxMjUgQyAxNC44NTE1NjIgLTcuNjQ4NDM4IDE1LjIwMzEyNSAtNy41IDE1LjYwOTM3NSAtNy41IEwgMjAuNDA2MjUgLTcuNSBDIDIwLjgyMDMxMiAtNy41IDIxLjE3MTg3NSAtNy42NDg0MzggMjEuNDUzMTI1IC03Ljk1MzEyNSBDIDIxLjczNDM3NSAtOC4yNjU2MjUgMjEuODc1IC04LjYyODkwNiAyMS44NzUgLTkuMDQ2ODc1IEwgMjEuODc1IC0xOC44NTkzNzUgQyAyMS44NzUgLTE5LjI3MzQzOCAyMS43MzQzNzUgLTE5LjYzMjgxMiAyMS40NTMxMjUgLTE5LjkzNzUgQyAyMS4xNzE4NzUgLTIwLjI1IDIwLjgyMDMxMiAtMjAuNDA2MjUgMjAuNDA2MjUgLTIwLjQwNjI1IEwgMTMuNDUzMTI1IC0yMC40MDYyNSBDIDcuMDU0Njg4IC0yMC40MDYyNSAzLjg1OTM3NSAtMjMuODA0Njg4IDMuODU5Mzc1IC0zMC42MDkzNzUgTCAzLjg1OTM3NSAtNDAuNTkzNzUgQyAzLjg1OTM3NSAtNDcuMzk0NTMxIDcuMDU0Njg4IC01MC43OTY4NzUgMTMuNDUzMTI1IC01MC43OTY4NzUgTCAyMi4wMzEyNSAtNTAuNzk2ODc1IEMgMjguNDI1NzgxIC01MC43OTY4NzUgMzEuNjI1IC00Ny4zOTQ1MzEgMzEuNjI1IC00MC41OTM3NSBaIE0gMzEuNjI1IC0zNi44NzUgIi8+PC9nPjwvZz48L2c+PGcgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIxIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MC42Njc3MTMsIDY2Ljc2OTc4MykiPjxnPjxwYXRoIGQ9Ik0gMjIuNSAtOC4xODc1IEwgMjIuNSAtMTUuOTIxODc1IEwgMzIuNzgxMjUgLTE1LjkyMTg3NSBMIDMyLjc4MTI1IC05LjQzNzUgQyAzMi43ODEyNSAtMi42MzI4MTIgMjkuNTgyMDMxIDAuNzY1NjI1IDIzLjE4NzUgMC43NjU2MjUgTCAxMy40NTMxMjUgMC43NjU2MjUgQyA3LjA1NDY4OCAwLjc2NTYyNSAzLjg1OTM3NSAtMi42MzI4MTIgMy44NTkzNzUgLTkuNDM3NSBMIDMuODU5Mzc1IC00MC41OTM3NSBDIDMuODU5Mzc1IC00Ny4zOTQ1MzEgNy4wNTQ2ODggLTUwLjc5Njg3NSAxMy40NTMxMjUgLTUwLjc5Njg3NSBMIDIzLjE4NzUgLTUwLjc5Njg3NSBDIDI5LjU4MjAzMSAtNTAuNzk2ODc1IDMyLjc4MTI1IC00Ny4zOTQ1MzEgMzIuNzgxMjUgLTQwLjU5Mzc1IEwgMzIuNzgxMjUgLTM1Ljg3NSBMIDIyLjUgLTM1Ljg3NSBMIDIyLjUgLTQxLjkwNjI1IEMgMjIuNSAtNDIuMzEyNSAyMi4zNTE1NjIgLTQyLjY3MTg3NSAyMi4wNjI1IC00Mi45ODQzNzUgQyAyMS43ODEyNSAtNDMuMjk2ODc1IDIxLjQzNzUgLTQzLjQ1MzEyNSAyMS4wMzEyNSAtNDMuNDUzMTI1IEwgMTYuMTU2MjUgLTQzLjQ1MzEyNSBDIDE1Ljc1IC00My40NTMxMjUgMTUuMzk4NDM4IC00My4yOTY4NzUgMTUuMTA5Mzc1IC00Mi45ODQzNzUgQyAxNC44MjgxMjUgLTQyLjY3MTg3NSAxNC42ODc1IC00Mi4zMTI1IDE0LjY4NzUgLTQxLjkwNjI1IEwgMTQuNjg3NSAtOC4xODc1IEMgMTQuNjg3NSAtNy43ODEyNSAxNC44MjgxMjUgLTcuNDIxODc1IDE1LjEwOTM3NSAtNy4xMDkzNzUgQyAxNS4zOTg0MzggLTYuODA0Njg4IDE1Ljc1IC02LjY1NjI1IDE2LjE1NjI1IC02LjY1NjI1IEwgMjEuMDMxMjUgLTYuNjU2MjUgQyAyMS40Mzc1IC02LjY1NjI1IDIxLjc4MTI1IC02LjgwNDY4OCAyMi4wNjI1IC03LjEwOTM3NSBDIDIyLjM1MTU2MiAtNy40MjE4NzUgMjIuNSAtNy43ODEyNSAyMi41IC04LjE4NzUgWiBNIDIyLjUgLTguMTg3NSAiLz48L2c+PC9nPjwvZz48ZyBmaWxsPSIjMDAwMDAwIiBmaWxsLW9wYWNpdHk9IjEiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDgwLjA5Mjk5LCA2Ni43Njk3ODMpIj48Zz48cGF0aCBkPSJNIDE0LjY4NzUgLTUwLjAxNTYyNSBMIDE0LjY4NzUgMCBMIDMuODU5Mzc1IDAgTCAzLjg1OTM3NSAtNTAuMDE1NjI1IFogTSAxNC42ODc1IC01MC4wMTU2MjUgIi8+PC9nPjwvZz48L2c+PGcgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIxIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDIuOTc1MzAzLCA2Ni43Njk3ODMpIj48Zz48cGF0aCBkPSJNIDE0LjY4NzUgLTguOTY4NzUgTCAyNi42NzE4NzUgLTguOTY4NzUgTCAyNi42NzE4NzUgMCBMIDMuODU5Mzc1IDAgTCAzLjg1OTM3NSAtNTAuMDE1NjI1IEwgMjYuNjcxODc1IC01MC4wMTU2MjUgTCAyNi42NzE4NzUgLTQxLjIwMzEyNSBMIDE0LjY4NzUgLTQxLjIwMzEyNSBMIDE0LjY4NzUgLTI5LjQ1MzEyNSBMIDI1LjkwNjI1IC0yOS40NTMxMjUgTCAyNS45MDYyNSAtMjAuOTUzMTI1IEwgMTQuNjg3NSAtMjAuOTUzMTI1IFogTSAxNC42ODc1IC04Ljk2ODc1ICIvPjwvZz48L2c+PC9nPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTM2LjA2MTcwMSwgNjYuNzY5NzgzKSI+PGc+PHBhdGggZD0iTSAzMi41NDY4NzUgMCBMIDIxLjcxODc1IDAgTCAyMS43MTg3NSAtNDEuNTE1NjI1IEMgMjEuNzE4NzUgLTQxLjkyOTY4OCAyMS41NzgxMjUgLTQyLjI4OTA2MiAyMS4yOTY4NzUgLTQyLjU5Mzc1IEMgMjEuMDE1NjI1IC00Mi45MDYyNSAyMC42NjQwNjIgLTQzLjA2MjUgMjAuMjUgLTQzLjA2MjUgTCAxNi4wNzgxMjUgLTQzLjA2MjUgQyAxNS42NzE4NzUgLTQzLjA2MjUgMTUuMzIwMzEyIC00Mi45MDYyNSAxNS4wMzEyNSAtNDIuNTkzNzUgQyAxNC43NSAtNDIuMjg5MDYyIDE0LjYwOTM3NSAtNDEuOTI5Njg4IDE0LjYwOTM3NSAtNDEuNTE1NjI1IEwgMTQuNjA5Mzc1IDAgTCAzLjc4MTI1IDAgTCAzLjc4MTI1IC00MC41OTM3NSBDIDMuNzgxMjUgLTQ3LjM5NDUzMSA2Ljk3NjU2MiAtNTAuNzk2ODc1IDEzLjM3NSAtNTAuNzk2ODc1IEwgMjIuOTY4NzUgLTUwLjc5Njg3NSBDIDI5LjM1MTU2MiAtNTAuNzk2ODc1IDMyLjU0Njg3NSAtNDcuMzk0NTMxIDMyLjU0Njg3NSAtNDAuNTkzNzUgWiBNIDMyLjU0Njg3NSAwICIvPjwvZz48L2c+PC9nPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTc2LjAyODEwNiwgNjYuNzY5NzgzKSI+PGc+PHBhdGggZD0iTSAyMi41IC04LjE4NzUgTCAyMi41IC0xNS45MjE4NzUgTCAzMi43ODEyNSAtMTUuOTIxODc1IEwgMzIuNzgxMjUgLTkuNDM3NSBDIDMyLjc4MTI1IC0yLjYzMjgxMiAyOS41ODIwMzEgMC43NjU2MjUgMjMuMTg3NSAwLjc2NTYyNSBMIDEzLjQ1MzEyNSAwLjc2NTYyNSBDIDcuMDU0Njg4IDAuNzY1NjI1IDMuODU5Mzc1IC0yLjYzMjgxMiAzLjg1OTM3NSAtOS40Mzc1IEwgMy44NTkzNzUgLTQwLjU5Mzc1IEMgMy44NTkzNzUgLTQ3LjM5NDUzMSA3LjA1NDY4OCAtNTAuNzk2ODc1IDEzLjQ1MzEyNSAtNTAuNzk2ODc1IEwgMjMuMTg3NSAtNTAuNzk2ODc1IEMgMjkuNTgyMDMxIC01MC43OTY4NzUgMzIuNzgxMjUgLTQ3LjM5NDUzMSAzMi43ODEyNSAtNDAuNTkzNzUgTCAzMi43ODEyNSAtMzUuODc1IEwgMjIuNSAtMzUuODc1IEwgMjIuNSAtNDEuOTA2MjUgQyAyMi41IC00Mi4zMTI1IDIyLjM1MTU2MiAtNDIuNjcxODc1IDIyLjA2MjUgLTQyLjk4NDM3NSBDIDIxLjc4MTI1IC00My4yOTY4NzUgMjEuNDM3NSAtNDMuNDUzMTI1IDIxLjAzMTI1IC00My40NTMxMjUgTCAxNi4xNTYyNSAtNDMuNDUzMTI1IEMgMTUuNzUgLTQzLjQ1MzEyNSAxNS4zOTg0MzggLTQzLjI5Njg3NSAxNS4xMDkzNzUgLTQyLjk4NDM3NSBDIDE0LjgyODEyNSAtNDIuNjcxODc1IDE0LjY4NzUgLTQyLjMxMjUgMTQuNjg3NSAtNDEuOTA2MjUgTCAxNC42ODc1IC04LjE4NzUgQyAxNC42ODc1IC03Ljc4MTI1IDE0LjgyODEyNSAtNy40MjE4NzUgMTUuMTA5Mzc1IC03LjEwOTM3NSBDIDE1LjM5ODQzOCAtNi44MDQ2ODggMTUuNzUgLTYuNjU2MjUgMTYuMTU2MjUgLTYuNjU2MjUgTCAyMS4wMzEyNSAtNi42NTYyNSBDIDIxLjQzNzUgLTYuNjU2MjUgMjEuNzgxMjUgLTYuODA0Njg4IDIyLjA2MjUgLTcuMTA5Mzc1IEMgMjIuMzUxNTYyIC03LjQyMTg3NSAyMi41IC03Ljc4MTI1IDIyLjUgLTguMTg3NSBaIE0gMjIuNSAtOC4xODc1ICIvPjwvZz48L2c+PC9nPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjE1LjQ1MzM4MywgNjYuNzY5NzgzKSI+PGc+PHBhdGggZD0iTSAxNC42ODc1IC04Ljk2ODc1IEwgMjYuNjcxODc1IC04Ljk2ODc1IEwgMjYuNjcxODc1IDAgTCAzLjg1OTM3NSAwIEwgMy44NTkzNzUgLTUwLjAxNTYyNSBMIDI2LjY3MTg3NSAtNTAuMDE1NjI1IEwgMjYuNjcxODc1IC00MS4yMDMxMjUgTCAxNC42ODc1IC00MS4yMDMxMjUgTCAxNC42ODc1IC0yOS40NTMxMjUgTCAyNS45MDYyNSAtMjkuNDUzMTI1IEwgMjUuOTA2MjUgLTIwLjk1MzEyNSBMIDE0LjY4NzUgLTIwLjk1MzEyNSBaIE0gMTQuNjg3NSAtOC45Njg3NSAiLz48L2c+PC9nPjwvZz48ZyBmaWxsPSIjMDAwMDAwIiBmaWxsLW9wYWNpdHk9IjEiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0OC41Mzk3ODEsIDY2Ljc2OTc4MykiPjxnPjxwYXRoIGQ9Ik0gMzEuNjI1IC0zNi44NzUgTCAyMS4zNDM3NSAtMzYuODc1IEwgMjEuMzQzNzUgLTQwLjgyODEyNSBDIDIxLjM0Mzc1IC00MS4yMzQzNzUgMjEuMTk1MzEyIC00MS41OTM3NSAyMC45MDYyNSAtNDEuOTA2MjUgQyAyMC42MjUgLTQyLjIxODc1IDIwLjI4MTI1IC00Mi4zNzUgMTkuODc1IC00Mi4zNzUgTCAxNS42MDkzNzUgLTQyLjM3NSBDIDE1LjIwMzEyNSAtNDIuMzc1IDE0Ljg1MTU2MiAtNDIuMjE4NzUgMTQuNTYyNSAtNDEuOTA2MjUgQyAxNC4yODEyNSAtNDEuNTkzNzUgMTQuMTQwNjI1IC00MS4yMzQzNzUgMTQuMTQwNjI1IC00MC44MjgxMjUgTCAxNC4xNDA2MjUgLTMxLjkzNzUgQyAxNC4xNDA2MjUgLTMxLjUxOTUzMSAxNC4yODEyNSAtMzEuMTU2MjUgMTQuNTYyNSAtMzAuODQzNzUgQyAxNC44NTE1NjIgLTMwLjUzOTA2MiAxNS4yMDMxMjUgLTMwLjM5MDYyNSAxNS42MDkzNzUgLTMwLjM5MDYyNSBMIDIyLjU3ODEyNSAtMzAuMzkwNjI1IEMgMjguOTYwOTM4IC0zMC4yODUxNTYgMzIuMTU2MjUgLTI2Ljg3ODkwNiAzMi4xNTYyNSAtMjAuMTcxODc1IEwgMzIuMTU2MjUgLTkuNDM3NSBDIDMyLjE1NjI1IC0yLjYzMjgxMiAyOC45NjA5MzggMC43NjU2MjUgMjIuNTc4MTI1IDAuNzY1NjI1IEwgMTMuNDUzMTI1IDAuNzY1NjI1IEMgNy4wNTQ2ODggMC43NjU2MjUgMy44NTkzNzUgLTIuNjMyODEyIDMuODU5Mzc1IC05LjQzNzUgTCAzLjg1OTM3NSAtMTQuNjA5Mzc1IEwgMTQuMTQwNjI1IC0xNC42MDkzNzUgTCAxNC4xNDA2MjUgLTkuMDQ2ODc1IEMgMTQuMTQwNjI1IC04LjYyODkwNiAxNC4yODEyNSAtOC4yNjU2MjUgMTQuNTYyNSAtNy45NTMxMjUgQyAxNC44NTE1NjIgLTcuNjQ4NDM4IDE1LjIwMzEyNSAtNy41IDE1LjYwOTM3NSAtNy41IEwgMjAuNDA2MjUgLTcuNSBDIDIwLjgyMDMxMiAtNy41IDIxLjE3MTg3NSAtNy42NDg0MzggMjEuNDUzMTI1IC03Ljk1MzEyNSBDIDIxLjczNDM3NSAtOC4yNjU2MjUgMjEuODc1IC04LjYyODkwNiAyMS44NzUgLTkuMDQ2ODc1IEwgMjEuODc1IC0xOC44NTkzNzUgQyAyMS44NzUgLTE5LjI3MzQzOCAyMS43MzQzNzUgLTE5LjYzMjgxMiAyMS40NTMxMjUgLTE5LjkzNzUgQyAyMS4xNzE4NzUgLTIwLjI1IDIwLjgyMDMxMiAtMjAuNDA2MjUgMjAuNDA2MjUgLTIwLjQwNjI1IEwgMTMuNDUzMTI1IC0yMC40MDYyNSBDIDcuMDU0Njg4IC0yMC40MDYyNSAzLjg1OTM3NSAtMjMuODA0Njg4IDMuODU5Mzc1IC0zMC42MDkzNzUgTCAzLjg1OTM3NSAtNDAuNTkzNzUgQyAzLjg1OTM3NSAtNDcuMzk0NTMxIDcuMDU0Njg4IC01MC43OTY4NzUgMTMuNDUzMTI1IC01MC43OTY4NzUgTCAyMi4wMzEyNSAtNTAuNzk2ODc1IEMgMjguNDI1NzgxIC01MC43OTY4NzUgMzEuNjI1IC00Ny4zOTQ1MzEgMzEuNjI1IC00MC41OTM3NSBaIE0gMzEuNjI1IC0zNi44NzUgIi8+PC9nPjwvZz48L2c+PC9nPjwvZz48L3N2Zz4=" alt="eSCIENCES">
+  <div class="meta">S1 · FMTTN · Numérique</div>
+  <div class="title-wrap">
+    <div>
+      <div class="kicker">Les bases de la programmation · P5 → S1</div>
+      <h1 class="big">Parler<br>à une <span class="hl">machine</span></h1>
+      <p class="subtitle">Algorithme, boucle, condition, variable : les briques pour programmer.</p>
+    </div>
+    <div class="stack" aria-hidden="true">
+      <div class="blk c-algo" style="background:var(--algo)">quand je clique sur ▶</div>
+      <div class="blk c-var" style="background:var(--var)">idées ← 0</div>
+      <div class="blk loopwrap" style="background:var(--loop)">répéter 3 fois
+        <div class="inner">
+          <div class="blk small" style="background:var(--seq)">apprendre une brique</div>
+          <div class="blk small" style="background:var(--var)">idées ← idées + 1</div>
+        </div>
+      </div>
+      <div class="blk" style="background:var(--cond)">si j'ai compris alors… je programme !</div>
+    </div>
+  </div>
+  <div class="title-foot"><span>Formation numérique · 1re secondaire</span><span class="cc">CC BY-NC-SA</span></div>
+</section>
+
+<!-- 2 · AU PROGRAMME -->
+<section class="slide" data-name="Au programme" hidden>
+  <div class="head"><span class="tag">Au programme</span></div>
+  <h2>Ce que tu as vu en primaire… et ce qu'on ajoute</h2>
+  <div class="road4">
+    <div class="box">
+      <h3>P5 <small>premiers pas</small></h3>
+      <div class="chips">
+        <span class="chip c-algo">Algorithme</span>
+        <span class="chip">Logigramme</span>
+        <span class="chip">Début, processus, décision</span>
+        <span class="chip c-seq">Programme séquentiel</span>
+        <span class="chip c-seq">Déplacements</span>
+        <span class="chip c-seq">Blocs de code</span>
+        <span class="chip c-bug">Tester et déboguer</span>
+      </div>
+    </div>
+    <div class="box">
+      <h3>P6 <small>on répète, on choisit</small></h3>
+      <div class="chips">
+        <span class="chip c-algo">Algorithme ≠ programme</span>
+        <span class="chip">Langage de programmation</span>
+        <span class="chip c-loop">Boucle</span>
+        <span class="chip c-loop">Repérer une répétition</span>
+        <span class="chip c-cond">Condition</span>
+      </div>
+    </div>
+    <div class="box new">
+      <h3>S1 <small>nouveau cette année</small></h3>
+      <div class="chips">
+        <span class="chip c-var" style="background:var(--card)">Variable</span>
+        <span class="chip" style="background:var(--card)">Boucle + condition + variable</span>
+        <span class="chip" style="background:var(--card)">Optimiser</span>
+      </div>
+      <p class="small" style="color:var(--ink);margin-top:auto">Une boîte qui retient une valeur, et des programmes plus courts et plus malins.</p>
+    </div>
+    <div class="box later">
+      <h3>S2</h3>
+      <div class="chips"><span class="chip">ET</span><span class="chip">OU</span><span class="chip">NON</span></div>
+      <p class="small" style="margin-top:auto">Les opérateurs logiques.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · MACHINE OBÉISSANTE -->
+<section class="slide" data-name="Machine obéissante" data-niv="P5" hidden>
+  <div class="head"><span class="tag c-algo">Programmer</span></div>
+  <h2>Une machine obéit à la lettre. Elle ne devine rien.</h2>
+  <div class="versus">
+    <div class="box">
+      <h3>Ordre flou</h3>
+      <div class="say">« Mets du choco sur le pain. »</div>
+      <button class="btn" data-reveal="r1">Que fait le robot ?</button>
+      <div class="robot-says" id="r1" hidden><span class="k">robot&gt;</span> je pose le pot fermé sur le pain.<br><span class="err">✗ Pas de tartine. L'ordre était trop vague.</span></div>
+    </div>
+    <div class="box">
+      <h3>Ordres précis</h3>
+      <div class="say" style="font-size:23px;line-height:1.5">1. Ouvre le pot.<br>2. Prends un couteau.<br>3. Plonge le couteau dans le pot.<br>4. Étale le choco sur la tranche.</div>
+      <button class="btn" data-reveal="r2">Et maintenant ?</button>
+      <div class="robot-says" id="r2" hidden><span class="k">robot&gt;</span> tartine prête !<br><span class="k">✓</span> Chaque étape est claire et dans le bon ordre.</div>
+    </div>
+  </div>
+  <p class="lead"><b>Programmer</b>, c'est donner à une machine des instructions <b>précises</b>, dans le <b>bon ordre</b>.</p>
+</section>
+
+<!-- 4 · ALGORITHME -->
+<section class="slide c-algo" data-name="Algorithme" data-niv="P5" hidden>
+  <div class="head"><span class="tag c-algo">Algorithme</span></div>
+  <div class="row grow">
+    <div class="col" style="width:420px;flex:none">
+      <div class="box def"><span class="word">Algorithme</span><p style="font-size:24px;line-height:1.4">Une suite d'<b>étapes</b>, dans un <b>ordre précis</b>, pour résoudre un problème.</p></div>
+      <p class="small">Une recette, un mode d'emploi, le chemin vers l'école : ce sont des algorithmes de la vie de tous les jours.</p>
+      <p style="font-size:22px;font-weight:600">À toi : remets les étapes dans l'ordre pour se brosser les dents.</p>
+      <div class="feedback" id="ord-fb" aria-live="polite"></div>
+    </div>
+    <div class="order grow">
+      <div class="pool"><span class="label">Étapes mélangées</span><div id="ord-pool" class="pool"></div></div>
+      <div class="answer"><span class="label">Ton algorithme</span><div id="ord-ans" class="answer"></div>
+        <div style="display:flex;gap:12px;margin-top:6px"><button class="btn primary" id="ord-check">Vérifier</button><button class="btn" id="ord-reset">Recommencer</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4b · ALGORITHME <-> ACTIVITÉ -->
+<section class="slide" data-name="Devine l'activité" data-niv="P5" hidden>
+  <div class="head"><span class="tag c-algo">Algorithme ↔ activité</span><h2 style="font-size:42px">Devine l'activité cachée derrière l'algorithme</h2></div>
+  <div class="guess">
+    <div class="box"><span class="label">Algorithme A</span>
+      <ol><li>Mouiller ses mains</li><li>Mettre du savon</li><li>Frotter 30 secondes</li><li>Rincer</li><li>Sécher</li></ol>
+      <button class="btn" data-reveal="g1">C'est quoi ?</button><div class="ans" id="g1" hidden>Se laver les mains</div></div>
+    <div class="box"><span class="label">Algorithme B</span>
+      <ol><li>Croiser les deux lacets</li><li>Faire une boucle</li><li>Enrouler l'autre lacet autour</li><li>Tirer sur les deux boucles</li></ol>
+      <button class="btn" data-reveal="g2">C'est quoi ?</button><div class="ans" id="g2" hidden>Nouer ses lacets</div></div>
+    <div class="box"><span class="label">Algorithme C</span>
+      <ol><li>Choisir la boisson</li><li>Mettre une pièce</li><li>Attendre le gobelet</li><li>Prendre la boisson</li></ol>
+      <button class="btn" data-reveal="g3">C'est quoi ?</button><div class="ans" id="g3" hidden>Utiliser un distributeur</div></div>
+  </div>
+  <p class="lead" style="font-size:25px">Et dans l'autre sens : écris l'algorithme pour <b>préparer ton cartable</b>. Combien d'étapes ?</p>
+</section>
+
+<!-- 5 · ALGORITHME vs PROGRAMME -->
+<section class="slide" data-name="Algorithme ou programme" data-niv="P6" hidden>
+  <div class="head"><span class="tag c-algo">Algorithme ≠ programme</span></div>
+  <h2>Même idée, deux façons de l'écrire</h2>
+  <div class="compare">
+    <div class="box" style="background:var(--algo-soft)">
+      <h3>Algorithme</h3>
+      <ul><li>écrit pour un <b>humain</b></li><li>en français, avec des mots ou un dessin (logigramme)</li></ul>
+      <div class="say" style="font-size:22px;line-height:1.5;background:var(--card)">Tant qu'il reste des bougies allumées,<br>souffle une bougie.</div>
+    </div>
+    <div class="arrow" aria-hidden="true"><svg width="80" height="60" viewBox="0 0 80 60"><path d="M6 30 H62" stroke="var(--line)" stroke-width="6" fill="none"/><path d="M52 14 L74 30 L52 46 Z" fill="var(--line)"/></svg></div>
+    <div class="box" style="background:var(--seq-soft)">
+      <h3>Programme</h3>
+      <ul><li>écrit pour une <b>machine</b></li><li>traduit dans un <b>langage de programmation</b></li></ul>
+<pre class="code"><span class="kw">while</span> bougies <span class="kw">&gt;</span> <span class="nb">0</span>:
+    <span class="fn">souffler</span>()</pre>
+    </div>
+  </div>
+  <p class="lead" style="font-size:25px">Le programme, c'est l'algorithme <b>traduit</b> pour que l'ordinateur puisse l'exécuter.</p>
+</section>
+
+<!-- 6 · LANGAGES -->
+<section class="slide" data-name="Langages" data-niv="P6" hidden>
+  <div class="head"><span class="tag">Langage de programmation</span></div>
+  <h2>Un langage que la machine sait lire</h2>
+  <p class="lead" style="font-size:24px">Il en existe des centaines. Ils ont tous un <b>vocabulaire</b> et des <b>règles</b> très strictes. Voici le même ordre dans trois versions :</p>
+  <div class="langs">
+    <div class="box">
+      <span class="label">En français</span>
+      <p class="fr">Répète 4 fois :<br>&nbsp;&nbsp;avance de 100 pas<br>&nbsp;&nbsp;tourne à droite de 90°</p>
+      <p class="small">Le robot dessine… un carré !</p>
+    </div>
+    <div class="box">
+      <span class="label">En blocs</span>
+      <div class="blk loopwrap" style="background:var(--loop);font-size:20px">répéter 4 fois
+        <div class="inner">
+          <div class="blk small" style="background:var(--seq)">avancer de 100</div>
+          <div class="blk small" style="background:var(--seq)">tourner ↻ de 90°</div>
+        </div>
+      </div>
+      <div class="tools"><span class="tool">Scratch</span><span class="tool">MakeCode</span><span class="tool">Blockly</span></div>
+    </div>
+    <div class="box">
+      <span class="label">En texte (Python)</span>
+<pre class="code"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nb">4</span>):
+    <span class="fn">forward</span>(<span class="nb">100</span>)
+    <span class="fn">right</span>(<span class="nb">90</span>)</pre>
+      <div class="tools"><span class="tool">Python</span><span class="tool">JavaScript</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · LOGIGRAMME -->
+<section class="slide" data-name="Logigramme" data-niv="P5" hidden>
+  <div class="head"><span class="tag">Logigramme</span></div>
+  <h2>Un algorithme dessiné avec des formes</h2>
+  <div class="shapes">
+    <div class="box shape">
+      <svg viewBox="0 0 200 96"><rect x="20" y="18" width="160" height="60" rx="30" fill="var(--algo-soft)" stroke="var(--line)" stroke-width="3"/><text x="100" y="56" text-anchor="middle" class="fl-txt">Début / Fin</text></svg>
+      <h3>Début / Fin</h3><p>L'<b>ovale</b> : le programme commence ou s'arrête.</p>
+    </div>
+    <div class="box shape">
+      <svg viewBox="0 0 200 96"><rect x="20" y="18" width="160" height="60" rx="4" fill="var(--seq-soft)" stroke="var(--line)" stroke-width="3"/><text x="100" y="56" text-anchor="middle" class="fl-txt">Avancer</text></svg>
+      <h3>Processus</h3><p>Le <b>rectangle</b> : une action à faire.</p>
+    </div>
+    <div class="box shape">
+      <svg viewBox="0 0 200 96"><path d="M100 6 L186 48 L100 90 L14 48 Z" fill="var(--cond-soft)" stroke="var(--line)" stroke-width="3"/><text x="100" y="55" text-anchor="middle" class="fl-txt">Mur ?</text></svg>
+      <h3>Décision</h3><p>Le <b>losange</b> : une question, réponse oui ou non.</p>
+    </div>
+    <div class="box shape">
+      <svg viewBox="0 0 200 96"><path d="M30 48 H150" stroke="var(--line)" stroke-width="5"/><path d="M146 32 L172 48 L146 64 Z" fill="var(--line)"/></svg>
+      <h3>Lien</h3><p>La <b>flèche</b> : le chemin à suivre.</p>
+    </div>
+  </div>
+  <div class="box which" style="box-shadow:var(--shadow-s)">
+    <span class="q" id="sh-q">Quelle forme pour « Le feu est-il vert ? »</span>
+    <div style="display:flex;gap:10px">
+      <button class="btn" data-shape="ovale">Ovale</button>
+      <button class="btn" data-shape="rectangle">Rectangle</button>
+      <button class="btn" data-shape="losange">Losange</button>
+    </div>
+    <span class="feedback" id="sh-fb" aria-live="polite"></span>
+  </div>
+</section>
+
+<!-- 8 · SÉQUENCE -->
+<section class="slide" data-name="Séquence" data-niv="P5" hidden>
+  <div class="head"><span class="tag c-seq">Séquence</span><h2 style="font-size:42px">Les instructions s'exécutent une par une, dans l'ordre</h2></div>
+  <div class="robot-zone">
+    <div id="grid" class="grid" aria-label="Plateau du robot"></div>
+    <div class="col">
+      <p style="font-size:22px;font-weight:600">Mission : écris le logigramme qui amène le robot jusqu'à l'étoile, puis teste-le.</p>
+      <div class="cmds">
+        <button class="btn cmd" data-cmd="U">↑ haut</button>
+        <button class="btn cmd" data-cmd="D">↓ bas</button>
+        <button class="btn cmd" data-cmd="L">← gauche</button>
+        <button class="btn cmd" data-cmd="R">→ droite</button>
+      </div>
+      <span class="label">Ton logigramme <span id="prog-n"></span></span>
+      <div id="prog" class="prog" aria-live="polite"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn primary" id="run">▶ Exécuter</button>
+        <button class="btn" id="undo">Retirer la dernière</button>
+        <button class="btn" id="clear">Tout effacer</button>
+      </div>
+      <div class="feedback" id="run-fb" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8b · LIRE UN LOGIGRAMME -->
+<section class="slide" data-name="Lire un logigramme" data-niv="P5" hidden>
+  <div class="head"><span class="tag c-seq">Lire un logigramme</span><h2 style="font-size:42px">Lis le logigramme. Où arrive le robot ?</h2></div>
+  <div class="read-zone">
+    <div class="box" style="padding:6px 10px"><svg viewBox="0 0 300 470" width="100%" height="470" aria-label="Logigramme d'un déplacement"><defs><marker id="ah3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="fl-head"/></marker></defs><rect x="70" y="4" width="160" height="44" rx="22" class="fl-node" id="r-n0" style="fill:var(--algo-soft)"/><text x="150" y="33" text-anchor="middle" class="fl-txt">Début</text><path d="M150 48 V66" class="fl-edge" marker-end="url(#ah3)"/><rect x="40" y="70" width="220" height="44" rx="4" class="fl-node" id="r-n1"/><text x="150" y="99" text-anchor="middle" class="fl-txt">Aller à droite</text><path d="M150 114 V132" class="fl-edge" marker-end="url(#ah3)"/><rect x="40" y="136" width="220" height="44" rx="4" class="fl-node" id="r-n2"/><text x="150" y="165" text-anchor="middle" class="fl-txt">Aller à droite</text><path d="M150 180 V198" class="fl-edge" marker-end="url(#ah3)"/><rect x="40" y="202" width="220" height="44" rx="4" class="fl-node" id="r-n3"/><text x="150" y="231" text-anchor="middle" class="fl-txt">Monter</text><path d="M150 246 V264" class="fl-edge" marker-end="url(#ah3)"/><rect x="40" y="268" width="220" height="44" rx="4" class="fl-node" id="r-n4"/><text x="150" y="297" text-anchor="middle" class="fl-txt">Monter</text><path d="M150 312 V330" class="fl-edge" marker-end="url(#ah3)"/><rect x="40" y="334" width="220" height="44" rx="4" class="fl-node" id="r-n5"/><text x="150" y="363" text-anchor="middle" class="fl-txt">Aller à droite</text><path d="M150 378 V396" class="fl-edge" marker-end="url(#ah3)"/><rect x="70" y="400" width="160" height="44" rx="22" class="fl-node" id="r-n6" style="fill:var(--algo-soft)"/><text x="150" y="429" text-anchor="middle" class="fl-txt">Fin</text></svg></div>
+    <div class="col">
+      <div id="rgrid" class="grid small" aria-label="Plateau : où arrive le robot ?"></div>
+      <span class="small">Le robot part de la case bleue.</span>
+      <div class="blocks-out" id="r-out" hidden><span class="label">Le même programme en blocs de code</span></div>
+    </div>
+    <div class="col">
+      <p style="font-size:22px;font-weight:600">1. Suis le logigramme avec ton doigt, puis choisis :</p>
+      <div class="answers"><button class="btn" data-ans="A">A</button><button class="btn" data-ans="B">B</button><button class="btn" data-ans="C">C</button></div>
+      <div class="feedback" id="r-fb" aria-live="polite"></div>
+      <p style="font-size:22px;font-weight:600">2. Vérifie en lisant à voix haute :</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" id="r-play">▶ Vérifier pas à pas</button><button class="btn" id="r-blocks">Traduire en blocs</button></div>
+      <div class="narr" id="r-narr" style="min-height:64px" aria-live="polite">Chaque rectangle = une action, dans l'ordre, de haut en bas.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · BOUCLE -->
+<section class="slide" data-name="Boucle" data-niv="P6" hidden>
+  <div class="head"><span class="tag c-loop">Boucle</span><h2 style="font-size:42px">Quand ça se répète, on utilise une boucle</h2></div>
+  <div class="loop-zone">
+    <div class="col">
+      <span class="label">Programme d'un escalier</span>
+      <div id="loop-list" class="listing"></div>
+      <span class="counter" id="loop-count">8 instructions</span>
+    </div>
+    <div class="col">
+      <div class="box def c-loop"><span class="word">Boucle</span><p style="font-size:23px;line-height:1.4">Elle <b>répète</b> un groupe d'instructions. Le programme est plus <b>court</b>, plus <b>lisible</b> et on fait moins d'erreurs.</p></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn" id="loop-spot">1. Repérer la répétition</button>
+        <button class="btn primary" id="loop-do">2. Remplacer par une boucle</button>
+      </div>
+    </div>
+  </div>
+  <div class="kinds">
+    <div class="box"><b>répéter 4 fois</b><span>On sait combien de fois.</span></div>
+    <div class="box"><b>répéter jusqu'à …</b><span>On s'arrête quand une condition devient vraie.</span></div>
+    <div class="box"><b>répéter indéfiniment</b><span>Ça ne s'arrête jamais (un feu rouge, un jeu vidéo).</span></div>
+  </div>
+</section>
+
+<!-- 10 · CONDITION -->
+<section class="slide" data-name="Condition" data-niv="P6" hidden>
+  <div class="head"><span class="tag c-cond">Condition</span><h2 style="font-size:40px">Si… alors… sinon : le programme choisit</h2></div>
+  <div class="cond-zone">
+    <div class="box" style="padding:10px;display:grid;place-items:center">
+      <svg viewBox="0 0 560 440" width="100%" height="420" aria-label="Logigramme : il pleut ?">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="fl-head"/></marker></defs>
+        <rect x="200" y="10" width="160" height="50" rx="25" class="fl-node" id="c-start"/><text x="280" y="42" text-anchor="middle" class="fl-txt">Début</text>
+        <path d="M280 60 V92" class="fl-edge" id="c-e0" marker-end="url(#ah)"/>
+        <path d="M280 96 L380 150 L280 204 L180 150 Z" class="fl-node" id="c-dec"/><text x="280" y="157" text-anchor="middle" class="fl-txt">Il pleut ?</text>
+        <path d="M180 150 H100 V246" class="fl-edge" id="c-eyes" marker-end="url(#ah)"/><text x="150" y="138" class="fl-lbl" text-anchor="middle">oui</text>
+        <path d="M380 150 H460 V246" class="fl-edge" id="c-eno" marker-end="url(#ah)"/><text x="410" y="138" class="fl-lbl" text-anchor="middle">non</text>
+        <rect x="10" y="250" width="180" height="60" rx="4" class="fl-node" id="c-yes"/><text x="100" y="278" text-anchor="middle" class="fl-txt">Prendre</text><text x="100" y="300" text-anchor="middle" class="fl-txt">un parapluie</text>
+        <rect x="370" y="250" width="180" height="60" rx="4" class="fl-node" id="c-no"/><text x="460" y="278" text-anchor="middle" class="fl-txt">Prendre</text><text x="460" y="300" text-anchor="middle" class="fl-txt">une casquette</text>
+        <path d="M100 310 V346 H270" class="fl-edge" id="c-ey2" marker-end="url(#ah)"/>
+        <path d="M460 310 V346 H290" class="fl-edge" id="c-en2" marker-end="url(#ah)"/>
+        <rect x="200" y="370" width="160" height="50" rx="25" class="fl-node" id="c-end"/><text x="280" y="402" text-anchor="middle" class="fl-txt">Sortir</text>
+        <path d="M280 346 V366" class="fl-edge" id="c-e3" marker-end="url(#ah)"/>
+      </svg>
+    </div>
+    <div class="col">
+      <div class="box def c-cond"><span class="word">Condition</span><p style="font-size:22px;line-height:1.4">Une <b>question</b> dont la réponse est <b>vrai</b> ou <b>faux</b> : le programme choisit un chemin.</p></div>
+      <span class="label">Choisis la météo</span>
+      <div class="toggle"><button class="btn" data-rain="1">Il pleut</button><button class="btn" data-rain="0">Il fait beau</button></div>
+<pre class="code" id="cond-code" style="font-size:19px;padding:12px 16px"><span class="ln" data-l="0"><span class="kw">si</span> il pleut <span class="kw">alors</span></span><span class="ln" data-l="1">    prendre un parapluie</span><span class="ln" data-l="2"><span class="kw">sinon</span></span><span class="ln" data-l="3">    prendre une casquette</span><span class="ln" data-l="4">sortir</span></pre>
+      <p class="small" style="font-size:18px">Dans la vraie vie : <b>si</b> le capteur voit un obstacle, <b>alors</b> la voiture freine.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10b · BOUCLE + CONDITION -->
+<section class="slide" data-name="Boucle et condition" data-niv="P6" hidden>
+  <div class="head"><span class="tag c-loop">Boucle + condition</span><h2 style="font-size:42px">Traverser la rue : on repose la question</h2></div>
+  <div class="cond-zone">
+    <div class="box" style="padding:10px;display:grid;place-items:center">
+      <svg viewBox="0 0 570 450" width="100%" height="450" aria-label="Logigramme : traverser la rue">
+        <defs><marker id="ah4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="fl-head"/></marker></defs>
+        <rect x="200" y="6" width="160" height="48" rx="24" class="fl-node" id="f-start"/><text x="280" y="37" text-anchor="middle" class="fl-txt">Début</text>
+        <path d="M280 54 V96" class="fl-edge" id="f-e0" marker-end="url(#ah4)"/>
+        <path d="M280 100 L410 160 L280 220 L150 160 Z" class="fl-node fl-cond" id="f-dec"/><text x="280" y="155" text-anchor="middle" class="fl-txt">Le feu piéton</text><text x="280" y="179" text-anchor="middle" class="fl-txt">est vert ?</text>
+        <path d="M410 160 H490 V228" class="fl-edge" id="f-eno" marker-end="url(#ah4)"/><text x="440" y="148" class="fl-lbl">non</text>
+        <rect x="430" y="232" width="120" height="50" rx="4" class="fl-node" id="f-wait"/><text x="490" y="263" text-anchor="middle" class="fl-txt">Attendre</text>
+        <path d="M550 257 H562 V78 H290" class="fl-edge loopy" id="f-back" marker-end="url(#ah4)"/><text x="548" y="170" class="fl-lbl" style="fill:var(--loop)" transform="rotate(90 548 170)" text-anchor="middle">boucle</text>
+        <path d="M280 220 V280" class="fl-edge" id="f-eyes" marker-end="url(#ah4)"/><text x="292" y="256" class="fl-lbl">oui</text>
+        <rect x="200" y="284" width="160" height="50" rx="4" class="fl-node" id="f-cross"/><text x="280" y="315" text-anchor="middle" class="fl-txt">Traverser</text>
+        <path d="M280 334 V376" class="fl-edge" id="f-e2" marker-end="url(#ah4)"/>
+        <rect x="200" y="380" width="160" height="48" rx="24" class="fl-node" id="f-end"/><text x="280" y="411" text-anchor="middle" class="fl-txt">Fin</text>
+      </svg>
+    </div>
+    <div class="col">
+      <div style="display:flex;gap:20px;align-items:center">
+        <div class="feu rouge" id="feu" aria-label="Feu piéton"><i class="r"><svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5" fill="#fff"/><path d="M9 9h6v7H9z" fill="#fff"/></svg></i><i class="v"><svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5" fill="#fff"/><path d="M10 9h4l2 6-2 1-1-3-2 7-2-1 2-6z" fill="#fff"/></svg></i></div>
+        <p style="font-size:22px;line-height:1.4">Une <b>condition</b> dans une <b>boucle</b> : tant que la réponse est <b>non</b>, on recommence.</p>
+      </div>
+<pre class="code" id="f-code"><span class="ln" data-l="0"><span class="kw">répéter jusqu'à</span> feu vert :</span><span class="ln" data-l="1">    attendre</span><span class="ln" data-l="2">traverser</span></pre>
+      <div class="narr" id="f-narr" aria-live="polite">Appuie sur « Étape suivante » et lis le logigramme à voix haute.</div>
+      <div class="ctrls"><button class="btn primary" id="f-step">Étape suivante</button><button class="btn" id="f-play">▶ Tout jouer</button><button class="btn" id="f-reset">Recommencer</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · VARIABLE -->
+<section class="slide" data-name="Variable" data-niv="S1" hidden>
+  <div class="head"><span class="tag c-var">Variable · nouveau en S1</span></div>
+  <div class="var-zone">
+    <div>
+      <div class="vbox" id="vbox"><div class="lid"></div><div class="body"><span class="val" id="vval">0</span></div><span class="name">score</span></div>
+      <div class="vbtns">
+        <button class="btn" id="v-plus">score ← score + 1</button>
+        <button class="btn" id="v-minus">score ← score − 1</button>
+        <button class="btn" id="v-zero">score ← 0</button>
+      </div>
+    </div>
+    <div class="col">
+      <h2>Une boîte avec une étiquette</h2>
+      <div class="rules">
+        <div class="rule"><span class="k">nom</span><span>L'étiquette sur la boîte : <b>score</b>, <b>vies</b>, <b>temps</b>…</span></div>
+        <div class="rule"><span class="k">valeur</span><span>Ce qu'il y a dans la boîte <b>maintenant</b> (un nombre, un mot…).</span></div>
+        <div class="rule"><span class="k">change</span><span>Le programme peut <b>lire</b> la valeur et la <b>remplacer</b> par une autre.</span></div>
+      </div>
+      <div class="notation">score ← score + 1</div>
+      <p class="small">Se lit : « Prends la valeur de score, ajoute 1, et range le résultat dans score. »</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12 · TOUT ENSEMBLE -->
+<section class="slide" data-name="Tout ensemble" data-niv="S1" hidden>
+  <div class="head"><span class="tag">Boucle + condition + variable</span><h2 style="font-size:40px">Joyeux anniversaire, pas à pas</h2></div>
+  <div class="all-zone">
+    <div class="box" style="padding:8px">
+      <svg viewBox="0 0 600 520" width="100%" height="520" aria-label="Logigramme des bougies">
+        <defs><marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="fl-head"/></marker></defs>
+        <rect x="120" y="8" width="160" height="46" rx="23" class="fl-node" id="b-start"/><text x="200" y="38" text-anchor="middle" class="fl-txt">Début</text>
+        <path d="M200 54 V80" class="fl-edge" marker-end="url(#ah2)"/>
+        <rect x="90" y="84" width="220" height="52" rx="4" class="fl-node fl-var" id="b-init"/><text x="200" y="117" text-anchor="middle" class="fl-txt mono">bougies ← <tspan id="b-initv">5</tspan></text>
+        <path d="M200 136 V170" class="fl-edge" marker-end="url(#ah2)"/>
+        <path d="M200 174 L310 228 L200 282 L90 228 Z" class="fl-node fl-cond" id="b-dec"/><text x="200" y="235" text-anchor="middle" class="fl-txt mono">bougies &gt; 0 ?</text>
+        <path d="M200 282 V318" class="fl-edge" marker-end="url(#ah2)"/><text x="216" y="306" class="fl-lbl">oui</text>
+        <rect x="90" y="322" width="220" height="52" rx="4" class="fl-node" id="b-blow"/><text x="200" y="355" text-anchor="middle" class="fl-txt">Souffler une bougie</text>
+        <path d="M200 374 V402" class="fl-edge" marker-end="url(#ah2)"/>
+        <rect x="70" y="406" width="260" height="52" rx="4" class="fl-node fl-var" id="b-dec1"/><text x="200" y="439" text-anchor="middle" class="fl-txt mono">bougies ← bougies − 1</text>
+        <path d="M70 432 H30 V228 H86" class="fl-edge" id="b-back" marker-end="url(#ah2)" style="stroke:var(--loop)"/><text x="18" y="330" class="fl-lbl" transform="rotate(-90 18 330)" text-anchor="middle" style="fill:var(--loop)">boucle</text>
+        <path d="M310 228 H372" class="fl-edge" marker-end="url(#ah2)"/><text x="336" y="216" class="fl-lbl">non</text>
+        <rect x="376" y="196" width="210" height="64" rx="4" class="fl-node" id="b-song"/><text x="481" y="224" text-anchor="middle" class="fl-txt">Crier « Joyeux</text><text x="481" y="247" text-anchor="middle" class="fl-txt">anniversaire ! »</text>
+        <path d="M481 260 V318" class="fl-edge" marker-end="url(#ah2)"/>
+        <rect x="401" y="322" width="160" height="46" rx="23" class="fl-node" id="b-end"/><text x="481" y="352" text-anchor="middle" class="fl-txt">Fin</text>
+      </svg>
+    </div>
+    <div class="all-right">
+      <div class="cake">
+        <div class="mini-var"><div class="v" id="b-val">?</div><span class="n">bougies</span></div>
+        <div class="candles" id="candles" aria-hidden="true"></div>
+      </div>
+<pre class="code" id="b-code"><span class="ln" data-l="0">bougies <span class="kw">=</span> <span class="nb" id="b-codev">5</span></span><span class="ln" data-l="1"><span class="kw">while</span> bougies <span class="kw">&gt;</span> <span class="nb">0</span>:</span><span class="ln" data-l="2">    <span class="fn">souffler</span>()</span><span class="ln" data-l="3">    bougies <span class="kw">=</span> bougies <span class="kw">-</span> <span class="nb">1</span></span><span class="ln" data-l="4"><span class="fn">print</span>(<span class="st">"Joyeux anniversaire !"</span>)</span></pre>
+      <div class="narr" id="b-narr" aria-live="polite">Appuie sur « Étape suivante » et lis le logigramme à voix haute.</div>
+      <div class="ctrls">
+        <button class="btn primary" id="b-step">Étape suivante</button>
+        <button class="btn" id="b-play">▶ Tout jouer</button>
+        <button class="btn" id="b-reset">Recommencer</button>
+        <span class="label" style="margin-left:6px">Départ :</span>
+        <button class="btn" id="b-less" aria-label="Moins de bougies">−</button>
+        <button class="btn" id="b-more" aria-label="Plus de bougies">+</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 · BUG -->
+<section class="slide" data-name="Déboguer" data-niv="P5 → S1" hidden>
+  <div class="head"><span class="tag c-bug">Bug et débogage</span><h2 style="font-size:42px">Ça ne marche pas ? Cherche le bug !</h2></div>
+  <div class="bug-zone">
+    <div class="col">
+      <p style="font-size:22px">Ce programme devait dessiner un <b>carré</b>. Voici ce qu'il a fait. <b>Clique sur la ligne fautive.</b></p>
+      <div class="lines" id="bug-lines">
+        <button data-bug="0">stylo en bas</button>
+        <button data-bug="1">répéter 3 fois</button>
+        <button data-bug="0" class="indent">avancer de 100</button>
+        <button data-bug="0" class="indent">tourner ↻ de 90°</button>
+      </div>
+      <div class="feedback" id="bug-fb" aria-live="polite"></div>
+    </div>
+    <div class="col">
+      <div class="box" style="display:grid;place-items:center;padding:14px">
+        <svg viewBox="0 0 260 260" width="300" height="300" aria-label="Dessin du programme">
+          <path id="bug-draw" d="M50 210 L50 50 L210 50 L210 210" fill="none" stroke="var(--seq)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="50" cy="210" r="9" fill="var(--algo)" stroke="var(--line)" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="cycle"><span class="s">Écrire</span>→<span class="s">Tester</span>→<span class="s">Trouver le bug</span>→<span class="s">Corriger</span>→<span class="s">Tester encore</span></div>
+      <p class="small">Un <b>bug</b>, c'est une erreur dans un programme. <b>Déboguer</b>, c'est la trouver et la corriger. Tous les programmeurs le font, tout le temps !</p>
+    </div>
+  </div>
+</section>
+
+<!-- 13b · OPTIMISER -->
+<section class="slide" data-name="Optimiser" data-niv="S1" hidden>
+  <div class="head"><span class="tag c-var">Optimiser · nouveau en S1</span><h2 style="font-size:42px">Même dessin, programme plus malin</h2></div>
+  <div class="opt-zone">
+    <div class="col">
+      <div class="box def c-var"><span class="word">Optimiser</span><p style="font-size:22px;line-height:1.4">Obtenir le <b>même résultat</b> avec un programme plus <b>court</b>, plus <b>clair</b> et plus <b>facile à modifier</b>.</p></div>
+      <span class="label">Change la valeur de la variable côtés</span>
+      <div class="sides" id="sides"></div>
+      <div class="tally"><div><b id="o-long">12</b><span>instructions dans la version longue</span></div><div><b>4</b><span>lignes dans la version optimisée</span></div></div>
+    </div>
+    <div class="box" style="display:grid;place-items:center;padding:10px"><svg viewBox="0 0 280 280" width="270" height="270" aria-label="Le dessin du programme"><path id="o-poly" fill="var(--var-soft)" stroke="var(--var)" stroke-width="6" stroke-linejoin="round"/></svg></div>
+    <div class="col" style="gap:10px">
+      <span class="label">Version longue</span>
+      <div class="longprog" id="o-list"></div>
+      <span class="label">Version optimisée (boucle + variable)</span>
+<pre class="code" style="font-size:19px"><span class="ln">côtés <span class="kw">←</span> <span class="nb" id="o-n">6</span></span><span class="ln"><span class="kw">répéter</span> côtés <span class="kw">fois</span> :</span><span class="ln">    avancer de 80</span><span class="ln">    tourner ↻ de 360 / côtés</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- 14 · QUIZ -->
+<section class="slide" data-name="Quiz" hidden>
+  <div class="head"><span class="tag" style="background:var(--mint)">Turbo-check</span><div class="qdots" id="qdots"></div><span class="counter" id="qscore" style="margin-left:auto"></span></div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<!-- 15 · À RETENIR -->
+<section class="slide" data-name="À retenir" hidden>
+  <div class="head"><span class="tag">À retenir</span></div>
+  <h2>Les briques de base</h2>
+  <div class="memo">
+    <div class="box c-algo"><b>Algorithme</b><span>Suite d'étapes dans un ordre précis pour résoudre un problème.</span></div>
+    <div class="box"><b>Logigramme</b><span>L'algorithme dessiné : début/fin, processus, décision, liens.</span></div>
+    <div class="box c-seq"><b>Programme</b><span>L'algorithme traduit pour la machine.</span></div>
+    <div class="box"><b>Langage</b><span>Blocs ou texte : des mots et des règles strictes.</span></div>
+    <div class="box c-seq"><b>Séquence</b><span>Les instructions s'exécutent une par une, dans l'ordre.</span></div>
+    <div class="box c-loop"><b>Boucle</b><span>Répète un groupe d'instructions.</span></div>
+    <div class="box c-cond"><b>Condition</b><span>Si… alors… sinon : le programme choisit un chemin.</span></div>
+    <div class="box c-var"><b>Variable</b><span>Une boîte nommée qui garde une valeur qui peut changer.</span></div>
+    <div class="box c-bug"><b>Déboguer</b><span>Tester, trouver l'erreur, la corriger.</span></div>
+    <div class="box c-var"><b>Optimiser</b><span>Même résultat, programme plus court et plus clair.</span></div>
+  </div>
+  <div class="credits">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTYwIiB6b29tQW5kUGFuPSJtYWduaWZ5IiB2aWV3Qm94PSIwIDAgNDIwIDEzNS4wMDAwMDMiIGhlaWdodD0iMTgwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0IiB2ZXJzaW9uPSIxLjAiPjxkZWZzPjxnLz48Y2xpcFBhdGggaWQ9ImViN2UyYTYzOGIiPjxwYXRoIGQ9Ik0gNTcgNjkgTCAxMTYgNjkgTCAxMTYgMTA2LjExMzI4MSBMIDU3IDEwNi4xMTMyODEgWiBNIDU3IDY5ICIgY2xpcC1ydWxlPSJub256ZXJvIi8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9IjIzZGRmNTRmZWEiPjxwYXRoIGQ9Ik0gNTcgNjkuNzUgTCAxMTUuOTI5Njg4IDY5Ljc1IEwgMTE1LjkyOTY4OCAxMDYuMTEzMjgxIEwgNTcgMTA2LjExMzI4MSBaIE0gNTcgNjkuNzUgIiBjbGlwLXJ1bGU9Im5vbnplcm8iLz48L2NsaXBQYXRoPjxjbGlwUGF0aCBpZD0iZWYyODgwZDFkOCI+PHBhdGggZD0iTSA4NS41MzkwNjIgNzIuOTkyMTg4IEMgNzcuOTkyMTg4IDY3LjgzNTkzOCA2Ny44MDg1OTQgNjkuMDc0MjE5IDYxLjY5OTIxOSA3NS44OTA2MjUgQyA1NS41OTc2NTYgODIuNzA3MDMxIDU1LjQ0OTIxOSA5My4wMDc4MTIgNjEuMzU5Mzc1IDk5Ljk5NjA5NCBDIDY3LjE3OTY4OCAxMDMuODYzMjgxIDc0LjE2NDA2MiAxMDYuMTE3MTg4IDgxLjY3MTg3NSAxMDYuMTE3MTg4IEMgOTYuNjg3NSAxMDYuMTE3MTg4IDEwOS42MDkzNzUgOTcuMTAxNTYyIDExNS4zNTE1NjIgODQuMTY3OTY5IEwgMTE1LjU3NDIxOSA4My42NTYyNSBDIDExNS45OTYwOTQgODIuNDY4NzUgMTE1LjgyNDIxOSA4MS4xMzI4MTIgMTE1LjA5NzY1NiA4MC4wNzgxMjUgQyAxMTQuMjYxNzE5IDc4Ljg2NzE4OCAxMTIuODI0MjE5IDc4LjIyNjU2MiAxMTEuMzcxMDk0IDc4LjQxMDE1NiBDIDEwOS45MTc5NjkgNzguNTkzNzUgMTA4LjY4MzU5NCA3OS41NzQyMTkgMTA4LjE3MTg3NSA4MC45NTMxMjUgQyAxMDIuMjkyOTY5IDg5LjgzOTg0NCA4OS45ODQzNzUgODkuOTg0Mzc1IDgwLjgxMjUgODcuMjczNDM4IEMgNjguODk4NDM4IDgzLjc1IDcyLjIyNjU2MiA2OS40NDkyMTkgODUuNTM5MDYyIDcyLjk5MjE4OCAiIGNsaXAtcnVsZT0ibm9uemVybyIvPjwvY2xpcFBhdGg+PGNsaXBQYXRoIGlkPSIwNWMwYjA5N2FkIj48cGF0aCBkPSJNIDE2LjI2OTUzMSAyMS45ODQzNzUgTCAxMTMgMjEuOTg0Mzc1IEwgMTEzIDEwMCBMIDE2LjI2OTUzMSAxMDAgWiBNIDE2LjI2OTUzMSAyMS45ODQzNzUgIiBjbGlwLXJ1bGU9Im5vbnplcm8iLz48L2NsaXBQYXRoPjxjbGlwUGF0aCBpZD0iNjZhMzYyOTEyOSI+PHBhdGggZD0iTSAxNi4zMDA3ODEgMjEuOTg0Mzc1IEwgMTEzIDIxLjk4NDM3NSBMIDExMyAxMDAgTCAxNi4zMDA3ODEgMTAwIFogTSAxNi4zMDA3ODEgMjEuOTg0Mzc1ICIgY2xpcC1ydWxlPSJub256ZXJvIi8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9ImVlOWYxYzlhOWQiPjxwYXRoIGQ9Ik0gMzQuMTk1MzEyIDM3LjM4NjcxOSBDIDM3LjY0ODQzOCAzNy4zODY3MTkgNDAuNDQ1MzEyIDQwLjE5NTMxMiA0MC40NDUzMTIgNDMuNjYwMTU2IEMgNDAuNDQ1MzEyIDQ3LjEyNSAzNy42NDg0MzggNDkuOTMzNTk0IDM0LjE5NTMxMiA0OS45MzM1OTQgQyAzMC43NDYwOTQgNDkuOTMzNTk0IDI3Ljk0NTMxMiA0Ny4xMjUgMjcuOTQ1MzEyIDQzLjY2MDE1NiBDIDI3Ljk0MTQwNiA0MC4xOTUzMTIgMzAuNzQ2MDk0IDM3LjM4NjcxOSAzNC4xOTUzMTIgMzcuMzg2NzE5IE0gMjcuMDkzNzUgNjguNDY4NzUgQyAzMC41NDI5NjkgNjguNDY4NzUgMzMuMzM5ODQ0IDcxLjI3MzQzOCAzMy4zMzk4NDQgNzQuNzQyMTg4IEMgMzMuMzM5ODQ0IDc4LjIwNzAzMSAzMC41NDI5NjkgODEuMDExNzE5IDI3LjA5Mzc1IDgxLjAxMTcxOSBDIDIzLjY0MDYyNSA4MS4wMTE3MTkgMjAuODQzNzUgNzguMjAzMTI1IDIwLjg0Mzc1IDc0Ljc0MjE4OCBDIDIwLjg0Mzc1IDcxLjI3MzQzOCAyMy42NDA2MjUgNjguNDY4NzUgMjcuMDkzNzUgNjguNDY4NzUgWiBNIDIwLjI3MzQzOCA1MC43ODUxNTYgQyAyMi40NzI2NTYgNTAuNzg1MTU2IDI0LjI1IDUyLjU3NDIxOSAyNC4yNSA1NC43ODEyNSBDIDI0LjI1IDU2Ljk4NDM3NSAyMi40NzI2NTYgNTguNzczNDM4IDIwLjI3MzQzOCA1OC43NzM0MzggQyAxOC4wNzgxMjUgNTguNzczNDM4IDE2LjMwMDc4MSA1Ni45ODQzNzUgMTYuMzAwNzgxIDU0Ljc4MTI1IEMgMTYuMzAwNzgxIDUyLjU3NDIxOSAxOC4wODIwMzEgNTAuNzg1MTU2IDIwLjI3MzQzOCA1MC43ODUxNTYgWiBNIDQ1LjQxNDA2MiAyMS45ODQzNzUgQyA0Ny42MTMyODEgMjEuOTg0Mzc1IDQ5LjM5MDYyNSAyMy43NzM0MzggNDkuMzkwNjI1IDI1Ljk4MDQ2OSBDIDQ5LjM5MDYyNSAyOC4xODM1OTQgNDcuNjEzMjgxIDI5Ljk3MjY1NiA0NS40MTQwNjIgMjkuOTcyNjU2IEMgNDMuMjE0ODQ0IDI5Ljk3MjY1NiA0MS40Mzc1IDI4LjE4MzU5NCA0MS40Mzc1IDI1Ljk4MDQ2OSBDIDQxLjQzNzUgMjMuNzczNDM4IDQzLjIxNDg0NCAyMS45ODQzNzUgNDUuNDE0MDYyIDIxLjk4NDM3NSBaIE0gNjQuNjUyMzQ0IDczLjI0MjE4OCBDIDcwLjc1NzgxMiA2OC44NDc2NTYgNzkuMTA1NDY5IDY4LjU5NzY1NiA4NS41MzkwNjIgNzIuOTkyMTg4IEMgOTguMzc1IDc2LjQxNDA2MiAxMTMuMjE0ODQ0IDY4LjQ4MDQ2OSAxMTIuOTA2MjUgNTQuMzcxMDk0IEMgMTEyLjc1IDQ3LjA1MDc4MSAxMDguMzkwNjI1IDQyLjY5MTQwNiAxMDIuNjY0MDYyIDM4LjY5OTIxOSBDIDkwLjEzNjcxOSAyOS45NzI2NTYgNzMuNDY4NzUgMjkuOTE0MDYyIDYwLjg4MjgxMiAzOC41NTg1OTQgQyA2MS4yMTA5MzggMzQuNTY2NDA2IDU4LjA3NDIxOSAzMS4xNTIzNDQgNTQuMDg5ODQ0IDMxLjE1MjM0NCBDIDUwLjMyNDIxOSAzMS4xNTIzNDQgNDcuMjczNDM4IDM0LjIxNDg0NCA0Ny4yNzM0MzggMzcuOTk2MDk0IEMgNDcuMjczNDM4IDQxLjMxNjQwNiA0OS42Mjg5MDYgNDQuMDg1OTM4IDUyLjc1MzkwNiA0NC43MDcwMzEgTCA1Mi43NTc4MTIgNDQuNzA3MDMxIEMgNTMuMTM2NzE5IDQ0LjcwNzAzMSA1My41MDc4MTIgNDQuNzUgNTMuODU5Mzc1IDQ0LjgzNTkzOCBDIDU1Ljk5NjA5NCA0NS4zMzU5MzggNTcuNTgyMDMxIDQ3LjI1NzgxMiA1Ny41ODIwMzEgNDkuNTUwNzgxIEMgNTcuNTgyMDMxIDUzLjQxMDE1NiA1My4yNDYwOTQgNTUuNzg5MDYyIDQ5Ljk2NDg0NCA1My41IEMgNDguNDg0Mzc1IDUyLjQ2NDg0NCA0Ni41ODU5MzggNTEuODkwNjI1IDQ0LjczODI4MSA1MS44OTA2MjUgQyAzOS41ODU5MzggNTEuODkwNjI1IDM1LjQxMDE1NiA1Ni4wODIwMzEgMzUuNDEwMTU2IDYxLjI1MzkwNiBDIDM1LjQxMDE1NiA2Ni40MjU3ODEgMzkuNTg1OTM4IDcwLjYxNzE4OCA0NC43MzgyODEgNzAuNjE3MTg4IEwgNDQuODQzNzUgNzAuNTg1OTM4IEMgNDUuNDY0ODQ0IDcwLjQxNzk2OSA0Ni4xMTMyODEgNzAuMzQ3NjU2IDQ2Ljc2OTUzMSA3MC4zOTQ1MzEgQyA0OS43MzA0NjkgNzAuNjA1NDY5IDUyLjA2NjQwNiA3My4wNzgxMjUgNTIuMDY2NDA2IDc2LjEwMTU2MiBDIDUyLjA2NjQwNiA3OS43NzM0MzggNDguNzAzMTI1IDgyLjQxNzk2OSA0NS4yMjY1NjIgODEuNzA3MDMxIEMgNDUuMDA3ODEyIDgxLjY2NDA2MiA0NC43ODkwNjIgODEuNjA1NDY5IDQ0LjU3ODEyNSA4MS41MzkwNjIgQyA0NC4yMTA5MzggODEuNDYwOTM4IDQzLjgzMjAzMSA4MS40MjE4NzUgNDMuNDQxNDA2IDgxLjQyMTg3NSBDIDQwLjI5Mjk2OSA4MS40MjE4NzUgMzcuNzQyMTg4IDgzLjk4NDM3NSAzNy43NDIxODggODcuMTQ0NTMxIEMgMzcuNzQyMTg4IDkwLjMwNDY4OCA0MC4yOTI5NjkgOTIuODYzMjgxIDQzLjQ0MTQwNiA5Mi44NjMyODEgQyA0OS40ODQzNzUgOTIuODYzMjgxIDQ3LjkxNDA2MiA4NS4zODI4MTIgNTEuNzQyMTg4IDkwLjcxNDg0NCBDIDU0LjM1OTM3NSA5NC4zNjMyODEgNTcuNjIxMDk0IDk3LjUxMTcxOSA2MS4zNTkzNzUgOTkuOTk2MDk0IEMgNTguNjk1MzEyIDk2Ljg0Mzc1IDU3LjI2MTcxOSA5My4wMTU2MjUgNTcuMDUwNzgxIDg5LjE0MDYyNSBDIDU2Ljc0NjA5NCA4Ni44NTkzNzUgNTcuMTMyODEyIDg0LjA5NzY1NiA1OC4xODM1OTQgODEuNzA3MDMxIEMgNTcuMzAwNzgxIDg0LjA3NDIxOSA1Ni45MTc5NjkgODYuNTkzNzUgNTcuMDQ2ODc1IDg5LjA4OTg0NCBDIDUxLjk3MjY1NiAzMS44MDg1OTQgMTE1LjY2Nzk2OSA0NS43MzgyODEgOTQuNTE1NjI1IDYzLjI0MjE4OCBDIDkyLjg2MzI4MSA2NC42MDkzNzUgOTAuMjAzMTI1IDY0LjkyMTg3NSA4Ny4xNDA2MjUgNjQuODY3MTg4IEMgNzcuNDM3NSA2My4xOTkyMTkgNzAuNjk5MjE5IDY2Ljg0NzY1NiA2NC42NTIzNDQgNzMuMjQyMTg4IFogTSA2NC42NTIzNDQgNzMuMjQyMTg4ICIgY2xpcC1ydWxlPSJub256ZXJvIi8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9ImI5ZmJkMjk5YWMiPjxyZWN0IHg9IjAiIHdpZHRoPSIyODkiIHk9IjAiIGhlaWdodD0iODMiLz48L2NsaXBQYXRoPjwvZGVmcz48ZyBjbGlwLXBhdGg9InVybCgjZWI3ZTJhNjM4YikiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIGQ9Ik0gODUuNTM5MDYyIDcyLjk5MjE4OCBDIDc3Ljk5MjE4OCA2Ny44MzU5MzggNjcuODA4NTk0IDY5LjA3NDIxOSA2MS42OTkyMTkgNzUuODkwNjI1IEMgNTUuNTk3NjU2IDgyLjcwNzAzMSA1NS40NDkyMTkgOTMuMDA3ODEyIDYxLjM1OTM3NSA5OS45OTYwOTQgQyA2Ny4xNzk2ODggMTAzLjg2MzI4MSA3NC4xNjQwNjIgMTA2LjExNzE4OCA4MS42NzE4NzUgMTA2LjExNzE4OCBDIDk2LjY4NzUgMTA2LjExNzE4OCAxMDkuNjA5Mzc1IDk3LjEwMTU2MiAxMTUuMzUxNTYyIDg0LjE2Nzk2OSBMIDExNS41NzQyMTkgODMuNjU2MjUgQyAxMTUuOTk2MDk0IDgyLjQ2ODc1IDExNS44MjQyMTkgODEuMTMyODEyIDExNS4wOTc2NTYgODAuMDc4MTI1IEMgMTE0LjI2MTcxOSA3OC44NjcxODggMTEyLjgyNDIxOSA3OC4yMjY1NjIgMTExLjM3MTA5NCA3OC40MTAxNTYgQyAxMDkuOTE3OTY5IDc4LjU5Mzc1IDEwOC42ODM1OTQgNzkuNTc0MjE5IDEwOC4xNzE4NzUgODAuOTUzMTI1IEMgMTAyLjI5Mjk2OSA4OS44Mzk4NDQgODkuOTg0Mzc1IDg5Ljk4NDM3NSA4MC44MTI1IDg3LjI3MzQzOCBDIDY4Ljg5ODQzOCA4My43NSA3Mi4yMjY1NjIgNjkuNDQ5MjE5IDg1LjUzOTA2MiA3Mi45OTIxODggIiBmaWxsLW9wYWNpdHk9IjEiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48ZyBjbGlwLXBhdGg9InVybCgjMjNkZGY1NGZlYSkiPjxnIGNsaXAtcGF0aD0idXJsKCNlZjI4ODBkMWQ4KSI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTSA1NS40NTMxMjUgNjcuODM1OTM4IEwgMTE1Ljk5NjA5NCA2Ny44MzU5MzggTCAxMTUuOTk2MDk0IDEwNi4xMTcxODggTCA1NS40NTMxMjUgMTA2LjExNzE4OCBaIE0gNTUuNDUzMTI1IDY3LjgzNTkzOCAiIGZpbGwtb3BhY2l0eT0iMSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PC9nPjwvZz48ZyBjbGlwLXBhdGg9InVybCgjMDVjMGIwOTdhZCkiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIGQ9Ik0gMzQuMTk1MzEyIDM3LjM4NjcxOSBDIDM3LjY0ODQzOCAzNy4zODY3MTkgNDAuNDQ1MzEyIDQwLjE5NTMxMiA0MC40NDUzMTIgNDMuNjYwMTU2IEMgNDAuNDQ1MzEyIDQ3LjEyNSAzNy42NDg0MzggNDkuOTMzNTk0IDM0LjE5NTMxMiA0OS45MzM1OTQgQyAzMC43NDYwOTQgNDkuOTMzNTk0IDI3Ljk0NTMxMiA0Ny4xMjUgMjcuOTQ1MzEyIDQzLjY2MDE1NiBDIDI3Ljk0MTQwNiA0MC4xOTUzMTIgMzAuNzQ2MDk0IDM3LjM4NjcxOSAzNC4xOTUzMTIgMzcuMzg2NzE5IE0gMjcuMDkzNzUgNjguNDY4NzUgQyAzMC41NDI5NjkgNjguNDY4NzUgMzMuMzM5ODQ0IDcxLjI3MzQzOCAzMy4zMzk4NDQgNzQuNzQyMTg4IEMgMzMuMzM5ODQ0IDc4LjIwNzAzMSAzMC41NDI5NjkgODEuMDExNzE5IDI3LjA5Mzc1IDgxLjAxMTcxOSBDIDIzLjY0MDYyNSA4MS4wMTE3MTkgMjAuODQzNzUgNzguMjAzMTI1IDIwLjg0Mzc1IDc0Ljc0MjE4OCBDIDIwLjg0Mzc1IDcxLjI3MzQzOCAyMy42NDA2MjUgNjguNDY4NzUgMjcuMDkzNzUgNjguNDY4NzUgWiBNIDIwLjI3MzQzOCA1MC43ODUxNTYgQyAyMi40NzI2NTYgNTAuNzg1MTU2IDI0LjI1IDUyLjU3NDIxOSAyNC4yNSA1NC43ODEyNSBDIDI0LjI1IDU2Ljk4NDM3NSAyMi40NzI2NTYgNTguNzczNDM4IDIwLjI3MzQzOCA1OC43NzM0MzggQyAxOC4wNzgxMjUgNTguNzczNDM4IDE2LjMwMDc4MSA1Ni45ODQzNzUgMTYuMzAwNzgxIDU0Ljc4MTI1IEMgMTYuMzAwNzgxIDUyLjU3NDIxOSAxOC4wODIwMzEgNTAuNzg1MTU2IDIwLjI3MzQzOCA1MC43ODUxNTYgWiBNIDQ1LjQxNDA2MiAyMS45ODQzNzUgQyA0Ny42MTMyODEgMjEuOTg0Mzc1IDQ5LjM5MDYyNSAyMy43NzM0MzggNDkuMzkwNjI1IDI1Ljk4MDQ2OSBDIDQ5LjM5MDYyNSAyOC4xODM1OTQgNDcuNjEzMjgxIDI5Ljk3MjY1NiA0NS40MTQwNjIgMjkuOTcyNjU2IEMgNDMuMjE0ODQ0IDI5Ljk3MjY1NiA0MS40Mzc1IDI4LjE4MzU5NCA0MS40Mzc1IDI1Ljk4MDQ2OSBDIDQxLjQzNzUgMjMuNzczNDM4IDQzLjIxNDg0NCAyMS45ODQzNzUgNDUuNDE0MDYyIDIxLjk4NDM3NSBaIE0gNjQuNjUyMzQ0IDczLjI0MjE4OCBDIDcwLjc1NzgxMiA2OC44NDc2NTYgNzkuMTA1NDY5IDY4LjU5NzY1NiA4NS41MzkwNjIgNzIuOTkyMTg4IEMgOTguMzc1IDc2LjQxNDA2MiAxMTMuMjE0ODQ0IDY4LjQ4MDQ2OSAxMTIuOTA2MjUgNTQuMzcxMDk0IEMgMTEyLjc1IDQ3LjA1MDc4MSAxMDguMzkwNjI1IDQyLjY5MTQwNiAxMDIuNjY0MDYyIDM4LjY5OTIxOSBDIDkwLjEzNjcxOSAyOS45NzI2NTYgNzMuNDY4NzUgMjkuOTE0MDYyIDYwLjg4MjgxMiAzOC41NTg1OTQgQyA2MS4yMTA5MzggMzQuNTY2NDA2IDU4LjA3NDIxOSAzMS4xNTIzNDQgNTQuMDg5ODQ0IDMxLjE1MjM0NCBDIDUwLjMyNDIxOSAzMS4xNTIzNDQgNDcuMjczNDM4IDM0LjIxNDg0NCA0Ny4yNzM0MzggMzcuOTk2MDk0IEMgNDcuMjczNDM4IDQxLjMxNjQwNiA0OS42Mjg5MDYgNDQuMDg1OTM4IDUyLjc1MzkwNiA0NC43MDcwMzEgTCA1Mi43NTc4MTIgNDQuNzA3MDMxIEMgNTMuMTM2NzE5IDQ0LjcwNzAzMSA1My41MDc4MTIgNDQuNzUgNTMuODU5Mzc1IDQ0LjgzNTkzOCBDIDU1Ljk5NjA5NCA0NS4zMzU5MzggNTcuNTgyMDMxIDQ3LjI1NzgxMiA1Ny41ODIwMzEgNDkuNTUwNzgxIEMgNTcuNTgyMDMxIDUzLjQxMDE1NiA1My4yNDYwOTQgNTUuNzg5MDYyIDQ5Ljk2NDg0NCA1My41IEMgNDguNDg0Mzc1IDUyLjQ2NDg0NCA0Ni41ODU5MzggNTEuODkwNjI1IDQ0LjczODI4MSA1MS44OTA2MjUgQyAzOS41ODU5MzggNTEuODkwNjI1IDM1LjQxMDE1NiA1Ni4wODIwMzEgMzUuNDEwMTU2IDYxLjI1MzkwNiBDIDM1LjQxMDE1NiA2Ni40MjU3ODEgMzkuNTg1OTM4IDcwLjYxNzE4OCA0NC43MzgyODEgNzAuNjE3MTg4IEwgNDQuODQzNzUgNzAuNTg1OTM4IEMgNDUuNDY0ODQ0IDcwLjQxNzk2OSA0Ni4xMTMyODEgNzAuMzQ3NjU2IDQ2Ljc2OTUzMSA3MC4zOTQ1MzEgQyA0OS43MzA0NjkgNzAuNjA1NDY5IDUyLjA2NjQwNiA3My4wNzgxMjUgNTIuMDY2NDA2IDc2LjEwMTU2MiBDIDUyLjA2NjQwNiA3OS43NzM0MzggNDguNzAzMTI1IDgyLjQxNzk2OSA0NS4yMjY1NjIgODEuNzA3MDMxIEMgNDUuMDA3ODEyIDgxLjY2NDA2MiA0NC43ODkwNjIgODEuNjA1NDY5IDQ0LjU3ODEyNSA4MS41MzkwNjIgQyA0NC4yMTA5MzggODEuNDYwOTM4IDQzLjgzMjAzMSA4MS40MjE4NzUgNDMuNDQxNDA2IDgxLjQyMTg3NSBDIDQwLjI5Mjk2OSA4MS40MjE4NzUgMzcuNzQyMTg4IDgzLjk4NDM3NSAzNy43NDIxODggODcuMTQ0NTMxIEMgMzcuNzQyMTg4IDkwLjMwNDY4OCA0MC4yOTI5NjkgOTIuODYzMjgxIDQzLjQ0MTQwNiA5Mi44NjMyODEgQyA0OS40ODQzNzUgOTIuODYzMjgxIDQ3LjkxNDA2MiA4NS4zODI4MTIgNTEuNzQyMTg4IDkwLjcxNDg0NCBDIDU0LjM1OTM3NSA5NC4zNjMyODEgNTcuNjIxMDk0IDk3LjUxMTcxOSA2MS4zNTkzNzUgOTkuOTk2MDk0IEMgNTguNjk1MzEyIDk2Ljg0Mzc1IDU3LjI2MTcxOSA5My4wMTU2MjUgNTcuMDUwNzgxIDg5LjE0MDYyNSBDIDU2Ljc0NjA5NCA4Ni44NTkzNzUgNTcuMTMyODEyIDg0LjA5NzY1NiA1OC4xODM1OTQgODEuNzA3MDMxIEMgNTcuMzAwNzgxIDg0LjA3NDIxOSA1Ni45MTc5NjkgODYuNTkzNzUgNTcuMDQ2ODc1IDg5LjA4OTg0NCBDIDUxLjk3MjY1NiAzMS44MDg1OTQgMTE1LjY2Nzk2OSA0NS43MzgyODEgOTQuNTE1NjI1IDYzLjI0MjE4OCBDIDkyLjg2MzI4MSA2NC42MDkzNzUgOTAuMjAzMTI1IDY0LjkyMTg3NSA4Ny4xNDA2MjUgNjQuODY3MTg4IEMgNzcuNDM3NSA2My4xOTkyMTkgNzAuNjk5MjE5IDY2Ljg0NzY1NiA2NC42NTIzNDQgNzMuMjQyMTg4IFogTSA2NC42NTIzNDQgNzMuMjQyMTg4ICIgZmlsbC1vcGFjaXR5PSIxIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L2c+PGcgY2xpcC1wYXRoPSJ1cmwoIzY2YTM2MjkxMjkpIj48ZyBjbGlwLXBhdGg9InVybCgjZWU5ZjFjOWE5ZCkiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIGQ9Ik0gMTYuMzAwNzgxIDIxLjk4NDM3NSBMIDExNS42Njc5NjkgMjEuOTg0Mzc1IEwgMTE1LjY2Nzk2OSA5OS45OTYwOTQgTCAxNi4zMDA3ODEgOTkuOTk2MDk0IFogTSAxNi4zMDA3ODEgMjEuOTg0Mzc1ICIgZmlsbC1vcGFjaXR5PSIxIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48L2c+PC9nPjxnIHRyYW5zZm9ybT0ibWF0cml4KDEsIDAsIDAsIDEsIDEyMywgMzEpIj48ZyBjbGlwLXBhdGg9InVybCgjYjlmYmQyOTlhYykiPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMS4yNDI0MzUsIDY2Ljc2OTc4MykiPjxnPjxwYXRoIGQ9Ik0gMzEuNjI1IC0zNi44NzUgTCAyMS4zNDM3NSAtMzYuODc1IEwgMjEuMzQzNzUgLTQwLjgyODEyNSBDIDIxLjM0Mzc1IC00MS4yMzQzNzUgMjEuMTk1MzEyIC00MS41OTM3NSAyMC45MDYyNSAtNDEuOTA2MjUgQyAyMC42MjUgLTQyLjIxODc1IDIwLjI4MTI1IC00Mi4zNzUgMTkuODc1IC00Mi4zNzUgTCAxNS42MDkzNzUgLTQyLjM3NSBDIDE1LjIwMzEyNSAtNDIuMzc1IDE0Ljg1MTU2MiAtNDIuMjE4NzUgMTQuNTYyNSAtNDEuOTA2MjUgQyAxNC4yODEyNSAtNDEuNTkzNzUgMTQuMTQwNjI1IC00MS4yMzQzNzUgMTQuMTQwNjI1IC00MC44MjgxMjUgTCAxNC4xNDA2MjUgLTMxLjkzNzUgQyAxNC4xNDA2MjUgLTMxLjUxOTUzMSAxNC4yODEyNSAtMzEuMTU2MjUgMTQuNTYyNSAtMzAuODQzNzUgQyAxNC44NTE1NjIgLTMwLjUzOTA2MiAxNS4yMDMxMjUgLTMwLjM5MDYyNSAxNS42MDkzNzUgLTMwLjM5MDYyNSBMIDIyLjU3ODEyNSAtMzAuMzkwNjI1IEMgMjguOTYwOTM4IC0zMC4yODUxNTYgMzIuMTU2MjUgLTI2Ljg3ODkwNiAzMi4xNTYyNSAtMjAuMTcxODc1IEwgMzIuMTU2MjUgLTkuNDM3NSBDIDMyLjE1NjI1IC0yLjYzMjgxMiAyOC45NjA5MzggMC43NjU2MjUgMjIuNTc4MTI1IDAuNzY1NjI1IEwgMTMuNDUzMTI1IDAuNzY1NjI1IEMgNy4wNTQ2ODggMC43NjU2MjUgMy44NTkzNzUgLTIuNjMyODEyIDMuODU5Mzc1IC05LjQzNzUgTCAzLjg1OTM3NSAtMTQuNjA5Mzc1IEwgMTQuMTQwNjI1IC0xNC42MDkzNzUgTCAxNC4xNDA2MjUgLTkuMDQ2ODc1IEMgMTQuMTQwNjI1IC04LjYyODkwNiAxNC4yODEyNSAtOC4yNjU2MjUgMTQuNTYyNSAtNy45NTMxMjUgQyAxNC44NTE1NjIgLTcuNjQ4NDM4IDE1LjIwMzEyNSAtNy41IDE1LjYwOTM3NSAtNy41IEwgMjAuNDA2MjUgLTcuNSBDIDIwLjgyMDMxMiAtNy41IDIxLjE3MTg3NSAtNy42NDg0MzggMjEuNDUzMTI1IC03Ljk1MzEyNSBDIDIxLjczNDM3NSAtOC4yNjU2MjUgMjEuODc1IC04LjYyODkwNiAyMS44NzUgLTkuMDQ2ODc1IEwgMjEuODc1IC0xOC44NTkzNzUgQyAyMS44NzUgLTE5LjI3MzQzOCAyMS43MzQzNzUgLTE5LjYzMjgxMiAyMS40NTMxMjUgLTE5LjkzNzUgQyAyMS4xNzE4NzUgLTIwLjI1IDIwLjgyMDMxMiAtMjAuNDA2MjUgMjAuNDA2MjUgLTIwLjQwNjI1IEwgMTMuNDUzMTI1IC0yMC40MDYyNSBDIDcuMDU0Njg4IC0yMC40MDYyNSAzLjg1OTM3NSAtMjMuODA0Njg4IDMuODU5Mzc1IC0zMC42MDkzNzUgTCAzLjg1OTM3NSAtNDAuNTkzNzUgQyAzLjg1OTM3NSAtNDcuMzk0NTMxIDcuMDU0Njg4IC01MC43OTY4NzUgMTMuNDUzMTI1IC01MC43OTY4NzUgTCAyMi4wMzEyNSAtNTAuNzk2ODc1IEMgMjguNDI1NzgxIC01MC43OTY4NzUgMzEuNjI1IC00Ny4zOTQ1MzEgMzEuNjI1IC00MC41OTM3NSBaIE0gMzEuNjI1IC0zNi44NzUgIi8+PC9nPjwvZz48L2c+PGcgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIxIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MC42Njc3MTMsIDY2Ljc2OTc4MykiPjxnPjxwYXRoIGQ9Ik0gMjIuNSAtOC4xODc1IEwgMjIuNSAtMTUuOTIxODc1IEwgMzIuNzgxMjUgLTE1LjkyMTg3NSBMIDMyLjc4MTI1IC05LjQzNzUgQyAzMi43ODEyNSAtMi42MzI4MTIgMjkuNTgyMDMxIDAuNzY1NjI1IDIzLjE4NzUgMC43NjU2MjUgTCAxMy40NTMxMjUgMC43NjU2MjUgQyA3LjA1NDY4OCAwLjc2NTYyNSAzLjg1OTM3NSAtMi42MzI4MTIgMy44NTkzNzUgLTkuNDM3NSBMIDMuODU5Mzc1IC00MC41OTM3NSBDIDMuODU5Mzc1IC00Ny4zOTQ1MzEgNy4wNTQ2ODggLTUwLjc5Njg3NSAxMy40NTMxMjUgLTUwLjc5Njg3NSBMIDIzLjE4NzUgLTUwLjc5Njg3NSBDIDI5LjU4MjAzMSAtNTAuNzk2ODc1IDMyLjc4MTI1IC00Ny4zOTQ1MzEgMzIuNzgxMjUgLTQwLjU5Mzc1IEwgMzIuNzgxMjUgLTM1Ljg3NSBMIDIyLjUgLTM1Ljg3NSBMIDIyLjUgLTQxLjkwNjI1IEMgMjIuNSAtNDIuMzEyNSAyMi4zNTE1NjIgLTQyLjY3MTg3NSAyMi4wNjI1IC00Mi45ODQzNzUgQyAyMS43ODEyNSAtNDMuMjk2ODc1IDIxLjQzNzUgLTQzLjQ1MzEyNSAyMS4wMzEyNSAtNDMuNDUzMTI1IEwgMTYuMTU2MjUgLTQzLjQ1MzEyNSBDIDE1Ljc1IC00My40NTMxMjUgMTUuMzk4NDM4IC00My4yOTY4NzUgMTUuMTA5Mzc1IC00Mi45ODQzNzUgQyAxNC44MjgxMjUgLTQyLjY3MTg3NSAxNC42ODc1IC00Mi4zMTI1IDE0LjY4NzUgLTQxLjkwNjI1IEwgMTQuNjg3NSAtOC4xODc1IEMgMTQuNjg3NSAtNy43ODEyNSAxNC44MjgxMjUgLTcuNDIxODc1IDE1LjEwOTM3NSAtNy4xMDkzNzUgQyAxNS4zOTg0MzggLTYuODA0Njg4IDE1Ljc1IC02LjY1NjI1IDE2LjE1NjI1IC02LjY1NjI1IEwgMjEuMDMxMjUgLTYuNjU2MjUgQyAyMS40Mzc1IC02LjY1NjI1IDIxLjc4MTI1IC02LjgwNDY4OCAyMi4wNjI1IC03LjEwOTM3NSBDIDIyLjM1MTU2MiAtNy40MjE4NzUgMjIuNSAtNy43ODEyNSAyMi41IC04LjE4NzUgWiBNIDIyLjUgLTguMTg3NSAiLz48L2c+PC9nPjwvZz48ZyBmaWxsPSIjMDAwMDAwIiBmaWxsLW9wYWNpdHk9IjEiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDgwLjA5Mjk5LCA2Ni43Njk3ODMpIj48Zz48cGF0aCBkPSJNIDE0LjY4NzUgLTUwLjAxNTYyNSBMIDE0LjY4NzUgMCBMIDMuODU5Mzc1IDAgTCAzLjg1OTM3NSAtNTAuMDE1NjI1IFogTSAxNC42ODc1IC01MC4wMTU2MjUgIi8+PC9nPjwvZz48L2c+PGcgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIxIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDIuOTc1MzAzLCA2Ni43Njk3ODMpIj48Zz48cGF0aCBkPSJNIDE0LjY4NzUgLTguOTY4NzUgTCAyNi42NzE4NzUgLTguOTY4NzUgTCAyNi42NzE4NzUgMCBMIDMuODU5Mzc1IDAgTCAzLjg1OTM3NSAtNTAuMDE1NjI1IEwgMjYuNjcxODc1IC01MC4wMTU2MjUgTCAyNi42NzE4NzUgLTQxLjIwMzEyNSBMIDE0LjY4NzUgLTQxLjIwMzEyNSBMIDE0LjY4NzUgLTI5LjQ1MzEyNSBMIDI1LjkwNjI1IC0yOS40NTMxMjUgTCAyNS45MDYyNSAtMjAuOTUzMTI1IEwgMTQuNjg3NSAtMjAuOTUzMTI1IFogTSAxNC42ODc1IC04Ljk2ODc1ICIvPjwvZz48L2c+PC9nPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTM2LjA2MTcwMSwgNjYuNzY5NzgzKSI+PGc+PHBhdGggZD0iTSAzMi41NDY4NzUgMCBMIDIxLjcxODc1IDAgTCAyMS43MTg3NSAtNDEuNTE1NjI1IEMgMjEuNzE4NzUgLTQxLjkyOTY4OCAyMS41NzgxMjUgLTQyLjI4OTA2MiAyMS4yOTY4NzUgLTQyLjU5Mzc1IEMgMjEuMDE1NjI1IC00Mi45MDYyNSAyMC42NjQwNjIgLTQzLjA2MjUgMjAuMjUgLTQzLjA2MjUgTCAxNi4wNzgxMjUgLTQzLjA2MjUgQyAxNS42NzE4NzUgLTQzLjA2MjUgMTUuMzIwMzEyIC00Mi45MDYyNSAxNS4wMzEyNSAtNDIuNTkzNzUgQyAxNC43NSAtNDIuMjg5MDYyIDE0LjYwOTM3NSAtNDEuOTI5Njg4IDE0LjYwOTM3NSAtNDEuNTE1NjI1IEwgMTQuNjA5Mzc1IDAgTCAzLjc4MTI1IDAgTCAzLjc4MTI1IC00MC41OTM3NSBDIDMuNzgxMjUgLTQ3LjM5NDUzMSA2Ljk3NjU2MiAtNTAuNzk2ODc1IDEzLjM3NSAtNTAuNzk2ODc1IEwgMjIuOTY4NzUgLTUwLjc5Njg3NSBDIDI5LjM1MTU2MiAtNTAuNzk2ODc1IDMyLjU0Njg3NSAtNDcuMzk0NTMxIDMyLjU0Njg3NSAtNDAuNTkzNzUgWiBNIDMyLjU0Njg3NSAwICIvPjwvZz48L2c+PC9nPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTc2LjAyODEwNiwgNjYuNzY5NzgzKSI+PGc+PHBhdGggZD0iTSAyMi41IC04LjE4NzUgTCAyMi41IC0xNS45MjE4NzUgTCAzMi43ODEyNSAtMTUuOTIxODc1IEwgMzIuNzgxMjUgLTkuNDM3NSBDIDMyLjc4MTI1IC0yLjYzMjgxMiAyOS41ODIwMzEgMC43NjU2MjUgMjMuMTg3NSAwLjc2NTYyNSBMIDEzLjQ1MzEyNSAwLjc2NTYyNSBDIDcuMDU0Njg4IDAuNzY1NjI1IDMuODU5Mzc1IC0yLjYzMjgxMiAzLjg1OTM3NSAtOS40Mzc1IEwgMy44NTkzNzUgLTQwLjU5Mzc1IEMgMy44NTkzNzUgLTQ3LjM5NDUzMSA3LjA1NDY4OCAtNTAuNzk2ODc1IDEzLjQ1MzEyNSAtNTAuNzk2ODc1IEwgMjMuMTg3NSAtNTAuNzk2ODc1IEMgMjkuNTgyMDMxIC01MC43OTY4NzUgMzIuNzgxMjUgLTQ3LjM5NDUzMSAzMi43ODEyNSAtNDAuNTkzNzUgTCAzMi43ODEyNSAtMzUuODc1IEwgMjIuNSAtMzUuODc1IEwgMjIuNSAtNDEuOTA2MjUgQyAyMi41IC00Mi4zMTI1IDIyLjM1MTU2MiAtNDIuNjcxODc1IDIyLjA2MjUgLTQyLjk4NDM3NSBDIDIxLjc4MTI1IC00My4yOTY4NzUgMjEuNDM3NSAtNDMuNDUzMTI1IDIxLjAzMTI1IC00My40NTMxMjUgTCAxNi4xNTYyNSAtNDMuNDUzMTI1IEMgMTUuNzUgLTQzLjQ1MzEyNSAxNS4zOTg0MzggLTQzLjI5Njg3NSAxNS4xMDkzNzUgLTQyLjk4NDM3NSBDIDE0LjgyODEyNSAtNDIuNjcxODc1IDE0LjY4NzUgLTQyLjMxMjUgMTQuNjg3NSAtNDEuOTA2MjUgTCAxNC42ODc1IC04LjE4NzUgQyAxNC42ODc1IC03Ljc4MTI1IDE0LjgyODEyNSAtNy40MjE4NzUgMTUuMTA5Mzc1IC03LjEwOTM3NSBDIDE1LjM5ODQzOCAtNi44MDQ2ODggMTUuNzUgLTYuNjU2MjUgMTYuMTU2MjUgLTYuNjU2MjUgTCAyMS4wMzEyNSAtNi42NTYyNSBDIDIxLjQzNzUgLTYuNjU2MjUgMjEuNzgxMjUgLTYuODA0Njg4IDIyLjA2MjUgLTcuMTA5Mzc1IEMgMjIuMzUxNTYyIC03LjQyMTg3NSAyMi41IC03Ljc4MTI1IDIyLjUgLTguMTg3NSBaIE0gMjIuNSAtOC4xODc1ICIvPjwvZz48L2c+PC9nPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjE1LjQ1MzM4MywgNjYuNzY5NzgzKSI+PGc+PHBhdGggZD0iTSAxNC42ODc1IC04Ljk2ODc1IEwgMjYuNjcxODc1IC04Ljk2ODc1IEwgMjYuNjcxODc1IDAgTCAzLjg1OTM3NSAwIEwgMy44NTkzNzUgLTUwLjAxNTYyNSBMIDI2LjY3MTg3NSAtNTAuMDE1NjI1IEwgMjYuNjcxODc1IC00MS4yMDMxMjUgTCAxNC42ODc1IC00MS4yMDMxMjUgTCAxNC42ODc1IC0yOS40NTMxMjUgTCAyNS45MDYyNSAtMjkuNDUzMTI1IEwgMjUuOTA2MjUgLTIwLjk1MzEyNSBMIDE0LjY4NzUgLTIwLjk1MzEyNSBaIE0gMTQuNjg3NSAtOC45Njg3NSAiLz48L2c+PC9nPjwvZz48ZyBmaWxsPSIjMDAwMDAwIiBmaWxsLW9wYWNpdHk9IjEiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0OC41Mzk3ODEsIDY2Ljc2OTc4MykiPjxnPjxwYXRoIGQ9Ik0gMzEuNjI1IC0zNi44NzUgTCAyMS4zNDM3NSAtMzYuODc1IEwgMjEuMzQzNzUgLTQwLjgyODEyNSBDIDIxLjM0Mzc1IC00MS4yMzQzNzUgMjEuMTk1MzEyIC00MS41OTM3NSAyMC45MDYyNSAtNDEuOTA2MjUgQyAyMC42MjUgLTQyLjIxODc1IDIwLjI4MTI1IC00Mi4zNzUgMTkuODc1IC00Mi4zNzUgTCAxNS42MDkzNzUgLTQyLjM3NSBDIDE1LjIwMzEyNSAtNDIuMzc1IDE0Ljg1MTU2MiAtNDIuMjE4NzUgMTQuNTYyNSAtNDEuOTA2MjUgQyAxNC4yODEyNSAtNDEuNTkzNzUgMTQuMTQwNjI1IC00MS4yMzQzNzUgMTQuMTQwNjI1IC00MC44MjgxMjUgTCAxNC4xNDA2MjUgLTMxLjkzNzUgQyAxNC4xNDA2MjUgLTMxLjUxOTUzMSAxNC4yODEyNSAtMzEuMTU2MjUgMTQuNTYyNSAtMzAuODQzNzUgQyAxNC44NTE1NjIgLTMwLjUzOTA2MiAxNS4yMDMxMjUgLTMwLjM5MDYyNSAxNS42MDkzNzUgLTMwLjM5MDYyNSBMIDIyLjU3ODEyNSAtMzAuMzkwNjI1IEMgMjguOTYwOTM4IC0zMC4yODUxNTYgMzIuMTU2MjUgLTI2Ljg3ODkwNiAzMi4xNTYyNSAtMjAuMTcxODc1IEwgMzIuMTU2MjUgLTkuNDM3NSBDIDMyLjE1NjI1IC0yLjYzMjgxMiAyOC45NjA5MzggMC43NjU2MjUgMjIuNTc4MTI1IDAuNzY1NjI1IEwgMTMuNDUzMTI1IDAuNzY1NjI1IEMgNy4wNTQ2ODggMC43NjU2MjUgMy44NTkzNzUgLTIuNjMyODEyIDMuODU5Mzc1IC05LjQzNzUgTCAzLjg1OTM3NSAtMTQuNjA5Mzc1IEwgMTQuMTQwNjI1IC0xNC42MDkzNzUgTCAxNC4xNDA2MjUgLTkuMDQ2ODc1IEMgMTQuMTQwNjI1IC04LjYyODkwNiAxNC4yODEyNSAtOC4yNjU2MjUgMTQuNTYyNSAtNy45NTMxMjUgQyAxNC44NTE1NjIgLTcuNjQ4NDM4IDE1LjIwMzEyNSAtNy41IDE1LjYwOTM3NSAtNy41IEwgMjAuNDA2MjUgLTcuNSBDIDIwLjgyMDMxMiAtNy41IDIxLjE3MTg3NSAtNy42NDg0MzggMjEuNDUzMTI1IC03Ljk1MzEyNSBDIDIxLjczNDM3NSAtOC4yNjU2MjUgMjEuODc1IC04LjYyODkwNiAyMS44NzUgLTkuMDQ2ODc1IEwgMjEuODc1IC0xOC44NTkzNzUgQyAyMS44NzUgLTE5LjI3MzQzOCAyMS43MzQzNzUgLTE5LjYzMjgxMiAyMS40NTMxMjUgLTE5LjkzNzUgQyAyMS4xNzE4NzUgLTIwLjI1IDIwLjgyMDMxMiAtMjAuNDA2MjUgMjAuNDA2MjUgLTIwLjQwNjI1IEwgMTMuNDUzMTI1IC0yMC40MDYyNSBDIDcuMDU0Njg4IC0yMC40MDYyNSAzLjg1OTM3NSAtMjMuODA0Njg4IDMuODU5Mzc1IC0zMC42MDkzNzUgTCAzLjg1OTM3NSAtNDAuNTkzNzUgQyAzLjg1OTM3NSAtNDcuMzk0NTMxIDcuMDU0Njg4IC01MC43OTY4NzUgMTMuNDUzMTI1IC01MC43OTY4NzUgTCAyMi4wMzEyNSAtNTAuNzk2ODc1IEMgMjguNDI1NzgxIC01MC43OTY4NzUgMzEuNjI1IC00Ny4zOTQ1MzEgMzEuNjI1IC00MC41OTM3NSBaIE0gMzEuNjI1IC0zNi44NzUgIi8+PC9nPjwvZz48L2c+PC9nPjwvZz48L3N2Zz4=" alt="eSCIENCES">
+    <p><b>Ressource créée par Tommy Berben, eSCIENCES.be</b> · Basée sur le référentiel FMTTN (FW-B) et le programme TC-S1 FMTTN (SeGEC) · Mise en page et code réalisés avec l'aide de l'IA (Claude, Anthropic) · <b>Licence CC BY-NC-SA 4.0</b></p>
+    <span class="cc">CC BY-NC-SA</span>
+  </div>
+</section>
+
+</div>
+</div>
+
+<nav id="bar" aria-label="Navigation du diaporama">
+  <button id="prev" aria-label="Diapo précédente">←</button>
+  <span id="count">1 / 15</span>
+  <button id="next" aria-label="Diapo suivante">→</button>
+  <div id="progress"><span></span></div>
+  <span class="hint">Flèches du clavier ou télécommande</span>
+  <button id="fs">Plein écran</button>
+</nav>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  const stage=$('#stage'), vp=$('#viewport');
+  const slides=$$('.slide');
+  let cur=0;
+
+  function fit(){
+    const W=vp.clientWidth,H=vp.clientHeight;
+    const s=Math.min(W/1280,H/720);
+    stage.style.transform='scale('+s+')';
+    stage.style.left=((W-1280*s)/2)+'px';
+    stage.style.top=((H-720*s)/2)+'px';
+  }
+  addEventListener('resize',fit); fit();
+
+  function go(i){
+    i=Math.max(0,Math.min(slides.length-1,i));
+    if(i===cur && !slides[i].hidden) return;
+    slides[cur].hidden=true;
+    cur=i;
+    const s=slides[cur]; s.hidden=false;
+    s.classList.remove('enter'); void s.offsetWidth; s.classList.add('enter');
+    $('#count').textContent=(cur+1)+' / '+slides.length;
+    $('#progress span').style.width=((cur)/(slides.length-1)*100)+'%';
+    try{history.replaceState(null,'','#diapo-'+(cur+1))}catch(e){}
+  }
+  $('#prev').onclick=()=>go(cur-1);
+  $('#next').onclick=()=>go(cur+1);
+  $('#fs').onclick=()=>{
+    try{
+      if(document.fullscreenElement){document.exitFullscreen()}
+      else{const p=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); if(p&&p.catch)p.catch(()=>{})}
+    }catch(e){}
+  };
+  document.addEventListener('keydown',e=>{
+    const tag=(e.target.tagName||'');
+    if(['ArrowRight','PageDown'].includes(e.key)){e.preventDefault();go(cur+1)}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(cur-1)}
+    else if(e.key===' '&&tag!=='BUTTON'){e.preventDefault();go(cur+1)}
+    else if(e.key==='Home'){go(0)} else if(e.key==='End'){go(slides.length-1)}
+  });
+  const m=/^#diapo-(\d+)$/.exec(location.hash);
+  slides.forEach(s=>s.hidden=true);
+  cur=0; slides[0].hidden=false; go(m?(+m[1]-1):0);
+  $('#count').textContent=(cur+1)+' / '+slides.length;
+
+  /* révélations */
+  $$('[data-reveal]').forEach(b=>b.onclick=()=>{ $('#'+b.dataset.reveal).hidden=false; b.disabled=true; });
+
+  /* ---- 4. ordre ---- */
+  const steps=['Prendre sa brosse à dents','Mettre du dentifrice sur la brosse','Brosser ses dents pendant 2 minutes','Rincer sa bouche','Ranger la brosse dans le gobelet'];
+  const mix=[2,4,0,3,1];
+  let picked=[];
+  function drawOrder(){
+    const pool=$('#ord-pool'); pool.innerHTML='';
+    mix.forEach(i=>{const b=document.createElement('button');b.className='step'+(picked.includes(i)?' used':'');b.textContent=steps[i];
+      b.onclick=()=>{picked.push(i);$('#ord-fb').textContent='';$('#ord-fb').className='feedback';drawOrder()};pool.appendChild(b)});
+    const ans=$('#ord-ans'); ans.innerHTML='';
+    for(let k=0;k<steps.length;k++){
+      if(k<picked.length){const d=document.createElement('div');d.className='step';d.dataset.k=k;d.innerHTML='<span class="n">'+(k+1)+'</span><span></span>';d.lastChild.textContent=steps[picked[k]];ans.appendChild(d)}
+      else{const d=document.createElement('div');d.className='slot';ans.appendChild(d)}
+    }
+  }
+  $('#ord-check').onclick=()=>{
+    const fb=$('#ord-fb');
+    if(picked.length<steps.length){fb.className='feedback ko';fb.textContent='Il manque encore des étapes.';return}
+    let bad=0; $$('#ord-ans .step').forEach((d,k)=>{if(picked[k]!==k){d.classList.add('bad');bad++}});
+    if(!bad){fb.className='feedback ok';fb.textContent='Bravo ! Ton algorithme est dans le bon ordre.'}
+    else{fb.className='feedback ko';fb.textContent=bad+' étape'+(bad>1?'s sont mal placées':' est mal placée')+'. Dans un algorithme, l’ordre compte !'}
+  };
+  $('#ord-reset').onclick=()=>{picked=[];$('#ord-fb').textContent='';drawOrder()};
+  drawOrder();
+
+  /* ---- 7. formes ---- */
+  $$('[data-shape]').forEach(b=>b.onclick=()=>{
+    const fb=$('#sh-fb');
+    if(b.dataset.shape==='losange'){fb.className='feedback ok';fb.textContent='Oui ! Une question, c’est un losange.'}
+    else{fb.className='feedback ko';fb.textContent='Non. Cette phrase pose une question : oui ou non ?'}
+  });
+
+  /* ---- 8. robot ---- */
+  const COLS=8,ROWS=5,C=68;
+  const walls=new Set(['2,3','2,4','4,1','4,2','4,0','6,3','6,4']);
+  const start={x:0,y:4}, goal={x:7,y:1};
+  const grid=$('#grid'); grid.style.gridTemplateColumns='repeat('+COLS+','+C+'px)';
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const c=document.createElement('div');c.className='cell'+(walls.has(x+','+y)?' wall':'')+(x===start.x&&y===start.y?' start':'');grid.appendChild(c)}
+  const g=document.createElement('div');g.className='goal';g.style.left=goal.x*C+'px';g.style.top=goal.y*C+'px';
+  g.innerHTML='<svg width="50" height="50" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z" fill="#FBBF24" stroke="#172033" stroke-width="1.6" stroke-linejoin="round"/></svg>';grid.appendChild(g);
+  const bot=document.createElement('div');bot.className='sprite';
+  bot.innerHTML='<svg width="52" height="52" viewBox="0 0 52 52"><line x1="26" y1="4" x2="26" y2="12" stroke="#172033" stroke-width="3"/><circle cx="26" cy="5" r="4" fill="#6EE7B7" stroke="#172033" stroke-width="2.5"/><rect x="7" y="12" width="38" height="32" rx="9" fill="#2E6BE6" stroke="#172033" stroke-width="3"/><rect x="13" y="19" width="26" height="14" rx="5" fill="#fff" stroke="#172033" stroke-width="2"/><circle cx="20" cy="26" r="3" fill="#172033"/><circle cx="32" cy="26" r="3" fill="#172033"/><rect x="18" y="37" width="16" height="3" rx="1.5" fill="#172033"/></svg>';
+  grid.appendChild(bot);
+  let prog=[],pos={...start},running=false;
+  const names={U:'↑ haut',D:'↓ bas',L:'← gauche',R:'→ droite'}, d={U:[0,-1],D:[0,1],L:[-1,0],R:[1,0]};
+  function place(){bot.style.left=pos.x*C+'px';bot.style.top=pos.y*C+'px'}
+  function drawProg(active,err){
+    const p=$('#prog');p.innerHTML='';
+    if(!prog.length){p.innerHTML='<span class="empty">Clique sur les flèches pour écrire ton logigramme.</span>';}
+    else{const o=document.createElement('span');o.className='ov';o.textContent='Début';p.appendChild(o)}
+    prog.forEach((c,i)=>{const a=document.createElement('span');a.className='ar';a.textContent='→';p.appendChild(a);
+      const s=document.createElement('span');s.className='pc'+(i===active?' on':'')+(i===err?' err':'');s.textContent=names[c];s.title='Clique pour retirer';
+      s.onclick=()=>{if(running)return;prog.splice(i,1);drawProg()};p.appendChild(s)});
+    if(prog.length){const a=document.createElement('span');a.className='ar';a.textContent='→';p.appendChild(a);const o=document.createElement('span');o.className='ov';o.textContent='Fin';p.appendChild(o)}
+    $('#prog-n').textContent='('+prog.length+' instruction'+(prog.length>1?'s':'')+')';
+  }
+  $$('[data-cmd]').forEach(b=>b.onclick=()=>{if(running||prog.length>=24)return;prog.push(b.dataset.cmd);$('#run-fb').textContent='';drawProg()});
+  $('#undo').onclick=()=>{if(running)return;prog.pop();drawProg()};
+  $('#clear').onclick=()=>{if(running)return;prog=[];pos={...start};place();$('#run-fb').textContent='';drawProg()};
+  $('#run').onclick=()=>{
+    if(running)return; const fb=$('#run-fb');
+    if(!prog.length){fb.className='feedback ko';fb.textContent='Ton programme est vide.';return}
+    running=true;pos={...start};place();fb.textContent='';let i=0;
+    const tick=()=>{
+      if(i>=prog.length){running=false;drawProg();
+        if(pos.x===goal.x&&pos.y===goal.y){fb.className='feedback ok';fb.textContent='Mission réussie en '+prog.length+' instructions !'}
+        else{fb.className='feedback ko';fb.textContent='Le programme est fini, mais le robot n’est pas sur l’étoile.'}
+        return}
+      const [dx,dy]=d[prog[i]],nx=pos.x+dx,ny=pos.y+dy;
+      drawProg(i);
+      if(nx<0||ny<0||nx>=COLS||ny>=ROWS||walls.has(nx+','+ny)){
+        bot.classList.remove('bump');void bot.offsetWidth;bot.classList.add('bump');
+        running=false;drawProg(-1,i);fb.className='feedback ko';fb.textContent='Bug à l’instruction '+(i+1)+' : le robot fonce dans un mur !';return}
+      pos={x:nx,y:ny};place();i++;setTimeout(tick,420);
+    };
+    setTimeout(tick,250);
+  };
+  place();drawProg();
+
+  /* ---- 9. boucle ---- */
+  const LL=$('#loop-list');
+  function longList(){
+    LL.innerHTML='';
+    for(let k=0;k<4;k++){
+      ['→ droite','↑ haut'].forEach((t,j)=>{const b=document.createElement('div');b.className='blk';b.style.background='var(--seq)';b.dataset.p=k%2?'b':'a';b.textContent=t;LL.appendChild(b)});
+    }
+    $('#loop-count').textContent='8 instructions';
+  }
+  longList();
+  let compact=false;
+  $('#loop-spot').onclick=()=>{if(compact){compact=false;longList();$('#loop-do').textContent='2. Remplacer par une boucle'}
+    $$('#loop-list .blk').forEach(b=>b.classList.toggle(b.dataset.p==='a'?'pair-a':'pair-b'))};
+  $('#loop-do').onclick=()=>{
+    compact=!compact;
+    if(compact){
+      LL.innerHTML='<div class="blk loopwrap" style="background:var(--loop);font-size:22px">répéter 4 fois<div class="inner"><div class="blk small" style="background:var(--seq)">→ droite</div><div class="blk small" style="background:var(--seq)">↑ haut</div></div></div>';
+      $('#loop-count').textContent='3 blocs au lieu de 8 !';$('#loop-do').textContent='Revoir la version longue';
+    } else {longList();$('#loop-do').textContent='2. Remplacer par une boucle'}
+  };
+
+  /* ---- 10. condition ---- */
+  function cond(r){
+    $$('[data-rain]').forEach(b=>b.classList.toggle('on',b.dataset.rain===String(r)));
+    ['c-start','c-dec','c-end','c-e0','c-e3'].forEach(id=>$('#'+id).classList.add('on'));
+    $('#c-yes').classList.toggle('on',r===1);$('#c-eyes').classList.toggle('on',r===1);$('#c-ey2').classList.toggle('on',r===1);
+    $('#c-no').classList.toggle('on',r===0);$('#c-eno').classList.toggle('on',r===0);$('#c-en2').classList.toggle('on',r===0);
+    const on=r===1?[0,1,4]:[0,2,3,4];
+    $$('#cond-code .ln').forEach(l=>l.classList.toggle('on',on.includes(+l.dataset.l)));
+  }
+  $$('[data-rain]').forEach(b=>b.onclick=()=>cond(+b.dataset.rain));
+
+  /* ---- 11. variable ---- */
+  let score=0;
+  function setV(v){score=v;const box=$('#vbox');box.classList.add('open');$('#vval').textContent=score;clearTimeout(setV.t);setV.t=setTimeout(()=>box.classList.remove('open'),350)}
+  $('#v-plus').onclick=()=>setV(score+1);$('#v-minus').onclick=()=>setV(score-1);$('#v-zero').onclick=()=>setV(0);
+
+  /* ---- 12. bougies ---- */
+  let startN=5,n=null,phase=-1,timer=null;
+  const nodes=['b-start','b-init','b-dec','b-blow','b-dec1','b-song','b-end'];
+  function lightNode(id,line){
+    nodes.forEach(k=>$('#'+k).classList.toggle('on',k===id));
+    $('#b-back').classList.toggle('on',id==='b-dec'&&n!==null&&n<startN);
+    $$('#b-code .ln').forEach(l=>l.classList.toggle('on',+l.dataset.l===line));
+  }
+  function candles(){const c=$('#candles');c.innerHTML='';for(let k=0;k<startN;k++){const e=document.createElement('div');e.className='candle'+(n!==null&&k>=n?' out':'');c.appendChild(e)}}
+  function resetB(){clearInterval(timer);timer=null;$('#b-play').textContent='▶ Tout jouer';n=null;phase=-1;$('#b-val').textContent='?';
+    $('#b-initv').textContent=startN;$('#b-codev').textContent=startN;lightNode(null,-1);candles();
+    $('#b-narr').textContent='Appuie sur « Étape suivante » et lis le logigramme à voix haute.';$('#b-step').disabled=false}
+  // états : 0 début, 1 init, 2 décision, 3 souffler, 4 décrémenter, 5 chanson, 6 fin
+  function stepB(){
+    const nar=$('#b-narr');
+    if(phase===-1){phase=0;lightNode('b-start',-1);nar.textContent='Début du programme.'}
+    else if(phase===0){phase=1;n=startN;$('#b-val').textContent=n;lightNode('b-init',0);candles();nar.textContent='On crée la variable « bougies » et on y range '+n+'.'}
+    else if(phase===1||phase===4){phase=2;lightNode('b-dec',1);
+      nar.textContent='Condition : bougies vaut '+n+'. Est-ce plus grand que 0 ? '+(n>0?'OUI, on entre dans la boucle.':'NON, on sort de la boucle.')}
+    else if(phase===2){ if(n>0){phase=3;lightNode('b-blow',2);const c=$$('#candles .candle')[n-1];if(c)c.classList.add('out');nar.textContent='On souffle une bougie. Fffff !'}
+      else{phase=5;lightNode('b-song',4);nar.textContent='Toutes les bougies sont éteintes : Joyeux anniversaire !'} }
+    else if(phase===3){phase=4;n--;$('#b-val').textContent=n;lightNode('b-dec1',3);nar.textContent='La variable change : bougies vaut maintenant '+n+'. On remonte vers la condition.'}
+    else if(phase===5){phase=6;lightNode('b-end',-1);nar.textContent='Fin. La boucle a tourné '+startN+' fois grâce à la condition et à la variable.';$('#b-step').disabled=true;clearInterval(timer);timer=null;$('#b-play').textContent='▶ Tout jouer'}
+  }
+  $('#b-step').onclick=stepB;
+  $('#b-play').onclick=()=>{ if(timer){clearInterval(timer);timer=null;$('#b-play').textContent='▶ Tout jouer';return}
+    if(phase===6)resetB(); $('#b-play').textContent='⏸ Pause'; stepB(); timer=setInterval(stepB,1300)};
+  $('#b-reset').onclick=resetB;
+  $('#b-less').onclick=()=>{if(startN>1){startN--;resetB()}};
+  $('#b-more').onclick=()=>{if(startN<8){startN++;resetB()}};
+  resetB();
+
+  /* ---- 13. bug ---- */
+  $$('#bug-lines button').forEach(b=>b.onclick=()=>{
+    const fb=$('#bug-fb');
+    if(b.dataset.bug==='1'){b.classList.add('right');b.textContent='répéter 4 fois';fb.className='feedback ok';
+      fb.textContent='Trouvé ! Un carré a 4 côtés : il faut répéter 4 fois. Bug corrigé.';
+      $('#bug-draw').setAttribute('d','M50 210 L50 50 L210 50 L210 210 Z')}
+    else{b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');fb.className='feedback ko';fb.textContent='Cette ligne est correcte. Compte les côtés dessinés…'}
+  });
+
+  /* ---- badges référentiel ---- */
+  slides.forEach(s=>{const n=s.dataset.niv;if(!n)return;const h=s.querySelector('.head');if(!h)return;const b=document.createElement('span');b.className='niv';b.title='Attendu du référentiel FMTTN';b.innerHTML='Réf. <b></b>';b.lastChild.textContent=n;h.appendChild(b)});
+
+  /* ---- 8b. lire un logigramme ---- */
+  (function(){
+    const RC=5,RR=4,RS=72,st={x:0,y:3},prg=['R','R','U','U','R'];
+    const labels=['Aller à droite','Aller à droite','Monter','Monter','Aller à droite'];
+    const marks={A:{x:2,y:1},B:{x:3,y:1},C:{x:3,y:3}}, good='B';
+    const g=$('#rgrid');g.style.gridTemplateColumns='repeat('+RC+','+RS+'px)';
+    for(let y=0;y<RR;y++)for(let x=0;x<RC;x++){const c=document.createElement('div');c.className='cell'+(x===st.x&&y===st.y?' start':'');g.appendChild(c)}
+    Object.entries(marks).forEach(([k,p])=>{const m=document.createElement('div');m.className='mark';m.style.left=p.x*RS+'px';m.style.top=p.y*RS+'px';m.innerHTML='<span>'+k+'</span>';g.appendChild(m)});
+    const b=document.createElement('div');b.className='sprite';b.style.width=b.style.height=RS+'px';b.innerHTML=bot.innerHTML;g.appendChild(b);
+    let p={...st},timer=null;
+    const put=()=>{b.style.left=p.x*RS+'px';b.style.top=p.y*RS+'px'};put();
+    const light=i=>{for(let k=0;k<=6;k++)$('#r-n'+k).classList.toggle('on',k===i)};
+    $$('[data-ans]').forEach(btn=>btn.onclick=()=>{
+      $$('[data-ans]').forEach(o=>o.classList.remove('good','bad'));
+      const fb=$('#r-fb');
+      if(btn.dataset.ans===good){btn.classList.add('good');fb.className='feedback ok';fb.textContent='Bonne réponse ! Vérifie maintenant pas à pas.'}
+      else{btn.classList.add('bad');fb.className='feedback ko';fb.textContent='Pas tout à fait. Relis chaque rectangle, un par un.'}
+    });
+    $('#r-play').onclick=()=>{
+      clearTimeout(timer);p={...st};put();g.querySelectorAll('.trail').forEach(e=>e.remove());let i=0;light(0);$('#r-narr').textContent='Début. Le robot est sur la case bleue.';
+      const tick=()=>{
+        if(i>=prg.length){light(6);$('#r-narr').textContent='Fin. Le robot est arrivé sur la case '+good+'.';return}
+        const [dx,dy]=d[prg[i]];const tr=document.createElement('div');tr.className='trail';tr.style.left=p.x*RS+'px';tr.style.top=p.y*RS+'px';g.insertBefore(tr,g.querySelector('.mark'));
+        p={x:p.x+dx,y:p.y+dy};put();light(i+1);$('#r-narr').textContent='Étape '+(i+1)+' : « '+labels[i]+' ».';i++;timer=setTimeout(tick,1100);
+      };
+      timer=setTimeout(tick,900);
+    };
+    $('#r-blocks').onclick=()=>{const o=$('#r-out');if(!o.hidden){o.hidden=true;return}
+      o.querySelectorAll('.blk').forEach(e=>e.remove());
+      const s=document.createElement('div');s.className='blk';s.style.background='var(--algo)';s.textContent='quand je clique sur ▶';o.appendChild(s);
+      prg.forEach(c=>{const e=document.createElement('div');e.className='blk';e.style.background='var(--seq)';e.textContent=names[c];o.appendChild(e)});o.hidden=false};
+  })();
+
+  /* ---- 10b. boucle + condition ---- */
+  (function(){
+    const scen=['rouge','rouge','vert'];let k=0,ph=-1,tm=null;
+    const ids=['f-start','f-dec','f-wait','f-cross','f-end'],edges=['f-e0','f-eno','f-back','f-eyes','f-e2'];
+    const feu=$('#feu'),nar=$('#f-narr');
+    function show(node,edge,line){ids.forEach(i=>$('#'+i).classList.toggle('on',i===node));edges.forEach(i=>$('#'+i).classList.toggle('on',i===edge));
+      $$('#f-code .ln').forEach(l=>l.classList.toggle('on',+l.dataset.l===line))}
+    function setFeu(c){feu.className='feu '+c}
+    function reset(){clearInterval(tm);tm=null;$('#f-play').textContent='▶ Tout jouer';k=0;ph=-1;setFeu('rouge');show(null,null,-1);nar.textContent='Appuie sur « Étape suivante » et lis le logigramme à voix haute.';$('#f-step').disabled=false}
+    function step(){
+      if(ph===-1){ph=0;show('f-start',null,-1);nar.textContent='Début : j’arrive au passage piéton.'}
+      else if(ph===0||ph===2){ph=1;setFeu(scen[k]);const v=scen[k]==='vert';show('f-dec',ph===1&&k>0?'f-back':'f-e0',0);
+        nar.textContent='Question : le feu est-il vert ? '+(v?'OUI !':'NON, il est rouge.')}
+      else if(ph===1){ if(scen[k]==='vert'){ph=3;show('f-cross','f-eyes',2);nar.textContent='Je traverse. La boucle est terminée.'}
+        else{ph=2;k++;show('f-wait','f-eno',1);nar.textContent='J’attends… puis je remonte reposer la question (c’est la boucle).'} }
+      else if(ph===3){ph=4;show('f-end','f-e2',-1);nar.textContent='Fin. J’ai posé la question '+(k+1)+' fois avant de traverser.';$('#f-step').disabled=true;clearInterval(tm);tm=null;$('#f-play').textContent='▶ Tout jouer'}
+    }
+    $('#f-step').onclick=step;$('#f-reset').onclick=reset;
+    $('#f-play').onclick=()=>{if(tm){clearInterval(tm);tm=null;$('#f-play').textContent='▶ Tout jouer';return}
+      if(ph===4)reset();$('#f-play').textContent='⏸ Pause';step();tm=setInterval(step,1400)};
+    reset();
+  })();
+
+  /* ---- 13b. optimiser ---- */
+  (function(){
+    const box=$('#sides');let n=6;
+    function draw(){
+      $$('#sides .btn').forEach(b=>b.classList.toggle('on',+b.dataset.n===n));
+      $('#o-n').textContent=n;$('#o-long').textContent=2*n;
+      const L=$('#o-list');L.innerHTML='';const ang=Math.round(360/n*10)/10;
+      for(let i=0;i<n;i++){const a=document.createElement('span');a.textContent='avancer de 80';L.appendChild(a);const b=document.createElement('span');b.textContent='tourner ↻ de '+ang+'°';L.appendChild(b)}
+      const R=110,cx=140,cy=140,pts=[];for(let i=0;i<n;i++){const t=Math.PI/2+Math.PI/n+2*Math.PI*i/n;pts.push((cx+R*Math.cos(t)).toFixed(1)+' '+(cy+R*Math.sin(t)).toFixed(1))}
+      $('#o-poly').setAttribute('d','M'+pts.join(' L')+' Z');
+    }
+    [3,4,5,6,8].forEach(v=>{const b=document.createElement('button');b.className='btn';b.dataset.n=v;b.textContent=v;b.onclick=()=>{n=v;draw()};box.appendChild(b)});
+    draw();
+  })();
+
+  /* ---- 14. quiz ---- */
+  const Q=[
+    {q:'Un algorithme, c’est…',o:['un robot très intelligent','une suite d’étapes dans un ordre précis pour résoudre un problème','un langage de programmation'],a:1,e:'Un algorithme peut être écrit en français ou dessiné. Il n’a pas besoin d’ordinateur.'},
+    {q:'Quelle est la différence entre un algorithme et un programme ?',o:['Aucune, c’est pareil','Le programme est l’algorithme traduit dans un langage de programmation','Le programme est toujours plus court'],a:1,e:'L’algorithme est pour l’humain, le programme pour la machine.'},
+    {q:'Dans un logigramme, une question oui/non se dessine dans…',o:['un ovale','un rectangle','un losange'],a:2,e:'Le losange, c’est la forme de la décision (la condition).'},
+    {q:'Dans un logigramme, le rectangle représente…',o:['une décision','un processus : une action à faire','le début du programme'],a:1,e:'Ovale = début/fin, rectangle = processus, losange = décision, flèche = lien.'},
+    {q:'Quel bloc remplace « avancer, avancer, avancer, avancer » ?',o:['répéter 4 fois : avancer','si avancer alors avancer','avancer ← 4'],a:0,e:'Quand des instructions se répètent, on utilise une boucle.'},
+    {q:'« si le capteur voit un obstacle alors freiner » est…',o:['une boucle','une condition','une variable'],a:1,e:'Si… alors… : le programme fait un choix selon la réponse.'},
+    {q:'« Tant que le feu n’est pas vert, attendre » contient…',o:['seulement une condition','une boucle et une condition','une variable'],a:1,e:'On repose la question (condition) encore et encore (boucle) jusqu’à ce que le feu passe au vert.'},
+    {q:'Une variable, c’est…',o:['une boîte avec un nom qui garde une valeur qui peut changer','une erreur dans le programme','une forme du logigramme'],a:0,e:'Exemple : la variable « vies » passe de 3 à 2 quand tu perds une vie.'},
+    {q:'Optimiser un programme, c’est…',o:['le rendre plus long pour être sûr','obtenir le même résultat avec un programme plus court et plus clair','changer ce qu’il fait'],a:1,e:'Exemple : une boucle et une variable remplacent 12 instructions par 4 lignes.'},
+    {q:'Ton programme ne fait pas ce que tu voulais. Tu dois…',o:['tout effacer et abandonner','le déboguer : chercher l’erreur et la corriger','acheter un nouvel ordinateur'],a:1,e:'Tester, trouver le bug, corriger, tester encore : c’est normal !'}
+  ];
+  let qi=0,res=[];
+  function drawQ(){
+    const dots=$('#qdots');dots.innerHTML='';Q.forEach((_,k)=>{const i=document.createElement('i');if(res[k]===true)i.className='ok';else if(res[k]===false)i.className='ko';else if(k===qi)i.className='cur';dots.appendChild(i)});
+    const good=res.filter(x=>x).length; $('#qscore').textContent=good+' / '+Q.length;
+    const z=$('#quiz');z.innerHTML='';
+    if(qi>=Q.length){
+      z.innerHTML='<p class="q" style="font-size:52px">Score : '+good+' / '+Q.length+'</p><p class="lead">'+(good===Q.length?'Parfait ! Les bases sont solides.':good>=Q.length-3?'Bien joué ! Relis les notions ratées et c’est dans la poche.':'Pas de panique : reprends les diapos et retente ta chance.')+'</p>';
+      const b=document.createElement('button');b.className='btn primary';b.textContent='Recommencer le quiz';b.style.alignSelf='flex-start';b.onclick=()=>{qi=0;res=[];drawQ()};z.appendChild(b);return}
+    const it=Q[qi];
+    const p=document.createElement('p');p.className='q';p.textContent=(qi+1)+'. '+it.q;z.appendChild(p);
+    const os=document.createElement('div');os.className='opts';z.appendChild(os);
+    const ex=document.createElement('div');
+    it.o.forEach((t,k)=>{const b=document.createElement('button');b.className='opt';b.innerHTML='<span class="l">'+'ABC'[k]+'</span><span></span>';b.lastChild.textContent=t;
+      b.onclick=()=>{ if(res[qi]!==undefined)return; res[qi]=(k===it.a);
+        $$('#quiz .opt').forEach((o,j)=>{o.disabled=true;if(j===it.a)o.classList.add('good');else if(j===k)o.classList.add('bad')});
+        ex.className='expl';ex.innerHTML='<b>'+(k===it.a?'Exact ! ':'Pas tout à fait. ')+'</b>';ex.appendChild(document.createTextNode(it.e));
+        const nx=document.createElement('button');nx.className='btn primary';nx.textContent=qi<Q.length-1?'Question suivante':'Voir mon score';nx.style.alignSelf='flex-start';nx.onclick=()=>{qi++;drawQ()};z.appendChild(nx);
+        const good=res.filter(x=>x).length; $('#qscore').textContent=good+' / '+Q.length;
+        $$('#qdots i')[qi].className=res[qi]?'ok':'ko';
+      };os.appendChild(b)});
+    z.appendChild(ex);
+  }
+  drawQ();
+})();
+</script>
+
+</body>
+</html>
