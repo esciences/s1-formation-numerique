@@ -127,7 +127,7 @@ window.VC = window.VC || {};
 
   vis.hudGuide = () => `<div class="vis-hud">
       <div class="vh-bar"><span class="vh-clock">🕖 19:00</span><span class="vh-money">$ 1 500</span><span class="vh-stars"><i class="on">★</i><i class="on">★</i><i>★</i><i>★</i><i>★</i></span></div>
-      <div class="vh-legend"><div><b>🕖</b> l'heure avance</div><div><b>$</b> tes gains fictifs</div><div><b>★</b> erreurs : ça monte, un indice ou une correction : ça baisse</div></div>
+      <div class="vh-legend"><div><b>🕖</b> l'heure avance</div><div><b>$</b> tes gains fictifs</div><div><b>★</b> erreurs : ça monte, un indice ou une correction : ça baisse. 5 ★ = piratage !</div></div>
       <div class="vh-note">Erreur = information, pas punition.</div></div>`;
 
   vis.bitsToA = () => `<div class="vis-bits"><div class="vb-row">${"01000001".split("").map((b, i) => `<span class="vb-bit" style="--i:${i}">${b}</span>`).join("")}</div>

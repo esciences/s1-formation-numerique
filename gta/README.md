@@ -60,15 +60,22 @@ Chaque mission contient une liste `steps`. Chaque étape a un `type` :
 
 Champs communs aux exercices : `prompt`, `skill` (compétence suivie dans le bilan), `notion` (fiche proposée en cas d'erreur), `hints[]` (indices progressifs), `success` (explication finale).
 
+Les propositions (`choice`, `branch`, `sort`, `order`) sont mélangées à chaque affichage : ne faites jamais référence à « la réponse A » dans un texte.
+
+**Questions de piratage** : dans `hack`, en bas du fichier. `seconds` (temps de réponse), `win` (prime si réussite), `loss` (perte maximale si échec), puis `questions[{id, notion, q, options[{t, ok}], why}]`. Le champ `notion` est l'`id` d'une fiche `learn` : la question n'est posée que si l'élève a déjà vu cette fiche.
+
 Après une modification, rechargez la page. Si un élève a déjà une sauvegarde, les nouvelles missions s'ajoutent automatiquement.
 
 ## 5. Mécaniques
 
-- **Étoiles de recherche** : +1 par erreur, −1 par indice consulté ou par correction réussie. Ce n'est jamais bloquant : après 3 essais, une « solution expliquée » est proposée et signalée dans le bilan.
-- **Portefeuille** fictif : récompense de mission + 300 $ si la mission se termine à 0 étoile + bonus d'exploration. Les erreurs ne retirent rien.
+- **Étoiles de recherche** : +1 par erreur, −1 par indice consulté ou par correction réussie. Après 3 essais, une « solution expliquée » est proposée et signalée dans le bilan.
+- **Piratage à 5 étoiles** : les Requins « piratent » l'ordinateur. L'élève lance la contre-attaque quand il est prêt, puis a 40 secondes pour répondre à une question sur une notion déjà vue. Réussite : +150 $. Échec ou temps écoulé : jusqu'à −300 $ (jamais sous zéro), avec la bonne réponse expliquée. Dans les deux cas, les étoiles retombent à zéro.
+- **Portefeuille** fictif : chaque exercice réussi rapporte 200 $ (250 pour un cadenas), moins 30 %, 55 % ou 75 % selon le nombre d'erreurs, moins 15 $ par indice, plus un bonus de rapidité jamais affiché comme un chronomètre (+60 ou +25, seulement sans erreur). Une solution affichée ne rapporte rien. En fin de mission : prime (récompense de la mission, réduite selon les erreurs) + 300 $ si 0 étoile + bonus d'exploration.
+- **Rejouer** : une mission terminée peut être rejouée (depuis la carte ou le bilan). Seul le meilleur score compte, le portefeuille ne peut donc pas baisser.
+- **Horloge** : l'heure avance de quelques minutes à chaque étape et d'une minute par erreur, sans jamais dépasser le début de la mission suivante. Minuit à la fin de la finale.
 - **Carnet** : toutes les notions vues restent consultables.
-- **Mission bonus** (temps de téléchargement) débloquée après la mission 1, pour les élèves rapides.
-- **Bilan** : missions, badges, compétences (Maîtrisé / À consolider / À retravailler, calculé par exercice), notions à retenir et bilan imprimable.
+- **Mission bonus** (temps de téléchargement) débloquée après la mission 1. L'élève la fait quand il veut, mais elle est obligatoire avant la finale (la finale reste verrouillée tant qu'elle n'est pas réussie).
+- **Bilan** : missions (avec Parfait / Bien / À rejouer et un bouton pour rejouer), badges, compétences (Maîtrisé / À consolider / À retravailler, calculé par exercice), notions à retenir et bilan imprimable.
 - **Accessibilité** : utilisable entièrement au clavier, option « Réduire les animations » (activée d'office si le système la demande), option « Texte plus grand », information jamais donnée par la couleur seule (✔ ✘ + texte).
 
 ## 6. Liens avec le programme

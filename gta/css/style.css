@@ -701,7 +701,9 @@ code { font-family: var(--mono); background: rgba(255, 255, 255, .08); padding: 
 .d-card h3 { margin: 14px 0 6px; }
 .d-missions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .d-missions li { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--panel2); }
-.d-missions li.done span { color: var(--ok); font-weight: 900; }
+.d-missions li.done .dm-i { color: var(--ok); font-weight: 900; }
+.dm-t { display: flex; flex-direction: column; min-width: 0; }
+.dm-r { display: flex; align-items: center; gap: 6px; }
 .d-missions small { color: var(--muted); }
 .d-badges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .db { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 10px 6px; border-radius: 12px; background: var(--panel2); opacity: .35; filter: grayscale(1); }
@@ -792,6 +794,65 @@ code { font-family: var(--mono); background: rgba(255, 255, 255, .08); padding: 
   .map-screen { padding: 10px; }
   .gps { position: static; margin: 0; border-radius: 0; max-width: none; }
 }
+
+/* =====================================================================
+   HORLOGE · GAINS · BILAN DE MISSION · REJEU
+   ===================================================================== */
+.hud-clock b { font-weight: 700; color: var(--text); }
+.hud-clock.ticking b { color: var(--gold); text-shadow: 0 0 10px rgba(255, 200, 61, .6); }
+.fb-gain { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: 10px; padding: 8px 12px; border-radius: 10px; background: rgba(140, 255, 158, .1); border: 1px solid rgba(140, 255, 158, .35); }
+.fb-gain b { font: 900 1.2rem var(--display); color: var(--money); }
+.fb-gain small { color: var(--muted); font-size: .85rem; }
+.fb-gain.none { background: rgba(255, 255, 255, .05); border-color: var(--line2); color: var(--muted); }
+.p-bill { list-style: none; margin: 8px 0 6px; padding: 0; width: 100%; font-size: .9rem; }
+.p-bill li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-bottom: 1px dashed var(--line); }
+.p-bill li b { font: 800 .95rem var(--body); color: var(--money); }
+.p-note { margin: 0 auto 18px; max-width: 760px; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--gold); background: rgba(255, 200, 61, .1); font-weight: 700; text-align: center; }
+.d-replay { border: 2px solid var(--gold); background: linear-gradient(120deg, rgba(255, 200, 61, .12), rgba(255, 61, 139, .1)); }
+.dr-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.dr-list .btn small { display: block; font-weight: 600; opacity: .85; }
+
+/* =====================================================================
+   PIRATAGE (5 étoiles)
+   ===================================================================== */
+.hack { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 18px; background: radial-gradient(circle at 50% 40%, rgba(120, 0, 30, .92), rgba(8, 0, 6, .97)); animation: hackIn .45s ease-out; overflow-y: auto; }
+.hk-noise { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .04) 0 1px, transparent 1px 3px); animation: scan 6s linear infinite; }
+.hk-box { position: relative; width: min(720px, 100%); padding: 26px 28px; border-radius: 18px; background: #12030B; border: 2px solid #FF2D55; box-shadow: 0 0 0 4px rgba(255, 45, 85, .2), 0 0 60px rgba(255, 45, 85, .45); animation: shake .5s ease-in-out 2; }
+.hk-shark { font-size: 3.4rem; text-align: center; animation: sharkFloat 1.6s ease-in-out infinite; }
+.hk-kicker { margin: 0 0 6px; font: 800 .78rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #FF6B8A; text-align: center; }
+.hk-title { position: relative; margin: 0 0 12px; font: italic 900 clamp(2rem, 6vw, 3.4rem)/1 var(--display); text-align: center; color: #FFF; text-shadow: 0 0 18px #FF2D55; }
+.hk-title::before, .hk-title::after { content: attr(data-text); position: absolute; inset: 0; overflow: hidden; }
+.hk-title::before { color: #2EE6E6; transform: translate(-3px, 0); clip-path: inset(0 0 55% 0); animation: glitchA 1.2s steps(2) infinite; opacity: .8; }
+.hk-title::after { color: #FF3D8B; transform: translate(3px, 0); clip-path: inset(55% 0 0 0); animation: glitchB 1s steps(2) infinite; opacity: .8; }
+.hk-code { min-height: 6.4em; margin: 0 0 14px; padding: 10px 14px; border-radius: 10px; background: #000; color: #5CFF8F; font: 600 .9rem/1.6 var(--mono); white-space: pre-wrap; border: 1px solid rgba(92, 255, 143, .3); }
+.hk-lead { text-align: center; margin: 0 0 18px; line-height: 1.5; }
+.hk-intro .btn { display: block; margin: 0 auto; }
+.hk-timer { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.hk-sec { min-width: 2.2em; font: 900 2.2rem/1 var(--display); color: var(--gold); text-align: center; font-variant-numeric: tabular-nums; }
+.hk-bar { flex: 1; height: 14px; border-radius: 99px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.hk-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #FF2D55, var(--gold)); transition: width .1s linear; }
+.hack.hurry .hk-sec { color: #FF2D55; animation: blink .5s infinite; }
+.hack.hurry .hk-box { animation: shake .4s ease-in-out infinite; }
+.hk-ques { margin: 0 0 14px; font: 800 1.3rem/1.35 var(--body); }
+.hk-opts { display: grid; gap: 10px; }
+.hk-opt.ok { border-color: var(--ok); background: rgba(59, 227, 138, .18); }
+.hk-opt.ko { border-color: var(--ko); background: rgba(255, 107, 122, .18); }
+.hk-end { margin-top: 18px; }
+.hk-res { text-align: center; animation: fadeUp .4s ease-out; }
+.hk-res h3 { margin: 6px 0; font: italic 900 2rem var(--display); }
+.hk-big { font-size: 3rem; }
+.hk-why { margin: 12px auto 16px; max-width: 560px; padding: 10px 14px; border-radius: 10px; background: rgba(255, 255, 255, .07); text-align: left; }
+.hack.won { background: radial-gradient(circle at 50% 40%, rgba(0, 110, 90, .92), rgba(0, 10, 12, .97)); }
+.hack.won .hk-box { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(46, 230, 230, .2), 0 0 60px rgba(46, 230, 230, .4); animation: none; }
+.hack.won .hk-res h3 { color: var(--teal); }
+.hack.lost .hk-box { animation: none; }
+.hack.lost .hk-res h3 { color: #FF6B8A; }
+@keyframes hackIn { from { opacity: 0; filter: hue-rotate(90deg) blur(4px); } }
+@keyframes scan { to { background-position: 0 300px; } }
+@keyframes shake { 0%, 100% { transform: none; } 20% { transform: translate(-6px, 2px); } 40% { transform: translate(5px, -3px); } 60% { transform: translate(-4px, 1px); } 80% { transform: translate(3px, 2px); } }
+@keyframes sharkFloat { 50% { transform: translateY(-8px) rotate(-6deg); } }
+@keyframes glitchA { 0% { transform: translate(-3px, 0); } 50% { transform: translate(3px, -2px); } }
+@keyframes glitchB { 0% { transform: translate(3px, 0); } 50% { transform: translate(-3px, 2px); } }
 
 /* =====================================================================
    ANIMATIONS RÉDUITES

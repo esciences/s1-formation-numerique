@@ -82,7 +82,7 @@ window.VC = window.VC || {};
         unlocks: ["m1"],
         recap: [
           "PEGI 18 = jeu conseillé à partir de 18 ans. Ce n'est pas une note de qualité.",
-          "Une erreur fait monter tes étoiles. Un indice ou une correction les fait redescendre.",
+          "Une erreur fait monter tes étoiles. Un indice ou une correction les fait redescendre. À 5 étoiles : piratage !",
         ],
         steps: [
           { type: "story", messages: [
@@ -99,9 +99,9 @@ window.VC = window.VC || {};
                 <li>Ce n'est <strong>pas une note de qualité</strong>.</li></ul>
                 <p class="callout">Ici, on n'y joue pas. On enquête sur tout ce qui se passe <strong>autour</strong> de sa sortie : téléchargements, arnaques, rumeurs, comptes piratés.</p>` },
               { visual: "hudGuide", html: `<p>En haut de l'écran, une <strong>barre d'infos</strong> te suit pendant tout le jeu. Dans les jeux vidéo, on l'appelle le <strong>HUD</strong>. Voici ce qu'elle affiche :</p>
-                <ul><li><strong>Étoiles de recherche</strong> : une erreur ajoute une étoile. Pas de panique : un indice ou une bonne correction en enlève une. Tu n'es <strong>jamais bloqué·e</strong>.</li>
-                <li><strong>Portefeuille</strong> : chaque mission réussie rapporte des dollars (fictifs, bien sûr).</li>
-                <li><strong>Horloge</strong> : l'heure avance à chaque mission. Minuit = sortie du jeu.</li>
+                <ul><li><strong>Étoiles de recherche</strong> : une erreur ajoute une étoile. Un indice ou une bonne correction en enlève une. Attention : à <strong>5 étoiles</strong>, les Requins piratent ton ordinateur ! Tu devras répondre vite à une question pour reprendre la main.</li>
+                <li><strong>Portefeuille</strong> : chaque exercice réussi rapporte des dollars (fictifs, bien sûr). Moins d'erreurs = plus de dollars. Une prime s'ajoute à la fin de chaque mission.</li>
+                <li><strong>Horloge</strong> : l'heure avance au fil de ta progression. Minuit = sortie du jeu.</li>
                 <li><strong>Carnet</strong> 📖 : tu peux y relire toutes les notions découvertes.</li></ul>` },
             ] },
           { type: "choice", id: "c-pegi", skill: "pegi", notion: "n-pegi",
@@ -637,13 +637,13 @@ window.VC = window.VC || {};
       },
 
       /* ---------------------------------------------------------------
-         MISSION BONUS · TURBO-TÉLÉCHARGEMENT (facultative)
+         MISSION BONUS · TURBO-TÉLÉCHARGEMENT (libre, mais obligatoire avant la finale)
          --------------------------------------------------------------- */
       {
         id: "mB", code: "B", kind: "bonus", verb: "G",
         title: "Turbo-téléchargement",
         place: "Data Keys · antenne relais", time: "—", minutes: 10,
-        objective: "Bonus pour les rapides : calculer combien de temps prend le téléchargement du jeu.",
+        objective: "Mission bonus : calculer combien de temps prend le téléchargement du jeu.",
         skills: ["debit"], reward: 800, badge: { id: "turbo", icon: "⚡", name: "Turbo" },
         map: { x: 590, y: 458, icon: "📶" },
         unlocks: [],
@@ -689,6 +689,65 @@ window.VC = window.VC || {};
 
     /* Ordre d'affichage dans la feuille de route */
     order: ["m0", "m1", "m2", "m3", "m4", "mF", "mB"],
+
+    /* PIRATAGE · à 5 étoiles, une question sur une notion DÉJÀ VUE (champ notion = id d'une fiche learn).
+       seconds : temps pour répondre · win : prime si réussite · loss : perte maximale si échec. */
+    hack: {
+      seconds: 40, win: 150, loss: 300,
+      questions: [
+        { id: "h-pegi1", notion: "n-pegi", q: "Sur la boîte d'un jeu, que veut dire le chiffre PEGI ?",
+          options: [{ t: "L'âge conseillé pour y jouer", ok: true }, { t: "La note du jeu", }, { t: "Le prix du jeu" }, { t: "La taille du jeu en Go" }],
+          why: "Le chiffre PEGI est un âge conseillé (3, 7, 12, 16 ou 18). Ce n'est ni une note, ni un prix." },
+        { id: "h-pegi2", notion: "n-pegi", q: "À quoi servent les pictogrammes PEGI (poing, seringue, carte…) ?",
+          options: [{ t: "À expliquer pourquoi le jeu a cet âge", ok: true }, { t: "À dire sur quelle console il fonctionne" }, { t: "À montrer le nombre de joueurs" }, { t: "À décorer la boîte" }],
+          why: "Les pictogrammes expliquent le contenu : violence, langage grossier, drogues, achats intégrés…" },
+        { id: "h-units1", notion: "n-units", q: "Combien de bits y a-t-il dans 1 octet ?",
+          options: [{ t: "8", ok: true }, { t: "2" }, { t: "10" }, { t: "1 000" }],
+          why: "1 octet = 8 bits. Un octet suffit pour coder une lettre." },
+        { id: "h-units2", notion: "n-units", q: "Quelle taille est la plus grande ?",
+          options: [{ t: "2 To", ok: true }, { t: "900 Go" }, { t: "5 000 Mo" }, { t: "800 000 ko" }],
+          why: "2 To = 2 000 Go. C'est bien plus que 900 Go, 5 000 Mo (5 Go) ou 800 000 ko (0,8 Go)." },
+        { id: "h-units3", notion: "n-units", q: "1,5 Go, ça fait combien de Mo ?",
+          options: [{ t: "1 500 Mo", ok: true }, { t: "150 Mo" }, { t: "15 Mo" }, { t: "15 000 Mo" }],
+          why: "Go → Mo : × 1 000. Donc 1,5 × 1 000 = 1 500 Mo." },
+        { id: "h-mem1", notion: "n-memory", q: "Que se passe-t-il dans la mémoire vive (RAM) quand on éteint la console ?",
+          options: [{ t: "Elle se vide", ok: true }, { t: "Elle garde tout pour toujours" }, { t: "Elle part dans le cloud" }, { t: "Elle se copie sur une clé USB" }],
+          why: "La RAM, c'est le plan de travail : elle se vide à l'extinction. Le stockage, lui, garde les fichiers." },
+        { id: "h-mem2", notion: "n-memory", q: "Où un jeu doit-il être installé pour qu'on puisse y jouer ?",
+          options: [{ t: "Dans le stockage interne de la console (le SSD)", ok: true }, { t: "Dans le cloud" }, { t: "Dans la mémoire vive" }, { t: "Sur la manette" }],
+          why: "Un jeu s'installe dans le stockage interne. Le cloud sert plutôt aux photos et aux documents." },
+        { id: "h-url1", notion: "n-url", q: "Dans <code>https://boutique.rockstargames.com/gta6</code>, quel est le nom de domaine ?",
+          options: [{ t: "rockstargames.com", ok: true }, { t: "boutique" }, { t: "gta6" }, { t: "https" }],
+          why: "Le nom de domaine se lit juste avant la première « / » : rockstargames.com." },
+        { id: "h-url2", notion: "n-url", q: "Qui possède vraiment <code>https://rockstargames.com.cadeau-gta.net/free</code> ?",
+          options: [{ t: "cadeau-gta.net", ok: true }, { t: "rockstargames.com" }, { t: "free" }, { t: "Personne" }],
+          why: "Le vrai propriétaire est le dernier mot avant la première « / » : cadeau-gta.net. « rockstargames.com » n'est qu'un déguisement." },
+        { id: "h-sig1", notion: "n-signals", q: "« Plus que 5 minutes pour récupérer ton cadeau ! » Quel signal d'alerte vois-tu ?",
+          options: [{ t: "L'urgence", ok: true }, { t: "Une adresse officielle" }, { t: "Un fichier trop léger" }, { t: "Aucun : c'est normal" }],
+          why: "L'urgence sert à t'empêcher de réfléchir. C'est un signal d'alerte classique." },
+        { id: "h-sig2", notion: "n-signals", q: "Tu as cliqué sur un lien douteux. Quel est le bon réflexe ?",
+          options: [{ t: "Prévenir un adulte et changer mon mot de passe depuis l'appli officielle", ok: true }, { t: "Ne rien dire, par honte" }, { t: "Recliquer pour vérifier" }, { t: "Envoyer le lien à mes amis" }],
+          why: "Pas de honte : ça arrive aussi aux adultes. On prévient vite un adulte et on change son mot de passe." },
+        { id: "h-src1", notion: "n-source", q: "Avant de partager une info, quelles questions te poses-tu ?",
+          options: [{ t: "Qui le dit ? Quand ? Comment le sait-il ?", ok: true }, { t: "Est-ce que c'est drôle ?" }, { t: "Combien de likes ?" }, { t: "Est-ce que mes amis l'ont vu ?" }],
+          why: "Qui, quand, comment… puis on recoupe avec au moins deux sources fiables." },
+        { id: "h-src2", notion: "n-source", q: "Un compte officiel te demande ton mot de passe par message. C'est…",
+          options: [{ t: "Une arnaque : un vrai compte officiel ne fait jamais ça", ok: true }, { t: "Normal pour vérifier ton compte" }, { t: "Obligatoire pour jouer" }, { t: "Un cadeau" }],
+          why: "Un compte officiel ne demande jamais de mot de passe ni d'argent par message." },
+        { id: "h-id1", notion: "n-identity", q: "Sur un ordinateur partagé, le navigateur propose d'enregistrer ton mot de passe. Tu choisis…",
+          options: [{ t: "Jamais pour ce site", ok: true }, { t: "Oui, c'est plus pratique" }, { t: "Plus tard" }, { t: "Oui, mais seulement aujourd'hui" }],
+          why: "Sur un appareil partagé, on n'enregistre jamais de mot de passe : le client suivant pourrait l'utiliser." },
+        { id: "h-id2", notion: "n-identity", q: "À quoi sert la double authentification ?",
+          options: [{ t: "À bloquer un pirate même s'il connaît ton mot de passe", ok: true }, { t: "À jouer à deux" }, { t: "À aller plus vite sur Internet" }, { t: "À ne plus avoir de mot de passe" }],
+          why: "Un code arrive sur un autre appareil : sans lui, le pirate reste bloqué." },
+        { id: "h-debit1", notion: "n-debit", q: "Une connexion de 80 Mbit/s, c'est combien de Mo par seconde ?",
+          options: [{ t: "10 Mo/s", ok: true }, { t: "80 Mo/s" }, { t: "640 Mo/s" }, { t: "8 Mo/s" }],
+          why: "Mbit/s ÷ 8 = Mo/s. Donc 80 ÷ 8 = 10 Mo/s." },
+        { id: "h-debit2", notion: "n-debit", q: "2,5 h, ça fait combien en heures et minutes ?",
+          options: [{ t: "2 h 30 min", ok: true }, { t: "2 h 50 min" }, { t: "2 h 05 min" }, { t: "25 min" }],
+          why: "2,5 h = 2 h + 0,5 × 60 min = 2 h 30 min." },
+      ],
+    },
 
     sources: [
       { label: "Annexe « Attendus en lien avec les S – SF – C » (programme FMTTN, volet N) — fiches 3.3 et 3.6", url: "https://netboardme-cf1.s3.amazonaws.com/published/343873/files/71f8a1a271e0298d39eaa004377cded5.pdf" },

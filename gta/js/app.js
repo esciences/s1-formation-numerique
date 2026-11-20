@@ -8,6 +8,8 @@
   const D = VC.DATA, V = VC.V;
   const KEY = D.meta.storageKey;
   const CORE = ["m0", "m1", "m2", "m3", "m4", "mF"];
+  const ROUTE = ["m0", "m1", "m2", "m3", "m4", "mB", "mF"]; // ordre du GPS : le bonus passe avant la finale
+  const GATES = { mF: ["m4", "mB"] };                         // la finale exige la mission 4 ET le bonus
 
   /* ---------- utilitaires ---------- */
   const $ = (s, r = document) => r.querySelector(s);
@@ -18,6 +20,9 @@
   const money = (n) => "$ " + Number(n).toLocaleString("fr-BE");
   const M = (id) => D.missions.find((m) => m.id === id);
   const tpl = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => (o[k] !== undefined ? o[k] : ""));
+  const shuffle = (a) => { const r = a.slice(); for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
+  const toMin = (t) => { const [h, m] = String(t).split(":").map(Number); return h * 60 + m; };
+  const fromMin = (n) => `${String(Math.floor(n / 60) % 24).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
 
   /* ---------- sauvegarde locale ---------- */
   const store = {
@@ -27,18 +32,31 @@
   };
   function fresh() {
     const missions = {};
-    D.missions.forEach((m) => (missions[m.id] = { status: m.id === "m0" ? "open" : "locked", step: 0, errors: 0, hints: 0, reveals: 0, wantedEnd: 0, maxWanted: 0, extra: 0, startedAt: null, doneAt: null, earned: 0 }));
+    D.missions.forEach((m) => (missions[m.id] = { status: m.id === "m0" ? "open" : "locked", step: 0, errors: 0, hints: 0, reveals: 0, wantedEnd: 0, maxWanted: 0, extra: 0, startedAt: null, doneAt: null, earned: 0,
+      run: 0, best: 0, bestRun: null, runErr: 0, runHints: 0, runReveals: 0, mins: 0, base: null }));
     const skills = {};
     Object.keys(D.skills).forEach((k) => (skills[k] = { tries: 0, errors: 0, ok: 0, reveals: 0 }));
     let reduce = false;
     try { reduce = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
-    return { v: 1, created: Date.now(), current: null, missions, skills, wallet: 0, wanted: 0, badges: [], notebook: [], settings: { reduce, big: false }, name: "", finishedAt: null, clock: "18:00" };
+    return { v: 1, created: Date.now(), current: null, missions, skills, wallet: 0, wanted: 0, badges: [], notebook: [], settings: { reduce, big: false }, name: "", finishedAt: null, clock: "18:00", hackDelta: 0, hacks: { won: 0, lost: 0 }, hackSeen: [], demo: false };
   }
   function load() {
     const s = store.get();
     if (!s || s.v !== 1) return fresh();
     const f = fresh();
-    for (const k in f.missions) if (!s.missions[k]) s.missions[k] = f.missions[k];
+    for (const k in f.missions) {
+      const old = s.missions[k];
+      s.missions[k] = Object.assign({}, f.missions[k], old || {});
+      // anciennes sauvegardes : le gain enregistré devient le record de la mission
+      if (old && !("best" in old)) {
+        s.missions[k].best = old.earned || 0;
+        if (old.status === "done") s.missions[k].bestRun = { errors: old.errors || 0, hints: old.hints || 0, reveals: old.reveals || 0, money: old.earned || 0 };
+      }
+    }
+    if (s.hackDelta === undefined) s.hackDelta = 0;
+    if (!s.hacks) s.hacks = { won: 0, lost: 0 };
+    if (!s.hackSeen) s.hackSeen = [];
+    if (!s.demo) Object.entries(GATES).forEach(([t, req]) => { if (s.missions[t].status === "open" && !req.every((r) => s.missions[r].status === "done")) s.missions[t].status = "locked"; });
     for (const k in f.skills) if (!s.skills[k]) s.skills[k] = f.skills[k];
     s.settings = Object.assign(f.settings, s.settings || {});
     return s;
@@ -47,6 +65,10 @@
   const save = () => store.set(S);
   const ms = (id) => S.missions[id];
   const hasProgress = () => Object.values(S.missions).some((m) => m.status === "done" || m.step > 0) || S.current;
+  /* Portefeuille = meilleur score de chaque mission (ou la partie en cours si elle fait mieux) + bilan des piratages. */
+  const walletTotal = () => Math.max(0, (S.hackDelta || 0) + D.order.reduce((a, id) => a + Math.max(ms(id).best || 0, ms(id).run || 0), 0));
+  const syncWallet = () => (S.wallet = walletTotal());
+  syncWallet();
 
   /* ---------- squelette ---------- */
   const app = $("#app");
@@ -85,7 +107,7 @@
         <div class="hud-prog"><i style="width:${(done / CORE.length) * 100}%"></i></div><small>${done}/${CORE.length} missions</small>
       </div>
       <div class="hud-r">
-        <span class="hud-clock" title="Heure dans l'histoire">🕖 ${esc(S.clock)}</span>
+        <span class="hud-clock" id="hud-clock" title="Heure dans l'histoire">🕖 <b>${esc(S.clock)}</b></span>
         <span class="hud-money" id="hud-money" title="Portefeuille (fictif)">${money(S.wallet)}</span>
         <span class="hud-stars" id="hud-stars" role="img" aria-label="Niveau de recherche : ${S.wanted} étoile${S.wanted > 1 ? "s" : ""} sur 5">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= S.wanted ? "on" : ""}">★</i>`).join("")}</span>
         <button class="hud-btn" data-act="notebook" aria-label="Carnet des notions">📖<span>Carnet</span></button>
@@ -107,6 +129,31 @@
     const step = (t) => { const k = Math.min(1, (t - t0) / dur); mEl.textContent = money(Math.round(from + (to - from) * k)); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
+  /* ---------- horloge de l'histoire : elle avance avec la progression (pas un chronomètre) ---------- */
+  function bonusBase() { const t = toMin(S.clock || "18:00"); return t < 18 * 60 ? 23 * 60 + 20 : t; }
+  function clockBase(id) { const m = M(id), st = ms(id); return m.time && m.time !== "—" ? toMin(m.time) : (st.base != null ? st.base : bonusBase()); }
+  // L'heure d'une mission ne dépasse jamais le début de la mission suivante (ni 23:59).
+  function clockCap(base) { const nx = CORE.map((id) => M(id).time).filter((t) => t && t !== "—").map(toMin).filter((t) => t > base).sort((a, b) => a - b)[0]; return nx ? nx - 1 : 23 * 60 + 59; }
+  function clockOf(id) { const b = clockBase(id); return fromMin(Math.min(b + (ms(id).mins || 0), clockCap(b))); }
+  function stepMinutes(id, type) {
+    const b = clockBase(id), avail = clockCap(b) - b - 3, def = type === "story" ? 2 : type === "learn" ? 3 : 4;
+    return Math.max(1, Math.min(def, Math.floor(avail / M(id).steps.length)));
+  }
+  let clockAnim = null;
+  function tick(n) {
+    if (!currentMissionId || !n) return;
+    const from = S.clock;
+    ms(currentMissionId).mins += n;
+    S.clock = clockOf(currentMissionId); save();
+    const box = $("#hud-clock"), c = box && $("b", box);
+    if (!c) return;
+    clearInterval(clockAnim);
+    let cur = toMin(from); const to = toMin(S.clock);
+    if (S.settings.reduce || to <= cur) { c.textContent = S.clock; return; }
+    box.classList.add("ticking");
+    clockAnim = setInterval(() => { cur += 1; c.textContent = fromMin(cur); if (cur >= to) { clearInterval(clockAnim); box.classList.remove("ticking"); } }, 140);
+  }
+
   function toast(title, text, kind = "info", icon = "📱") {
     const box = $("#toasts");
     const t = el(`<div class="toast tk-${kind}"><span class="toast-i" aria-hidden="true">${icon}</span><div><b>${title}</b>${text ? `<p>${text}</p>` : ""}</div></div>`);
@@ -119,9 +166,10 @@
     S.wanted = Math.min(5, S.wanted + 1);
     if (currentMissionId) ms(currentMissionId).maxWanted = Math.max(ms(currentMissionId).maxWanted, S.wanted);
     refreshStars("up");
-    const msg = S.wanted >= 4 ? "Alerte maximale… mais rien n'est perdu : lis l'explication ou demande un indice." : "Pas de panique : lis l'explication, puis réessaie.";
+    const msg = S.wanted >= 5 ? "Les Requins t'ont repéré·e…" : S.wanted === 4 ? "Attention : à 5 étoiles, les Requins piratent ton ordinateur ! Un indice fait baisser les étoiles." : "Pas de panique : lis l'explication, puis réessaie.";
     toast(`Niveau de recherche ${"★".repeat(S.wanted)}`, msg, "warn", "🚨");
     save();
+    if (S.wanted >= 5) setTimeout(startHack, 1100);
   }
   function wantedDown(reason) {
     if (S.wanted <= 0) return;
@@ -205,7 +253,8 @@
   /* =====================================================================
      CARTE
      ===================================================================== */
-  function nextMission() { return CORE.find((id) => ms(id).status !== "done" && ms(id).status !== "locked") || null; }
+  function nextMission() { return ROUTE.find((id) => ms(id).status !== "done" && ms(id).status !== "locked") || null; }
+  const bonusRequired = () => ms("m4").status === "done" && ms("mB").status !== "done";
   function goMap() {
     currentMissionId = null;
     S.current = null; S.wanted = 0; save();
@@ -236,8 +285,8 @@
   }
   function missionCard(id, isNext) {
     const m = M(id), st = ms(id), steps = m.steps.length;
-    const label = { locked: "🔒 Verrouillée", open: st.step > 0 ? `⏸ En cours · étape ${st.step + 1}/${steps}` : "▶ Disponible", done: "✔ Réussie" }[st.status];
-    const kind = m.kind === "final" ? "Finale" : m.kind === "bonus" ? "Bonus · facultatif" : m.kind === "prologue" ? "Prologue" : "Mission " + m.code;
+    const label = { locked: id === "mF" && bonusRequired() ? "🔒 Termine d'abord la mission bonus" : "🔒 Verrouillée", open: st.step > 0 ? `⏸ En cours · étape ${st.step + 1}/${steps}` : "▶ Disponible", done: `✔ Réussie · ${money(st.best)}` }[st.status];
+    const kind = m.kind === "final" ? "Finale" : m.kind === "bonus" ? (st.status === "done" ? "Bonus" : bonusRequired() ? "Bonus · obligatoire maintenant" : "Bonus · à faire avant la finale") : m.kind === "prologue" ? "Prologue" : "Mission " + m.code;
     return `<li class="mc mc-${st.status}${isNext ? " next" : ""}${m.kind ? " mc-" + m.kind : ""}">
       <div class="mc-icon" aria-hidden="true">${st.status === "locked" ? "🔒" : m.map.icon}</div>
       <div class="mc-body"><small>${verbChip(m)}${kind} · ${esc(m.time !== "—" ? m.time + " · " : "")}≈ ${m.minutes} min</small><b>${esc(m.title)}</b><span class="mc-st">${label}${st.status === "done" && m.badge ? ` · ${m.badge.icon}` : ""}</span></div>
@@ -260,7 +309,7 @@
     if (st.status === "locked") return;
     currentMissionId = id;
     S.wanted = 0;
-    if (m.time && m.time !== "—") S.clock = m.time;
+    S.clock = clockOf(id);
     save();
     document.body.dataset.screen = "intro";
     renderHUD();
@@ -275,7 +324,7 @@
           <h1 class="intro-title" tabindex="-1">${esc(m.title)}</h1>
           <p class="intro-obj"><span>Objectif</span>${esc(m.objective)}</p>
           <div class="intro-skills">${m.skills.map((k) => `<span class="chip">${esc(D.skills[k].label)}</span>`).join("")}</div>
-          <div class="intro-meta"><span>⏱ ≈ ${m.minutes} min</span><span>💰 ${money(m.reward)}</span>${m.badge ? `<span>${m.badge.icon} badge « ${esc(m.badge.name)} »</span>` : ""}</div>
+          <div class="intro-meta"><span>⏱ ≈ ${m.minutes} min</span><span>💰 des $ à chaque exercice + prime ${money(m.reward)}</span>${st.status === "done" ? `<span>🏆 record ${money(st.best)}</span>` : ""}${m.badge ? `<span>${m.badge.icon} badge « ${esc(m.badge.name)} »</span>` : ""}</div>
           <div class="intro-btns">
             <button class="btn primary xl" id="in-go">${resume ? `▶ Reprendre à l'étape ${st.step + 1}` : st.status === "done" ? "▶ Rejouer" : "▶ Commencer"}</button>
             ${resume ? `<button class="btn ghost" id="in-restart">Recommencer la mission</button>` : ""}
@@ -283,9 +332,18 @@
           </div>
         </div>
       </section>`;
-    $("#in-go").addEventListener("click", () => { if (!st.startedAt || st.status === "done") st.startedAt = Date.now(); openStep(id, st.status === "done" ? 0 : st.step); });
-    const rs = $("#in-restart"); if (rs) rs.addEventListener("click", () => { st.step = 0; st.startedAt = Date.now(); openStep(id, 0); });
+    $("#in-go").addEventListener("click", () => { if (!resume) resetRun(id); openStep(id, st.status === "done" ? 0 : st.step); });
+    const rs = $("#in-restart"); if (rs) rs.addEventListener("click", () => { st.step = 0; resetRun(id); openStep(id, 0); });
     $(".intro-title").focus();
+  }
+
+  /* Nouvelle partie d'une mission (premier essai, « Recommencer » ou « Rejouer »). */
+  function resetRun(id) {
+    const st = ms(id);
+    Object.assign(st, { run: 0, runErr: 0, runHints: 0, runReveals: 0, extra: 0, mins: 0 });
+    if (M(id).kind === "bonus") st.base = bonusBase();
+    if (!st.startedAt || st.status !== "done") st.startedAt = Date.now();
+    syncWallet(); save();
   }
 
   /* =====================================================================
@@ -297,7 +355,7 @@
     if (st.status !== "done") st.step = idx;
     S.current = { mid: id, step: idx };
     if (!st.startedAt) st.startedAt = Date.now();
-    if (m.time && m.time !== "—") S.clock = m.time;
+    S.clock = clockOf(id);
     save();
     document.body.dataset.screen = "step";
     renderHUD();
@@ -309,11 +367,13 @@
           <div class="sb-obj"><span class="gps-i" aria-hidden="true">🧭</span><span><small>Objectif</small>${esc(m.objective)}</span></div>
           <div class="sb-dots" aria-label="Étape ${idx + 1} sur ${m.steps.length}">${dots}<span>Étape ${idx + 1}/${m.steps.length}</span></div>
         </div>
-        ${m.kind === "bonus" ? `<div class="sb-exit"><span>Mission facultative : tu peux la quitter quand tu veux, ta progression est gardée.</span><button class="btn ghost sm" data-act="map">↩ Retour aux missions principales</button></div>` : ""}
+        ${m.kind === "bonus" ? (bonusRequired()
+          ? `<div class="sb-exit"><span>Dernière étape avant la finale : cette mission bonus est obligatoire. Tu peux faire une pause, ta progression est gardée.</span><button class="btn ghost sm" data-act="map">↩ Retour à la carte</button></div>`
+          : `<div class="sb-exit"><span>Mission bonus : fais-la maintenant ou plus tard, mais elle sera obligatoire avant la finale. Ta progression est gardée.</span><button class="btn ghost sm" data-act="map">↩ Retour aux missions principales</button></div>`) : ""}
         <div class="step-body" id="step-body"></div>
       </section>`;
     const body = $("#step-body");
-    const next = () => { if (idx + 1 < m.steps.length) openStep(id, idx + 1); else missionPassed(id); };
+    const next = () => { tick(stepMinutes(id, step.type)); if (idx + 1 < m.steps.length) openStep(id, idx + 1); else missionPassed(id); };
     const R = RENDER[step.type];
     if (!R) { body.textContent = "Type d'étape inconnu : " + step.type; return; }
     window.scrollTo(0, 0);
@@ -340,7 +400,7 @@
       </div></div>`);
     body.appendChild(root);
     const ctx = {
-      root, body: $(".ex-body", root), tries: 0, hintIdx: 0, solved: false, step,
+      root, body: $(".ex-body", root), tries: 0, hintIdx: 0, solved: false, step, t0: Date.now(), errs: 0,
       fbBox: $(".ex-fb", root),
       feedback(kind, html, buttons = "") {
         const icon = { right: "✔", wrong: "✘", info: "ℹ", reveal: "🆘" }[kind];
@@ -362,13 +422,18 @@
         root.classList.add("is-solved");
         const chk = $('[data-x="check"]', root); if (chk) chk.disabled = true;
         if (step.lock) openLock(step.lock);
-        ctx.feedback("right", `${html ? html + " " : ""}${step.success ? `<span class="fb-why">${step.success}</span>` : ""}`, `<button class="btn primary fb-next">Continuer ➜</button>`);
+        const g = exerciseGain(step, ctx), before = S.wallet;
+        ms(currentMissionId).run += g.gain;
+        syncWallet();
+        ctx.feedback("right", `${html ? html + " " : ""}${step.success ? `<span class="fb-why">${step.success}</span>` : ""}<div class="fb-gain">💰 <b>+${money(g.gain)}</b><small>${g.parts.join(" · ")}</small></div>`, `<button class="btn primary fb-next">Continuer ➜</button>`);
+        refreshMoney(before);
         save();
       },
       fail(html, opts2 = {}) {
         if (ctx.solved) return;
-        ctx.tries += 1;
-        const st = ms(currentMissionId); st.errors += 1;
+        ctx.tries += 1; ctx.errs += 1;
+        const st = ms(currentMissionId); st.errors += 1; st.runErr += 1;
+        tick(1);
         const sk = S.skills[step.skill]; if (sk) sk.errors += 1;
         wantedUp();
         const rv = $('[data-x="reveal"]', root);
@@ -390,7 +455,7 @@
       ctx.hintIdx += 1;
       $(".hint-c", hintBtn).textContent = `(${ctx.hintIdx}/${step.hints.length})`;
       if (ctx.hintIdx >= step.hints.length) hintBtn.disabled = true;
-      ms(currentMissionId).hints += 1;
+      ms(currentMissionId).hints += 1; ms(currentMissionId).runHints += 1;
       wantedDown("Indice consulté : bonne idée !");
       if (opts.onHint) opts.onHint(ctx.hintIdx);
       announce(step.hints[ctx.hintIdx - 1]);
@@ -401,18 +466,34 @@
     if (rv) rv.addEventListener("click", () => {
       if (ctx.solved) return;
       ctx.solved = true;
-      ms(currentMissionId).reveals += 1;
+      ms(currentMissionId).reveals += 1; ms(currentMissionId).runReveals += 1;
       if (sk) sk.reveals += 1;
       const txt = opts.reveal ? opts.reveal() : "";
       root.classList.add("is-revealed");
       const chk = $('[data-x="check"]', root); if (chk) chk.disabled = true;
       if (step.lock) openLock(step.lock);
-      ctx.feedback("reveal", `${txt || ""}${step.success ? ` <span class="fb-why">${step.success}</span>` : ""}<p class="small">Cette notion apparaîtra dans « À retravailler » de ton bilan : c'est normal, c'est fait pour ça.</p>`, `<button class="btn primary fb-next">Continuer ➜</button>`);
+      ctx.feedback("reveal", `${txt || ""}${step.success ? ` <span class="fb-why">${step.success}</span>` : ""}<p class="small">Cette notion apparaîtra dans « À retravailler » de ton bilan : c'est normal, c'est fait pour ça.</p><div class="fb-gain none">💰 Solution affichée : pas de gain pour cet exercice.</div>`, `<button class="btn primary fb-next">Continuer ➜</button>`);
       save();
     });
     const chk = $('[data-x="check"]', root);
     if (chk) chk.addEventListener("click", () => { if (ctx.solved) return; if (sk) sk.tries += 1; opts.check(ctx); });
     return ctx;
+  }
+  /* Gain d'un exercice : base − erreurs − indices + bonus de rapidité (temps mesuré mais jamais affiché). */
+  const EXPECT = { choice: 40, input: 75, order: 70, sort: 100, inspect: 120, space: 200, branch: 90, toggles: 60, password: 90 };
+  function exerciseGain(step, ctx) {
+    const base = step.lock ? 250 : 200;
+    const secs = (Date.now() - ctx.t0) / 1000, exp = (EXPECT[step.type] || 60) * (step.multi ? 1.3 : 1);
+    const errCut = Math.round(base * (1 - [1, 0.7, 0.45, 0.25][Math.min(ctx.errs, 3)]));
+    const hintCut = 15 * ctx.hintIdx;
+    const speed = ctx.errs ? 0 : secs <= exp ? 60 : secs <= exp * 2 ? 25 : 0;
+    const gain = Math.max(20, Math.round((base - errCut - hintCut + speed) / 5) * 5);
+    const parts = [`base ${base}`];
+    if (errCut) parts.push(`${ctx.errs} erreur${ctx.errs > 1 ? "s" : ""} −${errCut}`);
+    if (hintCut) parts.push(`${ctx.hintIdx} indice${ctx.hintIdx > 1 ? "s" : ""} −${hintCut}`);
+    if (speed) parts.push(speed === 60 ? `éclair ⚡ +${speed}` : `rapide +${speed}`);
+    if (ms(currentMissionId).status === "done") parts.push("rejeu : compte pour battre ton record");
+    return { gain, parts };
   }
   function lockHeader(n) {
     const doneLocks = n - 1;
@@ -529,7 +610,7 @@
         return step.options.map((o) => `<span class="fb-line">${o.correct ? "✔" : "✘"} ${o.fb}</span>`).join("");
       },
     });
-    ctx.body.innerHTML = `<div class="opts ${step.layout ? "l-" + step.layout : ""}" role="${step.multi ? "group" : "radiogroup"}">${step.options.map((o, i) => `
+    ctx.body.innerHTML = `<div class="opts ${step.layout ? "l-" + step.layout : ""}" role="${step.multi ? "group" : "radiogroup"}">${shuffle(step.options).map((o, i) => `
       <button class="opt" data-id="${o.id}" role="${step.multi ? "checkbox" : "radio"}" aria-checked="false"><span class="opt-k" aria-hidden="true">${step.multi ? "☐" : String.fromCharCode(65 + i)}</span><span class="opt-t">${o.html}</span></button>`).join("")}</div>`;
     $$(".opt", ctx.body).forEach((b) => b.addEventListener("click", () => {
       if (ctx.solved) return;
@@ -558,7 +639,9 @@
     return res;
   }
   RENDER.order = (body, step, next) => {
+    const valid = (ord) => !step.rules.some((r) => (r.first ? ord.indexOf(r.first) >= r.within : ord.indexOf(r.before) > ord.indexOf(r.after)));
     let order = step.items.map((i) => i.id);
+    for (let k = 0; k < 40; k++) { order = shuffle(order); if (!valid(order)) break; } // jamais déjà rangé au départ
     const ctx = exFrame(body, step, {
       next, kind: "Remets dans l'ordre",
       check(ctx) {
@@ -600,6 +683,7 @@
     const place = {}; // itemId -> binId
     let selected = null;
     const accepted = (it) => (Array.isArray(it.bin) ? it.bin : [it.bin]);
+    const mixed = shuffle(step.items);
     const ctx = exFrame(body, step, {
       next, kind: "Classe chaque élément",
       check(ctx) {
@@ -622,12 +706,12 @@
     const lock = () => { $$("button", ctx.body).forEach((b) => (b.disabled = true)); $$(".card-it", ctx.body).forEach((c) => { c.classList.add("ok"); c.draggable = false; }); };
     function itemHTML(it) { return `<button class="card-it${selected === it.id ? " sel" : ""}" data-id="${it.id}" draggable="true" aria-pressed="${selected === it.id}">${it.html}</button>`; }
     function draw() {
-      const pool = step.items.filter((it) => !place[it.id]);
+      const pool = mixed.filter((it) => !place[it.id]);
       ctx.body.innerHTML = `<p class="howto">👆 Clique sur un élément, puis sur la catégorie où le placer. Tu peux aussi le glisser-déposer.</p>
         <div class="pool" data-bin="">${pool.length ? pool.map(itemHTML).join("") : `<span class="pool-empty">Tout est classé ! Clique sur « Vérifier ».</span>`}</div>
         <div class="bins b-${step.bins.length}">${step.bins.map((b) => `<div class="bin" data-bin="${b.id}">
           <button class="bin-h" data-target="${b.id}"><span aria-hidden="true">${b.icon}</span>${esc(b.label)}<small>${selected ? "➕ placer ici" : ""}</small></button>
-          <div class="bin-list">${step.items.filter((it) => place[it.id] === b.id).map(itemHTML).join("")}</div></div>`).join("")}</div>`;
+          <div class="bin-list">${mixed.filter((it) => place[it.id] === b.id).map(itemHTML).join("")}</div></div>`).join("")}</div>`;
       $$(".card-it", ctx.body).forEach((c) => {
         c.addEventListener("click", () => { if (ctx.solved) return; selected = selected === c.dataset.id ? null : c.dataset.id; draw(); const s = $(`.card-it[data-id="${selected}"]`, ctx.body); if (s) s.focus(); });
         c.addEventListener("dragstart", (e) => { selected = c.dataset.id; try { e.dataTransfer.setData("text/plain", c.dataset.id); } catch (x) {} });
@@ -747,7 +831,7 @@
     function draw() {
       const n = step.nodes[node];
       ctx.body.innerHTML = `<div class="branch"><div class="br-scene">${esc(n.scene)}</div><p class="br-text">${n.text}</p>
-        <div class="br-choices">${n.choices.map((c, i) => `<button class="br-c" data-i="${i}"><span class="opt-k">${String.fromCharCode(65 + i)}</span>${esc(c.text)}</button>`).join("")}</div><div class="br-out"></div></div>`;
+        <div class="br-choices">${shuffle(n.choices.map((c, i) => ({ c, i }))).map(({ c, i }, k) => `<button class="br-c" data-i="${i}"><span class="opt-k">${String.fromCharCode(65 + k)}</span>${esc(c.text)}</button>`).join("")}</div><div class="br-out"></div></div>`;
       $$(".br-c", ctx.body).forEach((b) => b.addEventListener("click", () => {
         if (ctx.solved) return;
         const c = n.choices[+b.dataset.i];
@@ -916,27 +1000,43 @@
   /* =====================================================================
      MISSION RÉUSSIE
      ===================================================================== */
+  /* Prime de fin de mission selon les erreurs de la partie. */
+  function primeFactor(st) { let f = st.runErr === 0 ? 1 : st.runErr <= 2 ? 0.8 : st.runErr <= 5 ? 0.6 : 0.4; if (st.runReveals) f -= 0.2; return Math.max(0.2, f); }
+  function unlockAfter(id) {
+    const done = (x) => ms(x).status === "done";
+    M(id).unlocks.forEach((u) => { if (ms(u).status === "locked" && (!GATES[u] || GATES[u].every(done))) ms(u).status = "open"; });
+    Object.entries(GATES).forEach(([t, req]) => { if (ms(t).status === "locked" && req.every(done)) ms(t).status = "open"; });
+  }
   function missionPassed(id) {
     const m = M(id), st = ms(id);
     const firstTime = st.status !== "done";
-    const discreet = S.wanted === 0;
-    const bonus = firstTime ? (discreet ? 300 : 0) + st.extra : 0;
-    const gain = firstTime ? m.reward + bonus : 0;
     const before = S.wallet;
+    const exGain = st.run, lynx = st.extra;
+    const prime = Math.round((m.reward * primeFactor(st)) / 10) * 10;
+    const discreet = S.wanted === 0 ? 300 : 0;
+    const total = exGain + prime + discreet + lynx;
+    const oldBest = st.best, record = firstTime || total > oldBest;
     st.wantedEnd = S.wanted;
+    if (record) { st.best = total; st.bestRun = { errors: st.runErr, hints: st.runHints, reveals: st.runReveals, money: total }; }
+    st.earned = st.best;
+    st.run = 0;
     if (firstTime) {
-      st.status = "done"; st.doneAt = Date.now(); st.earned = gain; S.wallet += gain;
+      st.status = "done"; st.doneAt = Date.now();
       if (m.badge && !S.badges.includes(m.badge.id)) S.badges.push(m.badge.id);
-      m.unlocks.forEach((u) => { if (ms(u).status === "locked") ms(u).status = "open"; });
-      if (id === "mF") { S.finishedAt = Date.now(); S.clock = "00:00"; }
+      unlockAfter(id);
+      if (id === "mF") S.finishedAt = Date.now();
     }
+    if (id === "mF") S.clock = "00:00";
     S.current = null;
-    save();
+    syncWallet(); save();
     document.body.dataset.screen = "passed";
     renderHUD();
     refreshMoney(before);
     const final = id === "mF";
+    const allCore = CORE.every((x) => ms(x).status === "done");
     const nxt = nextMission();
+    const toDash = final || (!firstTime && allCore);
+    const errTxt = st.runErr ? `${st.runErr} erreur${st.runErr > 1 ? "s" : ""}` : "sans faute";
     screen.innerHTML = `
       <section class="passed ${final ? "final" : ""}">
         ${final ? V.titleScene() : ""}
@@ -945,14 +1045,22 @@
             <h1 class="p-title" tabindex="-1">${final ? "Vice City<br>débloquée" : "Mission réussie"}</h1>
             <p class="p-sub">${esc(m.subtitle || m.title)}</p></div>
           <div class="p-grid">
-            <div class="p-card p-money"><small>Récompense</small><b>${firstTime ? "+" + money(gain) : "Déjà encaissée"}</b>${firstTime ? `<span>${money(m.reward)} mission${discreet ? " + 300 discrétion (0 ★)" : ""}${st.extra ? ` + ${st.extra} œil de lynx` : ""}</span>` : ""}</div>
+            <div class="p-card p-money"><small>${!firstTime && record ? "🏆 Nouveau record !" : "Bilan de la mission"}</small><b>+${money(total)}</b>
+              <ul class="p-bill">
+                <li><span>Exercices</span><b>${money(exGain)}</b></li>
+                <li><span>Prime de mission (${errTxt})</span><b>${money(prime)}</b></li>
+                ${discreet ? `<li><span>Discrétion (0 ★)</span><b>${money(discreet)}</b></li>` : ""}
+                ${lynx ? `<li><span>Œil de lynx</span><b>${money(lynx)}</b></li>` : ""}
+              </ul>
+              ${!firstTime ? `<span>${record ? `Ancien record : ${money(oldBest)}. Ton portefeuille est mis à jour.` : `Ton record reste ${money(oldBest)} : le portefeuille garde ton meilleur score.`}</span>` : ""}</div>
             ${m.badge ? `<div class="p-card p-badge"><span class="bdg">${m.badge.icon}</span><small>Badge débloqué</small><b>${esc(m.badge.name)}</b></div>` : ""}
-            <div class="p-card"><small>Niveau de recherche final</small><b class="p-stars">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= S.wanted ? "on" : ""}">★</i>`).join("")}</b><span>${st.errors} erreur${st.errors > 1 ? "s" : ""} · ${st.hints} indice${st.hints > 1 ? "s" : ""}${st.reveals ? ` · ${st.reveals} solution${st.reveals > 1 ? "s" : ""} affichée${st.reveals > 1 ? "s" : ""}` : ""}</span></div>
+            <div class="p-card"><small>Niveau de recherche final</small><b class="p-stars">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= S.wanted ? "on" : ""}">★</i>`).join("")}</b><span>${st.runErr} erreur${st.runErr > 1 ? "s" : ""} · ${st.runHints} indice${st.runHints > 1 ? "s" : ""}${st.runReveals ? ` · ${st.runReveals} solution${st.runReveals > 1 ? "s" : ""} affichée${st.runReveals > 1 ? "s" : ""}` : ""}</span></div>
           </div>
+          ${nxt === "mB" && bonusRequired() && !toDash ? `<p class="p-note">⚡ Avant la finale, il te reste la mission bonus « ${esc(M("mB").title)} ». Elle est obligatoire pour débloquer la finale.</p>` : ""}
           <div class="p-recap"><h2>Ce que tu retiens</h2><ul>${m.recap.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></div>
           <div class="p-btns">
-            ${final ? `<button class="btn primary xl" id="p-dash">🏆 Voir mon bilan d'agent</button>` : nxt && nxt !== id ? `<button class="btn primary xl" id="p-next">▶ ${esc(M(nxt).title)}</button>` : ""}
-            ${!final && id === "m1" && ms("mB").status === "open" ? `<button class="btn ghost" id="p-bonus">⚡ Mission bonus (facultative)</button>` : ""}
+            ${toDash ? `<button class="btn primary xl" id="p-dash">🏆 ${final && firstTime ? "Voir mon bilan d'agent" : "Retour au bilan"}</button>` : nxt && nxt !== id ? `<button class="btn primary xl" id="p-next">▶ ${esc(M(nxt).title)}${nxt === "mB" ? " (bonus)" : ""}</button>` : ""}
+            ${!toDash && id === "m1" && ms("mB").status === "open" ? `<button class="btn ghost" id="p-bonus">⚡ Mission bonus (maintenant ou plus tard)</button>` : ""}
             <button class="btn ghost" data-act="map">🗺️ Carte</button>
           </div>
         </div>
@@ -963,6 +1071,97 @@
     const pb = $("#p-bonus"); if (pb) pb.addEventListener("click", () => startMission("mB"));
     $(".p-title").focus();
     if (firstTime && m.badge) setTimeout(() => toast("Badge débloqué", `${m.badge.icon} ${m.badge.name}`, "good", "🏅"), 600);
+  }
+
+  /* =====================================================================
+     PIRATAGE (5 étoiles) : question chronométrée sur une notion déjà vue
+     ===================================================================== */
+  let hackOn = false;
+  function startHack() {
+    if (hackOn || S.wanted < 5 || !currentMissionId || !document.body.dataset.screen || document.body.dataset.screen !== "step") return;
+    hackOn = true;
+    const H = D.hack;
+    const seen = H.questions.filter((q) => S.notebook.includes(q.notion));
+    const pool0 = seen.length ? seen : H.questions.filter((q) => q.notion === "n-pegi");
+    const unseen = pool0.filter((q) => !S.hackSeen.includes(q.id));
+    const pool = unseen.length ? unseen : pool0;
+    const q = pool[Math.floor(Math.random() * pool.length)];
+    S.hackSeen = [...S.hackSeen.filter((x) => x !== q.id), q.id].slice(-8); save();
+    const back = document.activeElement;
+    const ov = el(`<div class="hack" role="alertdialog" aria-modal="true" aria-labelledby="hk-title">
+      <div class="hk-noise" aria-hidden="true"></div>
+      <div class="hk-box">
+        <div class="hk-intro">
+          <div class="hk-shark" aria-hidden="true">🦈</div>
+          <p class="hk-kicker">⚠ Intrusion détectée · niveau de recherche ★★★★★</p>
+          <h2 id="hk-title" class="hk-title" data-text="ORDINATEUR PIRATÉ">ORDINATEUR PIRATÉ</h2>
+          <pre class="hk-code" aria-hidden="true"></pre>
+          <p class="hk-lead">Les Requins t'ont repéré·e et ont pris le contrôle de ton poste. <b>Contre-attaque :</b> réponds juste à une question de sécurité avant la fin du compte à rebours (${H.seconds} secondes) pour reprendre la main.</p>
+          <button class="btn primary xl" id="hk-go">⌨️ Lancer la contre-attaque</button>
+        </div>
+        <div class="hk-q" hidden>
+          <div class="hk-timer" aria-hidden="true"><span class="hk-sec">${H.seconds}</span><div class="hk-bar"><i></i></div></div>
+          <p class="hk-kicker">Pare-feu de la Brigade · question de sécurité</p>
+          <h2 class="hk-ques">${q.q}</h2>
+          <div class="hk-opts">${shuffle(q.options.map((o, i) => ({ o, i }))).map(({ o, i }, k) => `<button class="opt hk-opt" data-i="${i}"><span class="opt-k" aria-hidden="true">${String.fromCharCode(65 + k)}</span><span class="opt-t">${o.t}</span></button>`).join("")}</div>
+        </div>
+        <div class="hk-end" hidden></div>
+      </div></div>`);
+    document.body.appendChild(ov);
+    const lines = ["> connexion au poste de la Brigade…", "> contournement du pare-feu… OK", "> copie du portefeuille… 37 %", "> verrouillage de l'écran…"];
+    const code = $(".hk-code", ov);
+    if (S.settings.reduce) code.textContent = lines.join("\n");
+    else { let li = 0; const ci = setInterval(() => { if (li >= lines.length || !document.body.contains(ov)) return clearInterval(ci); code.textContent += lines[li++] + "\n"; }, 380); }
+    announce("Alerte : ordinateur piraté par les Requins. Réponds juste à une question pour reprendre la main.");
+    setTimeout(() => $("#hk-go", ov).focus(), 60);
+    let iv = null, over = false;
+    $("#hk-go", ov).addEventListener("click", () => {
+      $(".hk-intro", ov).hidden = true; $(".hk-q", ov).hidden = false;
+      ov.classList.add("q-phase");
+      $(".hk-opt", ov).focus();
+      announce(`${stripTags(q.q)} Tu as ${H.seconds} secondes.`);
+      const bar = $(".hk-bar i", ov), sec = $(".hk-sec", ov), t0 = Date.now();
+      iv = setInterval(() => {
+        const left = Math.max(0, H.seconds - (Date.now() - t0) / 1000);
+        sec.textContent = Math.ceil(left); bar.style.width = (left / H.seconds) * 100 + "%";
+        ov.classList.toggle("hurry", left <= 10);
+        if (left <= 10 && !ov.dataset.warned) { ov.dataset.warned = "1"; announce("Plus que 10 secondes."); }
+        if (left <= 0) finish(-1);
+      }, 100);
+    });
+    $$(".hk-opt", ov).forEach((b) => b.addEventListener("click", () => finish(+b.dataset.i)));
+    function finish(i) {
+      if (over) return; over = true; clearInterval(iv);
+      const ok = i >= 0 && !!q.options[i].ok, right = q.options.findIndex((o) => o.ok);
+      $$(".hk-opt", ov).forEach((b) => { b.disabled = true; const k = +b.dataset.i; if (k === right) b.classList.add("ok"); else if (k === i) b.classList.add("ko"); });
+      const before = S.wallet;
+      const delta = ok ? H.win : -Math.min(H.loss, walletTotal());
+      S.hackDelta += delta;
+      if (ok) S.hacks.won += 1; else S.hacks.lost += 1;
+      S.wanted = 0; syncWallet(); save();
+      refreshStars("down"); refreshMoney(before); tick(2);
+      ov.classList.remove("hurry"); ov.classList.add(ok ? "won" : "lost");
+      $(".hk-timer", ov).hidden = true;
+      const end = $(".hk-end", ov);
+      end.hidden = false;
+      end.innerHTML = `<div class="hk-res"><span class="hk-big" aria-hidden="true">${ok ? "🛡️" : "💸"}</span>
+        <h3>${ok ? "Plan des Requins déjoué !" : i < 0 ? "Temps écoulé…" : "Raté…"}</h3>
+        <p>${ok ? `Accès rétabli. Tes étoiles de recherche retombent à zéro. Prime de la Brigade : <b>+${money(delta)}</b>.`
+          : `Les Requins se sont servis dans ton portefeuille : ${delta ? `<b>−${money(-delta)}</b>.` : "<b>il était vide, ouf !</b>"} La Brigade a quand même coupé leur accès : tes étoiles retombent à zéro.`}</p>
+        <p class="hk-why">${ok ? "✔" : "💡"} ${q.why}</p>
+        <button class="btn primary" id="hk-close">${ok ? "Reprendre la mission" : "Compris, je reprends la mission"}</button></div>`;
+      $("#hk-close", end).addEventListener("click", () => { ov.remove(); hackOn = false; if (back && document.body.contains(back)) back.focus(); });
+      setTimeout(() => $("#hk-close", end).focus(), 60);
+      announce(ok ? "Plan des Requins déjoué !" : "Raté. " + stripTags(q.why));
+    }
+    ov.addEventListener("keydown", (e) => {
+      if (e.key !== "Tab") return;
+      const f = $$("button:not([disabled])", ov).filter((x) => x.offsetParent);
+      if (!f.length) return;
+      const a1 = f[0], z = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === a1) { e.preventDefault(); z.focus(); }
+      else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a1.focus(); }
+    });
   }
 
   /* =====================================================================
@@ -983,7 +1182,8 @@
     document.body.dataset.screen = "dash";
     renderHUD();
     const done = D.order.filter((id) => ms(id).status === "done");
-    const errors = D.order.reduce((a, id) => a + ms(id).errors, 0), hints = D.order.reduce((a, id) => a + ms(id).hints, 0);
+    const errors = done.reduce((a, id) => a + bestRun(id).errors, 0), hints = done.reduce((a, id) => a + bestRun(id).hints, 0);
+    const toReplay = done.filter((id) => grade(id).cls !== "ok");
     const minutes = Math.round(D.order.reduce((a, id) => a + (ms(id).doneAt && ms(id).startedAt ? (ms(id).doneAt - ms(id).startedAt) : 0), 0) / 60000);
     const used = Object.keys(D.skills).filter((k) => S.skills[k].ok || S.skills[k].reveals);
     const redo = used.filter((k) => skillStatus(k).cls === "redo");
@@ -993,10 +1193,14 @@
     screen.innerHTML = `
       <section class="dash">
         <div class="dash-hero"><div><span class="p-kicker">Bilan de l'agent</span><h1 tabindex="-1">${allCore ? "Opération réussie" : "Opération en cours"}</h1>
-          <p>Rang : <b>${rank}</b> · ${done.length} mission${done.length > 1 ? "s" : ""} terminée${done.length > 1 ? "s" : ""} · ${money(S.wallet)} · ${minutes ? "≈ " + minutes + " min de jeu" : ""}</p></div>
+          <p>Rang : <b>${rank}</b> · ${done.length} mission${done.length > 1 ? "s" : ""} terminée${done.length > 1 ? "s" : ""} · ${money(S.wallet)}${minutes ? " · ≈ " + minutes + " min de jeu" : ""}${S.hacks.won + S.hacks.lost ? ` · 🦈 piratages : ${S.hacks.won} déjoué${S.hacks.won > 1 ? "s" : ""}, ${S.hacks.lost} subi${S.hacks.lost > 1 ? "s" : ""}` : ""}</p></div>
           <label class="dash-name">Ton prénom pour le bilan (facultatif, reste sur cet ordinateur)<input id="d-name" type="text" maxlength="40" autocomplete="off" value="${esc(S.name)}"></label></div>
         <div class="dash-grid">
-          <div class="d-card"><h2>🗺️ Missions</h2><ul class="d-missions">${D.order.map((id) => { const m = M(id), s = ms(id); return `<li class="${s.status}"><span>${s.status === "done" ? "✔" : s.status === "locked" ? "🔒" : "…"}</span><b>${esc(m.title)}</b><small>${s.status === "done" ? `${s.errors} err. · ${s.hints} ind.` : m.kind === "bonus" ? "facultative" : "à faire"}</small></li>`; }).join("")}</ul></div>
+          ${toReplay.length ? `<div class="d-card wide d-replay"><h2>🔁 Améliore ton score</h2><p>Rejoue une mission pour gagner plus de dollars. Seul ton <b>meilleur score</b> compte : tu ne peux rien perdre.</p>
+            <div class="dr-list">${toReplay.map((id) => { const g = grade(id); return `<button class="btn ${g.cls === "redo" ? "primary" : "ghost"}" data-replay="${id}">🔁 ${esc(M(id).title)} <small>${g.t} · record ${money(ms(id).best)}</small></button>`; }).join("")}</div></div>` : ""}
+          <div class="d-card"><h2>🗺️ Missions</h2><ul class="d-missions">${D.order.map((id) => { const m = M(id), s = ms(id), g = grade(id); return `<li class="${s.status}"><span class="dm-i">${s.status === "done" ? "✔" : s.status === "locked" ? "🔒" : "…"}</span>
+            <div class="dm-t"><b>${esc(m.title)}${m.kind === "bonus" ? " <small>(bonus)</small>" : ""}</b><small>${s.status === "done" ? `${bestRun(id).errors} err. · ${bestRun(id).hints} ind. · record ${money(s.best)}` : m.kind === "bonus" ? "à faire avant la finale" : "à faire"}</small></div>
+            <span class="dm-r">${g ? `<span class="st st-${g.cls}">${g.t}</span>${g.cls !== "ok" ? `<button class="btn ghost xs" data-replay="${id}" aria-label="Rejouer : ${esc(m.title)}">🔁</button>` : ""}` : ""}</span></li>`; }).join("")}</ul></div>
           <div class="d-card"><h2>🏅 Badges</h2><div class="d-badges">${D.missions.filter((m) => m.badge).map((m) => `<div class="db ${S.badges.includes(m.badge.id) ? "on" : ""}"><span>${m.badge.icon}</span><small>${esc(m.badge.name)}</small></div>`).join("")}</div>
             <div class="d-reward ${allCore ? "on" : ""}"><span>🌴</span><div><b>${allCore ? "Récompense finale : Légende de Leonida" : "Termine la finale pour la récompense"}</b><small>${allCore ? "Tu as protégé Vice City jusqu'à minuit." : ""}</small></div></div></div>
           <div class="d-card wide"><h2>🎯 Compétences travaillées</h2><table class="d-skills"><thead><tr><th>Compétence</th><th>Lien au programme</th><th>Bilan</th></tr></thead><tbody>
@@ -1005,15 +1209,25 @@
           <div class="d-card"><h2>💡 À retenir</h2><ul class="d-recap">${D.order.filter((id) => ms(id).status === "done").flatMap((id) => M(id).recap).map((r) => `<li>${esc(r)}</li>`).join("") || "<li>Termine une mission pour remplir cette liste.</li>"}</ul></div>
           <div class="d-card"><h2>🔁 À retravailler</h2>${redo.length ? `<ul class="d-redo">${redo.map((k) => `<li><b>${esc(D.skills[k].label)}</b>${notionFor(k) ? `<button class="btn ghost xs" data-nt="${notionFor(k)}">📖 Revoir</button>` : ""}</li>`).join("")}</ul>` : `<p>Aucune compétence à retravailler : bravo ! 💪</p>`}
             ${cons.length ? `<h3 class="d-sub">◐ À consolider</h3><ul class="d-redo">${cons.map((k) => `<li><span>${esc(D.skills[k].label)}</span>${notionFor(k) ? `<button class="btn ghost xs" data-nt="${notionFor(k)}">📖 Revoir</button>` : ""}</li>`).join("")}</ul>` : ""}
-            <p class="small">${errors} erreur${errors > 1 ? "s" : ""} au total, ${hints} indice${hints > 1 ? "s" : ""} consulté${hints > 1 ? "s" : ""}. Les erreurs servent à apprendre : elles ne comptent pas dans ta récompense.</p></div>
+            <p class="small">${errors} erreur${errors > 1 ? "s" : ""} au total, ${hints} indice${hints > 1 ? "s" : ""} consulté${hints > 1 ? "s" : ""}. Les erreurs servent à apprendre. Elles réduisent un peu tes gains : rejoue une mission pour améliorer ton score.</p></div>
         </div>
         <div class="dash-btns"><button class="btn primary" id="d-print" title="Si rien ne s'affiche, utilise Ctrl+P">🖨️ Imprimer mon bilan</button><button class="btn ghost" data-act="notebook">📖 Carnet</button><button class="btn ghost" data-act="map">🗺️ Carte</button><button class="btn ghost danger-t" id="d-reset">Recommencer le parcours</button></div>
       </section>`;
     $("#d-name").addEventListener("input", (e) => { S.name = e.target.value.slice(0, 40); save(); });
     $$("[data-nt]", screen).forEach((b) => b.addEventListener("click", () => showNotion(b.dataset.nt)));
+    $$("[data-replay]", screen).forEach((b) => b.addEventListener("click", () => startMission(b.dataset.replay)));
     $("#d-print").addEventListener("click", printReport);
     $("#d-reset").addEventListener("click", () => confirmBox("Recommencer le parcours ?", "Toute la progression de cet ordinateur sera effacée (missions, dollars, badges).", "Tout recommencer", resetAll));
     $("h1", screen).focus();
+  }
+  /* Meilleure partie d'une mission, et appréciation pour proposer de la rejouer. */
+  function bestRun(id) { const s = ms(id); return s.bestRun || { errors: s.errors, hints: s.hints, reveals: s.reveals, money: s.best }; }
+  function grade(id) {
+    if (ms(id).status !== "done") return null;
+    const r = bestRun(id);
+    if (r.reveals > 0 || r.errors >= 4) return { cls: "redo", t: "À rejouer" };
+    if (r.errors >= 1) return { cls: "prog", t: "Bien" };
+    return { cls: "ok", t: "Parfait" };
   }
   function notionFor(k) { for (const m of D.missions) for (const s of m.steps) if (s.skill === k && s.notion) return s.notion; return null; }
   function printReport() {
@@ -1021,8 +1235,8 @@
     const done = D.order.filter((id) => ms(id).status === "done");
     pr.innerHTML = `<h1>GTA · Gère. Traque. Agis. — Bilan de l'agent</h1>
       <p><b>Élève :</b> ${esc(S.name || "…………………………")} &nbsp; <b>Date :</b> ${new Date().toLocaleDateString("fr-BE")} &nbsp; <b>Cours :</b> ${esc(D.meta.course)}</p>
-      <h2>Missions</h2><table><tr><th>Mission</th><th>Statut</th><th>Erreurs</th><th>Indices</th><th>Solutions affichées</th></tr>
-      ${D.order.map((id) => { const m = M(id), s = ms(id); return `<tr><td>${esc(m.title)}${m.kind === "bonus" ? " (bonus)" : ""}</td><td>${s.status === "done" ? "Réussie" : "Non terminée"}</td><td>${s.errors}</td><td>${s.hints}</td><td>${s.reveals}</td></tr>`; }).join("")}</table>
+      <h2>Missions</h2><table><tr><th>Mission</th><th>Statut</th><th>Erreurs</th><th>Indices</th><th>Solutions affichées</th><th>Meilleur score</th></tr>
+      ${D.order.map((id) => { const m = M(id), s = ms(id), r = bestRun(id), g = grade(id); return `<tr><td>${esc(m.title)}${m.kind === "bonus" ? " (bonus)" : ""}</td><td>${s.status === "done" ? "Réussie · " + g.t : "Non terminée"}</td><td>${s.status === "done" ? r.errors : "—"}</td><td>${s.status === "done" ? r.hints : "—"}</td><td>${s.status === "done" ? r.reveals : "—"}</td><td>${s.status === "done" ? money(s.best) : "—"}</td></tr>`; }).join("")}</table>
       <h2>Compétences</h2><table><tr><th>Compétence</th><th>Lien au programme</th><th>Bilan</th></tr>
       ${Object.keys(D.skills).map((k) => `<tr><td>${esc(D.skills[k].label)} (${esc(D.skills[k].level)})</td><td>${esc(D.skills[k].ref)}</td><td>${skillStatus(k).t}</td></tr>`).join("")}</table>
       <h2>Ce que je retiens</h2><ul>${done.flatMap((id) => M(id).recap).map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
@@ -1062,10 +1276,13 @@
           <p><b>Choix pédagogiques.</b> Trois blocs seulement, pour être vraiment maîtrisés : <b>organiser ses données dans un espace de stockage adapté</b> (mission 1), <b>réagir face aux arnaques et protéger ses données personnelles</b> (missions 2 et 4), <b>vérifier une information</b> (mission 3). La finale réinvestit cinq notions.</p>
           <p><b>Niveaux.</b> D'après l'annexe consultée, l'ordre de grandeur des unités (ko → To) est un attendu de fin de parcours (S3) et la fiabilité des sources est travaillée en S2. Je les ai donc gardés en <b>découverte</b> ou en <b>anticipation</b>, avec des exigences modestes.</p></div>
         <div class="d-card"><h2>Mécaniques</h2><ul>
-          <li><b>Étoiles</b> : +1 par erreur, −1 par indice ou par correction réussie. Jamais bloquant : après 3 essais, une « solution expliquée » est proposée (et signalée dans le bilan).</li>
-          <li><b>Portefeuille</b> symbolique : récompense de mission + bonus discrétion (0 ★) + bonus d'exploration. Les erreurs ne retirent rien.</li>
+          <li><b>Étoiles</b> : +1 par erreur, −1 par indice ou par correction réussie. Après 3 essais, une « solution expliquée » est proposée (et signalée dans le bilan).</li>
+          <li><b>Piratage à 5 étoiles</b> : les Requins « piratent » l'ordinateur. L'élève a ${D.hack.seconds} secondes pour répondre à une question sur une notion déjà vue. Réussite : +$${D.hack.win} ; échec : jusqu'à −$${D.hack.loss} (jamais sous zéro). Dans les deux cas, les étoiles retombent à zéro et la mission continue.</li>
+          <li><b>Portefeuille</b> symbolique : chaque exercice rapporte 200 $ (250 pour un cadenas), moins 30 %, 55 % ou 75 % selon les erreurs, moins 15 $ par indice, plus un bonus de rapidité caché (+60 ou +25, seulement sans erreur). En fin de mission : prime selon les erreurs + discrétion (0 ★) + exploration. Rejouer une mission garde le meilleur score.</li>
+          <li><b>Horloge</b> : l'heure avance de quelques minutes à chaque étape et d'une minute par erreur. Ce n'est pas un chronomètre.</li>
+          <li><b>Ordre aléatoire</b> : les propositions des exercices sont mélangées à chaque affichage.</li>
           <li><b>Carnet</b> : toutes les notions vues restent consultables. Chaque erreur propose « Revoir la notion ».</li>
-          <li><b>Bonus</b> facultatif (temps de téléchargement) pour les rapides, débloqué après la mission 1.</li>
+          <li><b>Bonus</b> (temps de téléchargement), débloqué après la mission 1 : à faire quand l'élève veut, mais obligatoire avant la finale.</li>
           <li><b>Sauvegarde</b> dans le navigateur (localStorage), étape par étape. Aucune donnée envoyée. Même ordinateur + même navigateur = reprise possible.</li></ul></div>
         <div class="d-card wide"><h2>Missions, durées et liens au programme</h2><table class="d-skills"><thead><tr><th>Mission</th><th>Durée</th><th>Compétences · rattachement</th><th>Déroulé</th></tr></thead><tbody>${rows}</tbody></table>
           <p class="small">Rattachements établis à partir de l'annexe « Attendus en lien avec les S – SF – C » (fiches 3.3 et 3.6, volet N). À vérifier avec vos codes exacts du référentiel FMTTN et du programme SeGEC.</p></div>
@@ -1078,7 +1295,7 @@
           <h3>Sources</h3><ul class="src">${D.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a></li>`).join("")}</ul></div>
       </div></section>`;
     $("#th-back").addEventListener("click", goTitle);
-    $("#th-unlock").addEventListener("click", () => { D.order.forEach((id) => { if (ms(id).status === "locked") ms(id).status = "open"; }); save(); toast("Mode démo", "Toutes les missions sont accessibles.", "info", "🔓"); });
+    $("#th-unlock").addEventListener("click", () => { D.order.forEach((id) => { if (ms(id).status === "locked") ms(id).status = "open"; }); S.demo = true; save(); toast("Mode démo", "Toutes les missions sont accessibles.", "info", "🔓"); });
     $("#th-reset").addEventListener("click", () => confirmBox("Réinitialiser ?", "La progression enregistrée dans ce navigateur sera effacée.", "Réinitialiser", resetAll));
     $("h1", screen).focus();
   }
