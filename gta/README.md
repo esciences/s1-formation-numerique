@@ -62,6 +62,8 @@ Champs communs aux exercices : `prompt`, `skill` (compétence suivie dans le bil
 
 Les propositions (`choice`, `branch`, `sort`, `order`) sont mélangées à chaque affichage : ne faites jamais référence à « la réponse A » dans un texte.
 
+**Fiches mémo du bilan** (« À retenir ») : dans `memo`. Chaque fiche a une `mission` (elle se débloque quand cette mission est réussie), une `notion` (fiche à relire), un `icon`, une `color`, un petit schéma `visual` (HTML), 2 ou 3 `points` courts et une version texte `print` pour le bilan imprimé.
+
 **Questions de piratage** : dans `hack`, en bas du fichier. `seconds` (temps de réponse), `win` (prime si réussite), `loss` (perte maximale si échec), puis `questions[{id, notion, q, options[{t, ok}], why}]`. Le champ `notion` est l'`id` d'une fiche `learn` : la question n'est posée que si l'élève a déjà vu cette fiche.
 
 Après une modification, rechargez la page. Si un élève a déjà une sauvegarde, les nouvelles missions s'ajoutent automatiquement.

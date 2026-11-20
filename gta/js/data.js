@@ -690,6 +690,51 @@ window.VC = window.VC || {};
     /* Ordre d'affichage dans la feuille de route */
     order: ["m0", "m1", "m2", "m3", "m4", "mF", "mB"],
 
+    /* FICHES MÉMO du bilan (« À retenir ») : une carte visuelle par notion.
+       mission : la fiche s'affiche quand cette mission est réussie · notion : fiche à relire
+       visual : petit schéma (HTML) · points : 2 ou 3 phrases courtes · print : version texte pour le bilan imprimé */
+    memo: [
+      { id: "pegi", mission: "m0", notion: "n-pegi", icon: "🎮", color: "#FF3D8B", title: "Lire une étiquette PEGI",
+        visual: `<div class="mv-pegi"><span class="mv-18">18</span><span class="mv-eq">=</span><span class="mv-txt">âge conseillé<br><s>note du jeu</s></span></div>`,
+        points: ["Le <b>chiffre</b> = l'âge conseillé.", "Les <b>pictogrammes</b> = pourquoi (violence, achats…)."],
+        print: "PEGI : le chiffre est un âge conseillé (pas une note) ; les pictogrammes expliquent pourquoi." },
+      { id: "units", mission: "m1", notion: "n-units", icon: "📏", color: "#FFC83D", title: "Les unités de taille",
+        visual: `<div class="mv-ladder"><span>ko</span><i>➜</i><span>Mo</span><i>➜</i><span>Go</span><i>➜</i><span>To</span></div><div class="mv-rule big">×1 000 à chaque marche</div>
+          <div class="mv-rule"><b>Go → Mo</b> : × 1 000 &nbsp;·&nbsp; <b>Mo → Go</b> : ÷ 1 000</div>`,
+        points: ["1 octet = <b>8 bits</b>.", "Pour comparer, je mets tout dans la <b>même unité</b>."],
+        print: "Unités : 1 octet = 8 bits ; ko → Mo → Go → To : ×1 000 à chaque marche ; je compare dans la même unité." },
+      { id: "memory", mission: "m1", notion: "n-memory", icon: "🧠", color: "#2EE6E6", title: "Mémoire vive ou stockage ?",
+        visual: `<div class="mv-two"><div><b>🧠 RAM</b><small>plan de travail</small><em>se vide quand on éteint</em></div><div><b>🗄️ Stockage</b><small>armoires</small><em>garde tout</em></div></div>
+          <div class="mv-chips"><span>📦 interne</span><span>💽 externe</span><span>☁️ cloud</span></div>`,
+        points: ["Un jeu s'installe dans le <b>stockage interne</b>.", "Je choisis l'espace <b>adapté</b> à chaque fichier."],
+        print: "Mémoire vive (RAM) = plan de travail qui se vide ; stockage = armoires qui gardent tout (interne, externe, cloud)." },
+      { id: "space", mission: "m1", notion: "n-memory", icon: "🧹", color: "#3BE38A", title: "Faire de la place",
+        visual: `<div class="mv-flow"><span class="mv-q">C'est irremplaçable ?</span><div class="mv-yesno"><span class="yes">Oui → 💽 je <b>déplace</b></span><span class="no">Non → 🗑️ je peux <b>supprimer</b></span></div></div>`,
+        points: ["Photos et vidéos perso : <b>jamais supprimées</b>.", "Place à libérer = <b>taille demandée − espace libre</b>."],
+        print: "Faire de la place : si c'est irremplaçable, je déplace ; sinon je peux supprimer. Place à libérer = taille demandée − espace libre." },
+      { id: "url", mission: "m2", notion: "n-url", icon: "🔗", color: "#A78BFA", title: "Lire une adresse web",
+        visual: `<div class="mv-url">https://rockstargames.com.<mark>gta6-free.xyz</mark>/promo</div><div class="mv-rule">Le vrai propriétaire : le nom <b>juste avant la 1<sup>re</sup> « / »</b></div>`,
+        points: ["Le début de l'adresse peut être un <b>déguisement</b>.", "🔒 HTTPS = échanges chiffrés, <b>pas</b> un site honnête."],
+        print: "Adresse web : le vrai propriétaire est le nom juste avant la première « / ». HTTPS chiffre, mais ne prouve pas qu'un site est honnête." },
+      { id: "scam", mission: "m2", notion: "n-signals", icon: "🚨", color: "#FF6B7A", title: "Repérer une arnaque",
+        visual: `<div class="mv-chips big"><span>⏰ urgence</span><span>🎁 trop beau</span><span>🔗 adresse bizarre</span><span>🔑 données demandées</span><span>📦 fichier suspect</span><span>✍️ fautes</span></div>
+          <div class="mv-stop"><b>S</b><b>T</b><b>O</b><b>P</b></div>`,
+        points: ["<b>S</b>top · <b>T</b>este l'adresse · <b>O</b>bserve · <b>P</b>réviens un adulte.", "Déjà cliqué ? J'en parle vite à un adulte."],
+        print: "Arnaque : urgence, trop beau, adresse bizarre, données demandées, fichier suspect, fautes. Réflexe STOP : je m'arrête, je teste l'adresse, j'observe, je préviens un adulte." },
+      { id: "source", mission: "m3", notion: "n-source", icon: "📡", color: "#FF8A3D", title: "Vérifier une info",
+        visual: `<div class="mv-q3"><span>Qui ?</span><span>Quand ?</span><span>Comment ?</span></div><div class="mv-rule">+ la même info dans <b>2 sources fiables</b></div>`,
+        points: ["Je vérifie l'<b>identifiant exact</b> du compte.", "Un compte officiel ne demande <b>jamais</b> de mot de passe."],
+        print: "Vérifier une info : Qui ? Quand ? Comment le sait-il ? Puis la même info dans deux sources fiables." },
+      { id: "identity", mission: "m4", notion: "n-identity", icon: "🛡️", color: "#2EE6E6", title: "Protéger mon compte",
+        visual: `<ul class="mv-check"><li>🚪 Je me <b>déconnecte</b> sur un appareil partagé</li><li>🙅 Je n'<b>enregistre</b> jamais le mot de passe</li><li>🔐 Une <b>phrase de passe</b> par compte</li><li>📲 La <b>double authentification</b></li><li>🔒 Un profil <b>privé</b>, sans position</li></ul>`,
+        points: ["Compte piraté ? <b>Adulte</b> + nouveau mot de passe via l'<b>appli officielle</b>."],
+        print: "Mon compte : déconnexion sur un appareil partagé, jamais de mot de passe enregistré, une phrase de passe par compte, double authentification, profil privé." },
+      { id: "debit", mission: "mB", notion: "n-debit", icon: "⚡", color: "#FFC83D", title: "Calculer un téléchargement",
+        visual: `<div class="mv-rule big"><b>Mbit/s ÷ 8 = Mo/s</b></div><div class="mv-rule">temps (s) = taille (Mo) ÷ vitesse (Mo/s)</div><div class="mv-rule">2,25 h = 2 h + 0,25 × 60 min = <b>2 h 15 min</b></div>`,
+        points: ["Règle de trois : je passe d'abord par <b>1</b>."],
+        print: "Débit : Mbit/s ÷ 8 = Mo/s ; temps = taille ÷ vitesse ; heures à virgule : la partie après la virgule × 60 = minutes." },
+    ],
+
     /* PIRATAGE · à 5 étoiles, une question sur une notion DÉJÀ VUE (champ notion = id d'une fiche learn).
        seconds : temps pour répondre · win : prime si réussite · loss : perte maximale si échec. */
     hack: {

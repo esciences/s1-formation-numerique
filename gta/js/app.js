@@ -1206,10 +1206,14 @@
           <div class="d-card wide"><h2>🎯 Compétences travaillées</h2><table class="d-skills"><thead><tr><th>Compétence</th><th>Lien au programme</th><th>Bilan</th></tr></thead><tbody>
             ${Object.keys(D.skills).map((k) => { const st = skillStatus(k); return `<tr><td>${esc(D.skills[k].label)}<small class="lvl">${esc(D.skills[k].level)}</small></td><td><small>${esc(D.skills[k].ref)}</small></td><td><span class="st st-${st.cls}">${st.t}</span></td></tr>`; }).join("")}</tbody></table>
             <p class="small">Calcul par exercice : Maîtrisé = moins d'une erreur en moyenne · À consolider = une erreur ou plus · À retravailler = deux erreurs ou plus en moyenne, ou solution affichée.</p></div>
-          <div class="d-card"><h2>💡 À retenir</h2><ul class="d-recap">${D.order.filter((id) => ms(id).status === "done").flatMap((id) => M(id).recap).map((r) => `<li>${esc(r)}</li>`).join("") || "<li>Termine une mission pour remplir cette liste.</li>"}</ul></div>
-          <div class="d-card"><h2>🔁 À retravailler</h2>${redo.length ? `<ul class="d-redo">${redo.map((k) => `<li><b>${esc(D.skills[k].label)}</b>${notionFor(k) ? `<button class="btn ghost xs" data-nt="${notionFor(k)}">📖 Revoir</button>` : ""}</li>`).join("")}</ul>` : `<p>Aucune compétence à retravailler : bravo ! 💪</p>`}
+          <div class="d-card wide"><h2>🔁 À retravailler</h2>${redo.length ? `<ul class="d-redo">${redo.map((k) => `<li><b>${esc(D.skills[k].label)}</b>${notionFor(k) ? `<button class="btn ghost xs" data-nt="${notionFor(k)}">📖 Revoir</button>` : ""}</li>`).join("")}</ul>` : `<p>Aucune compétence à retravailler : bravo ! 💪</p>`}
             ${cons.length ? `<h3 class="d-sub">◐ À consolider</h3><ul class="d-redo">${cons.map((k) => `<li><span>${esc(D.skills[k].label)}</span>${notionFor(k) ? `<button class="btn ghost xs" data-nt="${notionFor(k)}">📖 Revoir</button>` : ""}</li>`).join("")}</ul>` : ""}
             <p class="small">${errors} erreur${errors > 1 ? "s" : ""} au total, ${hints} indice${hints > 1 ? "s" : ""} consulté${hints > 1 ? "s" : ""}. Les erreurs servent à apprendre. Elles réduisent un peu tes gains : rejoue une mission pour améliorer ton score.</p></div>
+          <div class="d-card wide"><h2>💡 À retenir · mes fiches mémo</h2><p class="small">Une fiche par notion. Clique sur « Relire » pour revoir la fiche complète.</p>
+            <div class="memo-grid">${D.memo.map((f) => { const ok = ms(f.mission).status === "done"; return `<article class="memo ${ok ? "" : "off"}" style="--c:${f.color}">
+              <header><span class="memo-i" aria-hidden="true">${f.icon}</span><h3>${esc(f.title)}</h3></header>
+              ${ok ? `<div class="memo-v">${f.visual}</div><ul class="memo-p">${f.points.map((t) => `<li>${t}</li>`).join("")}</ul>
+              <button class="btn ghost xs" data-nt="${f.notion}">📖 Relire</button>` : `<p class="memo-lock">🔒 Termine la mission « ${esc(M(f.mission).title)} » pour débloquer cette fiche.</p>`}</article>`; }).join("")}</div></div>
         </div>
         <div class="dash-btns"><button class="btn primary" id="d-print" title="Si rien ne s'affiche, utilise Ctrl+P">🖨️ Imprimer mon bilan</button><button class="btn ghost" data-act="notebook">📖 Carnet</button><button class="btn ghost" data-act="map">🗺️ Carte</button><button class="btn ghost danger-t" id="d-reset">Recommencer le parcours</button></div>
       </section>`;
@@ -1239,7 +1243,7 @@
       ${D.order.map((id) => { const m = M(id), s = ms(id), r = bestRun(id), g = grade(id); return `<tr><td>${esc(m.title)}${m.kind === "bonus" ? " (bonus)" : ""}</td><td>${s.status === "done" ? "Réussie · " + g.t : "Non terminée"}</td><td>${s.status === "done" ? r.errors : "—"}</td><td>${s.status === "done" ? r.hints : "—"}</td><td>${s.status === "done" ? r.reveals : "—"}</td><td>${s.status === "done" ? money(s.best) : "—"}</td></tr>`; }).join("")}</table>
       <h2>Compétences</h2><table><tr><th>Compétence</th><th>Lien au programme</th><th>Bilan</th></tr>
       ${Object.keys(D.skills).map((k) => `<tr><td>${esc(D.skills[k].label)} (${esc(D.skills[k].level)})</td><td>${esc(D.skills[k].ref)}</td><td>${skillStatus(k).t}</td></tr>`).join("")}</table>
-      <h2>Ce que je retiens</h2><ul>${done.flatMap((id) => M(id).recap).map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
+      <h2>Ce que je retiens</h2><ul>${D.memo.filter((f) => ms(f.mission).status === "done").map((f) => `<li><b>${esc(f.title)}</b> · ${esc(f.print)}</li>`).join("")}</ul>
       <p class="pr-foot">Badges : ${S.badges.length} · Portefeuille fictif : ${money(S.wallet)}. Aucune donnée n'a quitté cet ordinateur.</p>`;
     try { window.print(); } catch (e) { toast("Impression", "Utilise Ctrl+P (ou Cmd+P) pour imprimer ton bilan.", "info", "🖨️"); }
   }
