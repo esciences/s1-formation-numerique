@@ -13,7 +13,7 @@ Page d'accueil pour les élèves : `index.html` (publiée avec GitHub Pages).
 | `pixel/` | `pixel-quest.html` | Pixel Quest : 8 niveaux d'exercices interactifs à faire en autonomie |
 | `monument/` | `mon-monument-en-diapos.pdf` | Travail commun avec la FHGES : recherche sur un monument antique et présentation Canva (consignes, fiche de recherche, exemples de diapos, grille d'évaluation, 5 pages A4) |
 | `gta/` | `index.html` | GTA · Gère. Traque. Agis. : parcours interactif de missions (±90 min) autour de la sortie de GTA VI : stockage, faux sites, rumeurs, compte piraté. Guide enseignant dans `gta/README.md` |
-| `stocker-verifier-proteger/` | `index.html` | Support théorique interactif « Stocker, vérifier, protéger » : les 9 notions de l'activité GTA avec d'autres exemples (unités, mémoire vive et stockage, faire de la place, débit, vérifier une information, PEGI, adresse web, arnaques, données et comptes) et un turbo-check |
+| `stocker-verifier-proteger/` | `index.html` | Présentation interactive en diapos « Stocker, vérifier, protéger » (rangée dans le champ Sécurité) : les 9 notions de l'activité GTA avec d'autres exemples (unités, mémoire vive et stockage, faire de la place, débit, vérifier une information, PEGI, adresse web, arnaques, données et comptes) et un turbo-check |
 | `programmation/` | `parler-a-une-machine.html` | Présentation interactive « Parler à une machine » : les bases de la programmation de la P5 à la S1 (algorithme, logigramme, séquence, boucle, condition, variable, débogage, optimisation) |
 
 Chaque ressource est un fichier autonome : il s'ouvre dans n'importe quel navigateur, sans installation.

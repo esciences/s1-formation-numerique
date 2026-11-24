@@ -9,818 +9,1109 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Poppins:wght@600;700;800&family=Fira+Code:wght@500;600&display=swap">
 <style>
 /* =====================================================================
-   Support théorique interactif · charte OCTET
-   Une seule palette (écran et papier) : la couleur vive habille, les teintes pâles respirent, l'encre écrit.
-   Champ « Informations et données » = violet, champ « Sécurité » = vert.
+   Diaporama interactif · charte OCTET
+   Scène 16:9 (1280 × 720) mise à l'échelle de l'écran.
+   Chaque diapo porte sa notion (bandeau du haut) et son type :
+   « Je découvre » (théorie) · « À toi ! » (activité) · « À retenir » (synthèse).
+   Partie 1 = Informations et données (violet) · Partie 2 = Sécurité (vert) · Turbo-check (orange).
    ===================================================================== */
 :root {
   --encre: #1B1030; --discret: #5E5670; --filet: #ADA6BD; --ligne: #9C94AE; --blanc: #FFFFFF; --neon: #D4FF3D;
   --fond: #F8F6FC;
-  /* Informations et données */
   --i-aplat: #6C2BD9; --i-texte: #6C2BD9; --i-moyen: #CCB5F2; --i-clair: #EAE1FA; --i-pale: #F8F6FC;
-  /* Sécurité */
   --s-aplat: #22C55E; --s-texte: #15803D; --s-moyen: #B2EBC7; --s-clair: #E0F7E8; --s-pale: #F2FBF5;
-  /* Création de contenus (turbo-check) */
   --c-aplat: #F5A623; --c-texte: #A65F00; --c-moyen: #FCDCA7; --c-clair: #FEEFD6; --c-pale: #FFF8EC;
   --bon: #15803D; --bon-fond: #E0F7E8; --faux: #B3261E; --faux-fond: #FCE4E2;
   --f-titre: "Poppins", Arial, sans-serif; --f-corps: "Atkinson Hyperlegible", Verdana, sans-serif; --f-code: "Fira Code", Consolas, monospace;
-  --r: 14px; --gap: 22px;
+  --r: 14px;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 86px; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
-body { margin: 0; background: var(--fond); color: var(--encre); font: 18px/1.55 var(--f-corps); }
-h1, h2, h3, h4 { font-family: var(--f-titre); line-height: 1.15; margin: 0; text-wrap: balance; }
-p { margin: 0 0 12px; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--encre); color: var(--encre); font: 21px/1.45 var(--f-corps); display: flex; flex-direction: column; overflow: hidden;
+  padding: 10px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left)); }
+h1, h2, h3 { font-family: var(--f-titre); line-height: 1.15; margin: 0; text-wrap: balance; }
+p { margin: 0 0 10px; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--encre); outline-offset: 3px; box-shadow: 0 0 0 6px var(--neon); border-radius: 6px; }
-code, .code { font-family: var(--f-code); font-size: .92em; }
+code { font-family: var(--f-code); font-size: .9em; }
 .neon { background: linear-gradient(transparent 58%, var(--neon) 58%, var(--neon) 92%, transparent 92%); padding: 0 4px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
 
-/* champ courant : chaque chapitre pose ses couleurs */
+/* couleurs du champ de la diapo */
 .ch-i { --aplat: var(--i-aplat); --texte: var(--i-texte); --moyen: var(--i-moyen); --clair: var(--i-clair); --pale: var(--i-pale); --sur-aplat: #fff; --bord: solid; }
 .ch-s { --aplat: var(--s-aplat); --texte: var(--s-texte); --moyen: var(--s-moyen); --clair: var(--s-clair); --pale: var(--s-pale); --sur-aplat: var(--encre); --bord: double; }
 .ch-c { --aplat: var(--c-aplat); --texte: var(--c-texte); --moyen: var(--c-moyen); --clair: var(--c-clair); --pale: var(--c-pale); --sur-aplat: var(--encre); --bord: dotted; }
 
-/* ---------- barre du haut ---------- */
-.top { position: sticky; top: 0; z-index: 30; background: rgba(248, 246, 252, .94); backdrop-filter: blur(6px); border-bottom: 1.5px solid var(--i-moyen); }
-.top-in { max-width: 1240px; margin: 0 auto; padding: 10px max(16px, env(safe-area-inset-left)); display: flex; align-items: center; gap: 14px; }
-.logo { font: 800 1.15rem var(--f-titre); letter-spacing: .08em; color: var(--i-texte); text-decoration: none; }
-.top-t { font: 600 .98rem var(--f-titre); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.prog { display: flex; align-items: center; gap: 10px; }
-.octet { display: flex; gap: 4px; }
-.octet i { width: 14px; height: 14px; border: 2px solid var(--i-texte); border-radius: 3px; background: transparent; transition: background .3s; }
-.octet i.on { background: var(--i-aplat); }
-.prog small { font: 600 .82rem var(--f-code); color: var(--discret); white-space: nowrap; }
-.btn-som { display: none; }
+/* ---------- scène ---------- */
+#viewport { flex: 1; position: relative; min-height: 0; }
+#stage { position: absolute; top: 0; left: 0; width: 1280px; height: 720px; transform-origin: 0 0; background: var(--fond); border-radius: 16px; overflow: hidden; }
+.slide { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--pale, var(--fond)); }
+.slide.enter { animation: enter .4s cubic-bezier(.2, .8, .2, 1); }
+.slide.back { animation: back .4s cubic-bezier(.2, .8, .2, 1); }
+@keyframes enter { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+@keyframes back { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .slide.enter, .slide.back { animation: none; } * { transition: none !important; } }
 
-/* ---------- mise en page ---------- */
-.page { max-width: 1240px; margin: 0 auto; padding: 24px max(16px, env(safe-area-inset-left)) 60px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 34px; align-items: start; }
-.toc { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 6px; }
-.toc h2 { font: 600 .8rem var(--f-titre); letter-spacing: .12em; text-transform: uppercase; color: var(--discret); margin: 0 0 8px; }
-.toc ol { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 3px; }
-.toc a { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 9px; color: var(--encre); text-decoration: none; font-size: .95rem; line-height: 1.25; }
-.toc a:hover { background: var(--i-clair); }
-.toc a .n { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; font: 700 .8rem var(--f-titre); background: var(--blanc); border: 2px solid var(--aplat); color: var(--texte); }
-.toc a.vu .n { background: var(--aplat); color: var(--sur-aplat); }
-.toc a.vu .n::after { content: "✓"; }
-.toc a.vu .n span { display: none; }
-.toc a.ici { background: var(--clair); font-weight: 700; }
-.part-t { display: flex; align-items: center; gap: 8px; }
-.part-t svg { width: 18px; height: 18px; }
+/* bandeau du haut (rempli par le script) */
+.sh { flex: none; display: flex; align-items: center; gap: 14px; height: 58px; padding: 0 28px; background: var(--aplat); color: var(--sur-aplat); }
+.sh-n { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; background: var(--sur-aplat); color: var(--aplat); font: 800 1.2rem var(--f-titre); }
+.ch-s .sh-n { color: var(--s-texte); }
+.sh-t { font: 700 1.02rem var(--f-titre); letter-spacing: .01em; white-space: nowrap; }
+.sh-t small { font: 600 .78rem var(--f-titre); letter-spacing: .1em; text-transform: uppercase; opacity: .85; display: block; line-height: 1; margin-bottom: 3px; }
+.sh-pas { display: flex; gap: 5px; margin-left: 6px; }
+.sh-pas i { width: 12px; height: 12px; border-radius: 3px; border: 2px solid currentColor; opacity: .9; }
+.sh-pas i.on { background: currentColor; }
+.sh .grow { flex: 1; }
+.kind { display: inline-flex; align-items: center; gap: 8px; font: 700 .95rem var(--f-titre); padding: 6px 14px 6px 10px; border-radius: 999px; background: var(--blanc); color: var(--encre); border: 2px solid var(--encre); }
+.kind svg { width: 20px; height: 20px; }
+.kind.atoi { background: var(--neon); }
+.kind.retiens { background: var(--encre); color: var(--neon); }
 
-main { min-width: 0; display: flex; flex-direction: column; gap: 40px; }
-
-/* ---------- ouverture ---------- */
-.ouv { background: var(--blanc); border-radius: 22px; border: 1.5px solid var(--i-moyen); padding: 30px 34px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 30px; align-items: center; }
-.ouv .kicker { font: 600 .82rem var(--f-titre); letter-spacing: .12em; text-transform: uppercase; color: var(--i-texte); margin-bottom: 8px; }
-.ouv h1 { font-size: clamp(2.1rem, 5vw, 3.3rem); font-weight: 800; margin-bottom: 14px; }
-.ouv .lead { font-size: 1.12rem; }
-.parts { display: flex; flex-direction: column; gap: 12px; }
-.part-card { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: var(--r); background: var(--pale); border: 2px var(--bord) var(--aplat); text-decoration: none; color: var(--encre); }
-.part-card .pic { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: var(--aplat); color: var(--sur-aplat); }
-.part-card .pic svg { width: 26px; height: 26px; }
-.part-card b { font: 700 1.02rem var(--f-titre); display: block; }
-.part-card small { color: var(--discret); }
-.howto { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; color: var(--discret); font-size: .92rem; }
-.howto span { display: inline-flex; align-items: center; gap: 6px; }
-
-/* ---------- chapitre ---------- */
-.chap { background: var(--pale); border-radius: 22px; padding: 0 0 26px; border: 1.5px solid var(--moyen); overflow: hidden; }
-.bandeau { display: flex; align-items: center; gap: 12px; background: var(--aplat); color: var(--sur-aplat); padding: 10px 18px; border-radius: 22px 22px 0 0; font: 700 .82rem var(--f-titre); letter-spacing: .1em; text-transform: uppercase; }
-.bandeau svg { width: 20px; height: 20px; flex: none; }
-.bandeau .grow { flex: 1; }
-.bandeau .bin { display: flex; gap: 3px; align-items: center; }
-.bandeau .bin i { width: 11px; height: 11px; border-radius: 2px; border: 2px solid currentColor; }
-.bandeau .bin i.on { background: currentColor; }
-.bandeau .bin small { font: 600 .68rem var(--f-code); letter-spacing: 0; text-transform: none; margin-left: 6px; opacity: .9; }
-.chap-in { padding: 22px 28px 0; display: flex; flex-direction: column; gap: var(--gap); }
-.chap h2 { font-size: clamp(1.7rem, 3.6vw, 2.35rem); font-weight: 800; }
-.chap h2 .num { color: var(--texte); margin-right: 6px; }
-.chap h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; }
-.essentiel { font-size: 1.1rem; max-width: 64ch; }
-.duo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); align-items: start; }
-.duo > * { min-width: 0; }
-.bloc { background: var(--blanc); border-radius: var(--r); border: 1.5px solid var(--filet); padding: 18px 20px; }
-.retenir { background: var(--clair); border: 3px var(--bord) var(--texte); border-radius: var(--r); padding: 16px 20px; }
-.retenir > b:first-child { display: inline-block; font: 700 .78rem var(--f-titre); letter-spacing: .12em; text-transform: uppercase; color: var(--sur-aplat); background: var(--aplat); padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
-.retenir ul { margin: 0; padding-left: 1.2em; }
-.retenir li { margin: 4px 0; }
-.attention { background: var(--blanc); border: 2px dashed var(--filet); border-radius: var(--r); padding: 12px 16px; font-size: .96rem; }
+.corps { flex: 1; min-height: 0; padding: 22px 44px 26px; display: flex; flex-direction: column; gap: 16px; }
+.slide h2 { font-size: 2.15rem; font-weight: 800; }
+.slide h2 .num { color: var(--texte); margin-right: 8px; }
+.consigne { display: flex; align-items: center; gap: 12px; font: 700 1.08rem var(--f-titre); }
+.consigne .pt { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--neon); border: 2px solid var(--encre); font-size: 1.05rem; }
+.lead { font-size: 1.12rem; max-width: 62ch; margin: 0; }
+.grille { flex: 1; min-height: 0; display: grid; gap: 20px; }
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g12 { grid-template-columns: 1fr 1.25fr; }
+.g21 { grid-template-columns: 1.25fr 1fr; }
+.grille { align-items: start; align-content: start; }
+.grille > * { min-width: 0; min-height: 0; }
+.bloc { background: var(--blanc); border-radius: var(--r); border: 2px solid var(--moyen); padding: 18px 22px; }
+.bloc h3 { font-size: 1.22rem; margin-bottom: 10px; }
+.col { display: flex; flex-direction: column; gap: 14px; }
+.attention { background: var(--blanc); border: 2px dashed var(--filet); border-radius: var(--r); padding: 12px 18px; font-size: .95rem; margin: 0; }
 .attention b:first-child { color: var(--texte); }
-
-/* exercices : pastilles carrées numérotées (« bits ») */
-.ex { background: var(--blanc); border-radius: var(--r); border: 1.5px solid var(--filet); padding: 18px 20px; }
-.ex-h { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
-.bit { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 7px; background: var(--aplat); color: var(--sur-aplat); font: 800 1rem var(--f-titre); }
-.ex-h b { font: 700 1.08rem var(--f-titre); display: block; }
-.ex-h small { color: var(--discret); display: block; line-height: 1.4; margin-top: 2px; }
-.fb { min-height: 1.4em; margin-top: 10px; font-weight: 700; }
+.fb { min-height: 1.4em; margin: 8px 0 0; font-weight: 700; }
 .fb.ok { color: var(--bon); }
 .fb.ko { color: var(--faux); }
 .fb span { font-weight: 400; color: var(--encre); }
-
-.btn { font: 700 .98rem var(--f-titre); background: var(--aplat); color: var(--sur-aplat); border: 0; border-radius: 10px; padding: 9px 16px; }
-.btn.second { background: var(--blanc); color: var(--texte); border: 2px solid var(--texte); padding: 7px 14px; }
-.btn.petit { font-size: .85rem; padding: 6px 11px; }
+.btn { font: 700 .98rem var(--f-titre); background: var(--aplat); color: var(--sur-aplat); border: 2px solid var(--encre); border-radius: 10px; padding: 8px 16px; }
+.btn.second { background: var(--blanc); color: var(--texte); border-color: var(--texte); }
+.btn.petit { font-size: .85rem; padding: 5px 11px; }
 .btn[disabled] { opacity: .45; cursor: default; }
 .rangee { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
-/* bouton « J'ai compris » de fin de chapitre */
-.fin { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 14px 18px; border-radius: var(--r); background: var(--blanc); border: 1.5px solid var(--filet); }
-.fin label { display: flex; align-items: center; gap: 12px; font: 700 1.02rem var(--f-titre); cursor: pointer; }
-.fin input { width: 26px; height: 26px; accent-color: var(--aplat); }
-.fin a { color: var(--texte); font-weight: 700; }
+/* « À retenir » */
+.retenir-zone { flex: 1; display: grid; grid-template-columns: 1fr 320px; gap: 24px; min-height: 0; }
+.retenir { background: var(--clair); border: 4px var(--bord) var(--texte); border-radius: 18px; padding: 22px 28px; display: flex; flex-direction: column; justify-content: center; }
+.retenir ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 22px; }
+.retenir li { display: grid; grid-template-columns: 38px 1fr; gap: 14px; align-items: start; font-size: 1.32rem; line-height: 1.4; }
+.retenir li::before { content: "✔"; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px; background: var(--aplat); color: var(--sur-aplat); font-weight: 800; font-size: .95rem; margin-top: 1px; }
+.compris { display: flex; flex-direction: column; gap: 14px; justify-content: center; align-items: stretch; }
+.compris label { display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 16px; background: var(--blanc); border: 3px solid var(--encre); font: 700 1.12rem var(--f-titre); cursor: pointer; line-height: 1.25; }
+.compris label:has(input:checked) { background: var(--neon); }
+.compris input { width: 30px; height: 30px; accent-color: var(--encre); flex: none; }
+.compris p { font-size: .92rem; color: var(--discret); margin: 0; }
+.compris .octet-mini { display: flex; gap: 5px; justify-content: center; }
+.compris .octet-mini i { width: 22px; height: 22px; border-radius: 4px; border: 2.5px solid var(--encre); }
+.compris .octet-mini i.on { background: var(--i-aplat); }
+
+/* ---------- titre, mode d'emploi, parties ---------- */
+.s-titre { background: var(--blanc); }
+.s-titre .corps { padding: 46px 60px; justify-content: center; gap: 26px; }
+.kicker { font: 700 .9rem var(--f-titre); letter-spacing: .14em; text-transform: uppercase; color: var(--i-texte); }
+.s-titre h1 { font-size: 4.3rem; font-weight: 800; line-height: 1.02; }
+.s-titre .lead { font-size: 1.3rem; }
+.octet-deco { display: flex; gap: 8px; }
+.octet-deco i { width: 30px; height: 30px; border-radius: 6px; border: 3px solid var(--i-texte); }
+.octet-deco i:nth-child(-n+5) { background: var(--i-aplat); }
+.octet-deco i:nth-child(n+6) { background: var(--s-aplat); border-color: var(--s-texte); }
+.parts { display: grid; grid-template-columns: 1fr 1fr .8fr; gap: 16px; }
+.part { display: flex; gap: 14px; align-items: center; padding: 16px 18px; border-radius: 16px; background: var(--pale); border: 3px var(--bord) var(--aplat); text-align: left; color: var(--encre); }
+.part .pic { flex: none; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 13px; background: var(--aplat); color: var(--sur-aplat); font-size: 1.5rem; }
+.part .pic svg { width: 30px; height: 30px; }
+.part b { font: 700 1.1rem var(--f-titre); display: block; }
+.part small { color: var(--discret); font-size: .9rem; line-height: 1.3; display: block; }
+.part:hover { transform: translateY(-2px); }
+.depart { font: 700 1.05rem var(--f-titre); color: var(--discret); display: flex; align-items: center; gap: 10px; }
+.depart kbd { font: 700 .95rem var(--f-code); background: var(--encre); color: #fff; border-radius: 6px; padding: 2px 9px; }
+
+.legende { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.legende > div { background: var(--blanc); border: 2px solid var(--filet); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.legende .kind { font-size: 1.05rem; }
+.legende p { margin: 0; }
+.legende .ex-mini { margin-top: auto; font-size: .9rem; color: var(--discret); }
+.reperes { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.reperes > div { display: flex; gap: 14px; align-items: center; background: var(--blanc); border: 2px solid var(--filet); border-radius: 16px; padding: 14px 18px; font-size: 1rem; }
+.reperes .ico { flex: none; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 12px; background: var(--encre); color: #fff; font: 700 1.3rem var(--f-titre); }
+
+.s-partie { background: var(--aplat); color: var(--sur-aplat); }
+.s-partie .corps { padding: 56px 70px; justify-content: center; gap: 20px; }
+.s-partie .kicker { color: inherit; opacity: .85; }
+.s-partie h1 { font-size: 4.2rem; font-weight: 800; }
+.s-partie .lead { font-size: 1.25rem; }
+.chemin { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 12px; margin-top: 12px; }
+.chemin button { text-align: left; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; min-height: 130px; border-radius: 16px; background: var(--blanc); color: var(--encre); border: 3px solid var(--encre); }
+.chemin button b { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 9px; background: var(--aplat); color: var(--sur-aplat); font: 800 1.2rem var(--f-titre); border: 2px solid var(--encre); }
+.chemin button span { font: 700 1.02rem var(--f-titre); line-height: 1.25; }
+.chemin button.vu { background: var(--neon); }
+.chemin button.vu b::after { content: " ✓"; font-size: .8em; }
 
 /* ---------- 1. unités ---------- */
-.escalier { display: flex; align-items: flex-end; gap: 8px; }
-.marche { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
-.marche b { width: 100%; display: grid; place-items: center; background: var(--aplat); color: #fff; border-radius: 10px 10px 4px 4px; font: 800 1.1rem var(--f-titre); }
-.marche small { font-size: .78rem; color: var(--discret); text-align: center; line-height: 1.2; }
-.fois { text-align: center; font: 700 .85rem var(--f-code); color: var(--texte); margin-top: 6px; }
+.bits { display: flex; gap: 8px; justify-content: center; margin: 6px 0 10px; }
+.bits button { width: 50px; height: 62px; border-radius: 10px; border: 3px solid var(--encre); background: var(--blanc); font: 700 1.7rem var(--f-code); }
+.bits button.on { background: var(--aplat); color: #fff; }
+.bits-out { display: flex; justify-content: center; gap: 14px; align-items: center; font-size: 1.02rem; }
+.bits-out b.lettre { display: grid; place-items: center; min-width: 56px; height: 56px; padding: 0 10px; border-radius: 12px; background: var(--neon); border: 3px solid var(--encre); font: 800 1.8rem var(--f-titre); }
+.accolade { text-align: center; font: 700 1rem var(--f-titre); color: var(--texte); border-top: 3px solid var(--texte); margin: 0 40px 10px; padding-top: 6px; }
+.escalier { display: flex; align-items: flex-end; gap: 10px; height: 210px; }
+.marche { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; }
+.marche b { width: 100%; display: grid; place-items: center; background: var(--aplat); color: #fff; border-radius: 12px 12px 4px 4px; font: 800 1.4rem var(--f-titre); }
+.marche small { font-size: .85rem; color: var(--discret); text-align: center; line-height: 1.2; }
+.fleches { text-align: center; margin-bottom: 0; font: 700 .95rem var(--f-code); color: var(--texte); margin-top: 10px; }
+.sens { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.sens div { border-radius: 10px; padding: 8px 12px; background: var(--clair); font-size: .95rem; text-align: center; }
+.sens b { display: block; font-family: var(--f-titre); }
 .conv { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 12px; }
-.conv input, .conv select { padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; font-size: 1.05rem; }
-.conv-res { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.conv input, .conv select { padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; font-size: 1.1rem; }
+.conv-res { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .conv-res div { background: var(--clair); border-radius: 10px; padding: 8px; text-align: center; }
-.conv-res small { display: block; font: 700 .78rem var(--f-titre); color: var(--texte); }
-.conv-res span { font: 600 .98rem var(--f-code); word-break: break-all; }
+.conv-res small { display: block; font: 700 .8rem var(--f-titre); color: var(--texte); }
+.conv-res span { font: 600 1rem var(--f-code); word-break: break-all; }
 .conv-res div.src { background: var(--aplat); color: #fff; }
 .conv-res div.src small { color: #fff; }
 .duels { display: flex; flex-direction: column; gap: 10px; }
 .duel { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
 .duel .vs { font: 800 .85rem var(--f-titre); color: var(--discret); }
-.carte { text-align: left; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; line-height: 1.3; }
+.carte { text-align: left; padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; line-height: 1.3; font-size: .95rem; }
 .carte:hover { border-color: var(--texte); }
-.carte b { display: block; font-family: var(--f-code); }
+.carte b { display: block; font-family: var(--f-code); font-size: 1.05rem; }
 .carte.ok { border-color: var(--bon); background: var(--bon-fond); }
 .carte.ko { border-color: var(--faux); background: var(--faux-fond); }
 
 /* ---------- 2. RAM / stockage ---------- */
-.cuisine { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.cuisine div { background: var(--clair); border-radius: 12px; padding: 14px; text-align: center; }
-.cuisine .ico { font-size: 2rem; line-height: 1; }
-.cuisine b { display: block; font: 700 1.05rem var(--f-titre); margin: 6px 0 2px; }
-.tri { display: flex; flex-direction: column; gap: 8px; }
-.tri-l { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; }
+.cuisine { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.cuisine > div { background: var(--blanc); border: 3px solid var(--aplat); border-radius: 18px; padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; }
+.cuisine .ico { font-size: 3.2rem; line-height: 1; }
+.cuisine h3 { font-size: 1.5rem; }
+.cuisine .egal { font: 700 1.1rem var(--f-titre); color: var(--texte); }
+.cuisine ul { margin: 0; padding-left: 1.1em; }
+.cuisine li { margin: 4px 0; }
+.etat { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; font-weight: 700; }
+.etat.vide { background: var(--faux-fond); color: var(--faux); }
+.etat.garde { background: var(--bon-fond); color: var(--bon); }
+.tri { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tri-l { min-height: 120px; display: flex; flex-direction: column; gap: 8px; justify-content: space-between; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--filet); background: #fff; }
 .tri-l.ok { border-color: var(--bon); background: var(--bon-fond); }
 .tri-l.ko { border-color: var(--faux); background: var(--faux-fond); }
-.tri-l .rangee { gap: 6px; }
-.tri-l small { display: block; color: var(--discret); font-size: .86rem; }
-table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; background: #fff; border-radius: var(--r); overflow: hidden; }
-.tab th { background: var(--moyen); text-align: left; padding: 9px 12px; font-family: var(--f-titre); font-size: .9rem; }
-.tab td { padding: 9px 12px; border-top: 1px solid var(--i-clair); vertical-align: top; }
-.tab td:first-child { font-weight: 700; white-space: nowrap; }
+.tri-l small { display: block; color: var(--discret); font-size: .86rem; margin-top: 4px; }
+.espaces { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.espace { background: var(--blanc); border: 2px solid var(--moyen); border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.espace .ico { font-size: 2.6rem; line-height: 1; }
+.espace h3 { font-size: 1.35rem; }
+.espace .ex2 { font-size: .95rem; background: var(--clair); border-radius: 10px; padding: 8px 12px; }
+.espace .plus { margin-top: auto; font-size: .95rem; }
+.espace .plus div { display: flex; gap: 8px; }
 
 /* ---------- 3. faire de la place ---------- */
-.phone { display: grid; grid-template-columns: 1fr; gap: 12px; }
-.jauge { background: var(--clair); border-radius: 12px; padding: 12px 14px; }
-.jauge-h { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; flex-wrap: wrap; }
-.jauge-bar { position: relative; height: 22px; border-radius: 99px; background: #fff; border: 2px solid var(--texte); overflow: hidden; margin: 8px 0 4px; }
+.formule { font: 700 1.3rem var(--f-titre); text-align: center; background: #fff; border: 3px solid var(--texte); border-radius: 14px; padding: 14px; margin: 0 0 14px; }
+.calc-ex { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; font: 700 1.15rem var(--f-titre); }
+.calc-ex span { background: var(--clair); border-radius: 10px; padding: 8px 14px; }
+.calc-ex span.r { background: var(--neon); border: 2px solid var(--encre); }
+.flow { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.flow .q { background: var(--aplat); color: #fff; font: 700 1.15rem var(--f-titre); padding: 10px 18px; border-radius: 12px; text-align: center; }
+.flow .yn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.flow .yn div { background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 12px; text-align: center; font-size: .95rem; }
+.flow .yn .gros { font-size: 2rem; display: block; }
+.phone { display: grid; grid-template-columns: 360px 1fr; gap: 20px; flex: 1; min-height: 0; }
+.jauge { background: var(--blanc); border: 2px solid var(--moyen); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.jauge-h { font: 700 1.05rem var(--f-titre); }
+.jauge-big { font: 800 2rem var(--f-titre); }
+.jauge-bar { position: relative; height: 26px; border-radius: 99px; background: #fff; border: 2px solid var(--texte); overflow: hidden; }
 .jauge-bar i { position: absolute; inset: 0 auto 0 0; background: var(--aplat); transition: width .35s; }
 .jauge-bar em { position: absolute; top: -2px; bottom: -2px; width: 3px; background: var(--encre); }
-.jauge small { color: var(--discret); }
-.items { display: flex; flex-direction: column; gap: 8px; }
-.item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 10px; background: #fff; border: 2px solid var(--filet); }
-.item .nm small { display: block; color: var(--discret); font-size: .85rem; }
+.jauge small { color: var(--discret); font-size: .88rem; }
+.items { display: flex; flex-direction: column; gap: 7px; }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 6px 12px; border-radius: 10px; background: #fff; border: 2px solid var(--filet); font-size: .95rem; line-height: 1.25; }
+.item .nm small { display: block; color: var(--discret); font-size: .8rem; }
 .seg { display: inline-flex; border: 2px solid var(--texte); border-radius: 10px; overflow: hidden; }
-.seg button { border: 0; background: #fff; padding: 6px 10px; font-size: .86rem; font-weight: 700; color: var(--texte); }
+.seg button { border: 0; background: #fff; padding: 5px 10px; font-size: .84rem; font-weight: 700; color: var(--texte); }
 .seg button + button { border-left: 2px solid var(--texte); }
 .seg button[aria-pressed="true"] { background: var(--aplat); color: var(--sur-aplat); }
-.flow { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.flow .q { background: var(--aplat); color: #fff; font: 700 1rem var(--f-titre); padding: 8px 14px; border-radius: 10px; text-align: center; }
-.flow .yn { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-.flow .yn div { background: #fff; border: 2px solid var(--filet); border-radius: 10px; padding: 10px; text-align: center; font-size: .95rem; }
-.formule { font: 700 1.05rem var(--f-titre); text-align: center; background: #fff; border: 2px solid var(--texte); border-radius: 10px; padding: 10px; }
 
 /* ---------- 4. débit ---------- */
-.calc { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.calc label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; font-size: .92rem; }
-.calc .in { display: flex; align-items: center; gap: 8px; }
-.calc input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 2px solid var(--filet); font-size: 1.05rem; }
-.calc em { font-style: normal; font-weight: 700; color: var(--texte); white-space: nowrap; }
-.etapes { margin: 0; padding: 0; list-style: none; counter-reset: e; display: flex; flex-direction: column; gap: 6px; }
-.etapes li { counter-increment: e; display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: baseline; font-family: var(--f-code); font-size: .95rem; }
-.etapes li::before { content: counter(e); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: var(--clair); color: var(--texte); font: 700 .8rem var(--f-titre); }
-.etapes li.res { font-weight: 600; }
-.etapes li.res b { background: var(--neon); padding: 0 4px; border-radius: 4px; }
-.r3 { display: grid; grid-template-columns: auto auto auto; justify-content: center; gap: 4px 14px; font: 600 1.02rem var(--f-code); background: #fff; border-radius: 12px; padding: 12px; }
+.debit-visu { display: flex; align-items: center; justify-content: center; gap: 14px; font: 700 1.3rem var(--f-titre); margin: 6px 0 12px; flex-wrap: wrap; }
+.debit-visu span { background: var(--clair); border-radius: 12px; padding: 10px 16px; }
+.debit-visu .op { background: transparent; color: var(--texte); padding: 0; }
+.debit-visu .r { background: var(--neon); border: 2px solid var(--encre); }
+.paquet { display: flex; gap: 4px; justify-content: center; margin-bottom: 6px; }
+.paquet i { width: 26px; height: 26px; border-radius: 5px; background: var(--aplat); border: 2px solid var(--encre); }
+.r3 { display: grid; grid-template-columns: auto auto auto; justify-content: center; gap: 6px 18px; font: 600 1.15rem var(--f-code); background: var(--clair); border-radius: 12px; padding: 14px; }
 .r3 .op { color: var(--texte); font-weight: 700; text-align: center; }
-.hconv { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.hconv input { width: 110px; padding: 8px 10px; border-radius: 10px; border: 2px solid var(--filet); font-size: 1.05rem; }
-.hconv-out { margin-top: 10px; font-family: var(--f-code); font-size: .98rem; line-height: 1.7; }
-.hconv-out b { background: var(--neon); padding: 0 4px; border-radius: 4px; }
+.calc { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.calc label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; font-size: .95rem; }
+.calc .in { display: flex; align-items: center; gap: 8px; }
+.calc input { width: 100%; padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); font-size: 1.15rem; }
+.calc em { font-style: normal; font-weight: 700; color: var(--texte); white-space: nowrap; }
+.etapes { margin: 0; padding: 0; list-style: none; counter-reset: e; display: flex; flex-direction: column; gap: 10px; }
+.etapes li { counter-increment: e; display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: center; font-family: var(--f-code); font-size: 1.05rem; background: #fff; border: 2px solid var(--filet); border-radius: 10px; padding: 8px 12px; }
+.etapes li::before { content: counter(e); display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; background: var(--clair); color: var(--texte); font: 700 .9rem var(--f-titre); }
+.etapes li.res { border-color: var(--encre); }
+.etapes li.res b { background: var(--neon); padding: 0 6px; border-radius: 4px; }
+.hconv { display: flex; align-items: center; gap: 10px; font-size: 1.4rem; }
+.hconv input { width: 150px; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--filet); font: 600 1.4rem var(--f-code); }
+.hconv-out { margin-top: 14px; font-family: var(--f-code); font-size: 1.12rem; line-height: 1.9; background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 12px 16px; }
+.hconv-out b { background: var(--neon); padding: 0 5px; border-radius: 4px; }
+.piege { display: flex; align-items: center; gap: 16px; justify-content: center; font: 800 1.6rem var(--f-titre); }
+.piege .non { text-decoration: line-through; color: var(--faux); }
+.piege .oui { background: var(--neon); padding: 0 8px; border-radius: 6px; }
 
 /* ---------- 5. vérifier une info ---------- */
-.q3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.q3 div { background: #fff; border-radius: 12px; border: 2px solid var(--texte); padding: 12px; text-align: center; }
-.q3 b { display: block; font: 800 1.35rem var(--f-titre); color: var(--texte); }
-.q3 small { color: var(--discret); }
-.posts { display: flex; flex-direction: column; gap: 12px; }
-.post { background: #fff; border-radius: 12px; border: 2px solid var(--filet); padding: 12px 14px; }
-.post-h { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.av { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 700 .9rem var(--f-titre); color: #fff; flex: none; }
+.q3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.q3 div { background: #fff; border-radius: 16px; border: 3px solid var(--texte); padding: 16px; text-align: center; }
+.q3 .ico { font-size: 2.2rem; line-height: 1; }
+.q3 b { display: block; font: 800 1.7rem var(--f-titre); color: var(--texte); margin: 4px 0; }
+.q3 small { color: var(--discret); font-size: .98rem; }
+.posts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; min-height: 0; }
+.post { min-height: 300px; background: #fff; border-radius: 14px; border: 2px solid var(--filet); padding: 14px 16px; display: flex; flex-direction: column; font-size: .98rem; }
+.post-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.av { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; font: 700 .9rem var(--f-titre); color: #fff; flex: none; }
 .post-h b { font-size: .95rem; }
-.post-h small { display: block; color: var(--discret); font-size: .82rem; }
+.post-h small { display: block; color: var(--discret); font-size: .8rem; line-height: 1.25; }
 .post p { margin: 0 0 10px; }
+.post .rangee { margin-top: auto; }
+.post .fb { font-size: .9rem; }
 .post.ok { border-color: var(--bon); }
 .post.ko { border-color: var(--faux); }
-.tag-f { display: inline-block; font: 700 .7rem var(--f-titre); letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: var(--clair); color: var(--texte); }
+.tag-f { display: inline-block; font: 700 .68rem var(--f-titre); letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: var(--clair); color: var(--texte); }
 
 /* ---------- 6. PEGI ---------- */
-.ages { display: flex; gap: 8px; flex-wrap: wrap; }
-.age { display: grid; place-items: center; width: 54px; height: 62px; border-radius: 8px; font: 800 1.4rem var(--f-titre); color: #fff; border: 3px solid var(--encre); }
-.age small { font: 600 .6rem var(--f-titre); letter-spacing: .04em; margin-top: -8px; }
+.ages { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 8px 0 12px; }
+.age { display: grid; place-items: center; width: 70px; height: 82px; border-radius: 10px; font: 800 1.9rem var(--f-titre); color: #fff; border: 3px solid var(--encre); }
 .a3, .a7 { background: #2E9E3F; } .a12, .a16 { background: #E58A00; color: var(--encre); } .a18 { background: #D9001B; }
-.pictos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.picto { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 10px; border: 2px solid var(--encre); background: #fff; font-weight: 700; font-size: .86rem; text-align: center; line-height: 1.2; }
-.picto span { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 8px; background: var(--encre); color: #fff; font-size: 1.3rem; }
-.picto[aria-expanded="true"] { background: var(--clair); border-color: var(--texte); }
-.picto-def { min-height: 3.2em; margin-top: 10px; padding: 10px 14px; border-radius: 10px; background: var(--clair); }
-.boite { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 12px; background: var(--pale); border: 2px solid var(--filet); margin-bottom: 10px; }
-.boite .jeu { font: 700 1rem var(--f-titre); }
-.boite .lbl { display: flex; gap: 6px; align-items: center; }
-.mini { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; background: var(--encre); color: #fff; font-size: 1.05rem; }
-.choix { display: flex; flex-direction: column; gap: 8px; }
-.choix button { text-align: left; padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; line-height: 1.35; }
+.vs-x { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.vs-x div { border-radius: 12px; padding: 10px 14px; font-size: .98rem; }
+.vs-x .oui { background: var(--bon-fond); border: 2px solid var(--bon); }
+.vs-x .non { background: var(--faux-fond); border: 2px solid var(--faux); }
+.vs-x b { display: block; font-family: var(--f-titre); }
+.etiq { display: flex; gap: 18px; align-items: center; justify-content: center; margin: 4px 0 12px; }
+.etiq .plus { font: 800 2rem var(--f-titre); color: var(--discret); }
+.etiq .pics { display: flex; gap: 8px; }
+.mini { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 8px; background: var(--encre); color: #fff; font-size: 1.5rem; }
+.pictos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.picto { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border-radius: 12px; border: 2px solid var(--encre); background: #fff; font-weight: 700; font-size: .95rem; text-align: center; line-height: 1.2; }
+.picto span { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 9px; background: var(--encre); color: #fff; font-size: 1.5rem; }
+.picto[aria-expanded="true"] { background: var(--neon); }
+.picto.vu:not([aria-expanded="true"]) { background: var(--clair); }
+.picto-def { min-height: 3.4em; padding: 14px 18px; border-radius: 12px; background: var(--blanc); border: 3px solid var(--texte); font-size: 1.08rem; }
+.boite { display: flex; gap: 18px; align-items: center; padding: 18px; border-radius: 16px; background: var(--blanc); border: 3px solid var(--encre); }
+.boite .jeu { font: 800 1.3rem var(--f-titre); display: block; margin-bottom: 8px; }
+.boite .lbl { display: flex; gap: 8px; }
+.choix { display: flex; flex-direction: column; gap: 10px; }
+.choix button { text-align: left; padding: 11px 14px; border-radius: 12px; border: 2px solid var(--filet); background: #fff; line-height: 1.35; font-size: 1rem; }
 .choix button:hover { border-color: var(--texte); }
 .choix button.ok { border-color: var(--bon); background: var(--bon-fond); }
 .choix button.ko { border-color: var(--faux); background: var(--faux-fond); }
 
 /* ---------- 7. adresse web ---------- */
-.anat { display: flex; flex-wrap: wrap; justify-content: center; font: 600 clamp(.95rem, 2.4vw, 1.25rem) var(--f-code); background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 16px 10px 12px; gap: 0; }
-.anat button { border: 0; background: transparent; padding: 4px 1px; border-bottom: 5px solid transparent; font: inherit; }
+.anat { display: flex; flex-wrap: wrap; justify-content: center; font: 600 2rem var(--f-code); background: #fff; border: 3px solid var(--encre); border-radius: 16px; padding: 22px 12px 18px; }
+.anat button { border: 0; background: transparent; padding: 4px 2px; border-bottom: 7px solid transparent; font: inherit; }
 .anat button[data-k="proto"] { border-color: #9C94AE; }
 .anat button[data-k="sous"] { border-color: var(--i-moyen); }
 .anat button[data-k="dom"] { border-color: var(--neon); background: rgba(212, 255, 61, .35); }
 .anat button[data-k="chemin"] { border-color: #F1B2D8; }
 .anat button[aria-pressed="true"] { background: var(--clair); }
-.anat-def { margin-top: 10px; padding: 10px 14px; border-radius: 10px; background: var(--clair); min-height: 3.2em; }
-.urls { display: flex; flex-direction: column; gap: 12px; }
-.url-l { background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 10px 12px; }
+.anat-leg { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; font-size: .88rem; color: var(--discret); margin-top: 8px; }
+.anat-leg span::before { content: ""; display: inline-block; width: 18px; height: 6px; border-radius: 3px; margin-right: 6px; vertical-align: middle; background: var(--c); }
+.anat-def { min-height: 3.2em; padding: 12px 18px; border-radius: 12px; background: var(--blanc); border: 3px solid var(--texte); font-size: 1.05rem; }
+.cadenas { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+.cadenas .ico { font-size: 3rem; }
+.urls { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.url-l { background: #fff; border: 2px solid var(--filet); border-radius: 14px; padding: 14px 16px; }
 .url-l.ok { border-color: var(--bon); background: var(--bon-fond); }
-.url-c { display: flex; flex-wrap: wrap; font: 600 .98rem var(--f-code); }
+.url-c { display: flex; flex-wrap: wrap; font: 600 1.25rem var(--f-code); }
 .url-c button { border: 0; background: transparent; padding: 3px 1px; border-radius: 4px; font: inherit; }
 .url-c button:hover { background: var(--clair); }
 .url-c button.ok { background: var(--neon); }
 .url-c button.ko { background: var(--faux-fond); text-decoration: line-through; }
-.url-l .fb { margin-top: 6px; font-size: .95rem; }
-.cadenas { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
-.cadenas .ico { font-size: 2rem; }
+.url-l .fb { font-size: .92rem; }
 
 /* ---------- 8. arnaques ---------- */
-.signaux { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.signal { background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 10px 12px; }
-.signal span { font-size: 1.5rem; }
-.signal b { display: block; font: 700 1rem var(--f-titre); }
-.signal small { color: var(--discret); }
-.sms { max-width: 380px; margin: 0 auto; background: #EEF0F4; border-radius: 22px; padding: 14px; border: 3px solid var(--encre); }
-.sms-h { text-align: center; font-size: .85rem; color: var(--discret); margin-bottom: 8px; }
-.sms .bulle { background: #fff; border-radius: 16px 16px 16px 4px; padding: 10px 12px; line-height: 1.6; }
+.signaux { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.signal { background: #fff; border: 2px solid var(--moyen); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+.signal span { font-size: 2.3rem; line-height: 1; }
+.signal b { font: 700 1.25rem var(--f-titre); margin-top: 6px; }
+.signal small { color: var(--discret); font-size: .98rem; }
+.compteur { display: flex; align-items: center; gap: 14px; background: var(--blanc); border: 3px solid var(--encre); border-radius: 14px; padding: 10px 16px; font-size: 1.02rem; }
+.compteur b { font: 800 1.3rem var(--f-titre); white-space: nowrap; }
+.sms { width: 440px; background: #EEF0F4; border-radius: 28px; padding: 18px; border: 4px solid var(--encre); align-self: center; }
+.sms-h { text-align: center; font-size: .88rem; color: var(--discret); margin-bottom: 10px; }
+.sms .bulle { background: #fff; border-radius: 18px 18px 18px 4px; padding: 14px 16px; line-height: 1.75; font-size: 1.05rem; }
 .sms .hot { display: inline; -webkit-box-decoration-break: clone; box-decoration-break: clone; cursor: pointer; border: 0; background: transparent; padding: 0 2px; border-radius: 4px; font: inherit; text-align: left; border-bottom: 2px dotted var(--ligne); }
 .sms .hot.found { background: var(--neon); border-bottom-color: transparent; }
-.trouves { margin: 10px 0 0; padding-left: 1.2em; }
-.stop { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.stop div { background: #fff; border-radius: 12px; border: 2px solid var(--texte); padding: 10px; text-align: center; }
-.stop b { display: grid; place-items: center; width: 42px; height: 42px; margin: 0 auto 6px; border-radius: 8px; background: var(--aplat); color: var(--sur-aplat); font: 800 1.4rem var(--f-titre); }
-.stop small { font-size: .9rem; line-height: 1.25; display: block; }
+.trouves { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.trouves li { background: #fff; border: 2px solid var(--bon); border-radius: 10px; padding: 8px 12px; font-size: .95rem; }
+.trouves li.vide { border-style: dashed; border-color: var(--filet); color: var(--discret); }
+.stop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.stop div { background: #fff; border-radius: 16px; border: 3px solid var(--texte); padding: 16px 12px; text-align: center; }
+.stop b { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 10px; border-radius: 12px; background: var(--aplat); color: var(--sur-aplat); font: 800 2.2rem var(--f-titre); border: 3px solid var(--encre); }
+.stop small { font-size: 1.02rem; line-height: 1.3; display: block; }
+.stop small strong { display: block; font: 700 1.1rem var(--f-titre); }
 
 /* ---------- 9. identité ---------- */
-.share { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-.share button { padding: 10px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; font-weight: 700; line-height: 1.25; }
+.share { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.share button { font-size: 1.1rem; padding: 12px; border-radius: 12px; border: 2px solid var(--filet); background: #fff; font-weight: 700; line-height: 1.25; min-height: 92px; }
 .share button.ok { border-color: var(--bon); background: var(--bon-fond); }
 .share button.ko { border-color: var(--faux); background: var(--faux-fond); }
 .share button small { display: block; font-weight: 400; font-size: .82rem; margin-top: 4px; }
-.mode { display: inline-flex; border: 2px solid var(--texte); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
-.mode button { border: 0; background: #fff; padding: 6px 12px; font-weight: 700; color: var(--texte); }
-.mode button[aria-pressed="true"] { background: var(--aplat); color: var(--sur-aplat); }
-.check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.check li { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: start; }
-.check li > span:first-child { font-size: 1.2rem; }
-.pw input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--filet); font: 600 1.05rem var(--f-code); }
-.pw-bar { height: 12px; border-radius: 99px; background: var(--clair); overflow: hidden; margin: 10px 0 6px; }
+.mode { display: inline-flex; border: 3px solid var(--encre); border-radius: 12px; overflow: hidden; }
+.mode button { border: 0; background: #fff; padding: 8px 16px; font-weight: 700; }
+.mode button + button { border-left: 3px solid var(--encre); }
+.mode button[aria-pressed="true"] { background: var(--neon); }
+.check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.check li { display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: start; }
+.check li > span:first-child { font-size: 1.6rem; line-height: 1.1; }
+.pw input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--filet); font: 600 1.2rem var(--f-code); }
+.pw-bar { height: 16px; border-radius: 99px; background: var(--clair); overflow: hidden; margin: 12px 0 6px; border: 2px solid var(--texte); }
 .pw-bar i { display: block; height: 100%; width: 0; background: var(--aplat); transition: width .25s; }
-.pw ul { list-style: none; margin: 8px 0 0; padding: 0; font-size: .95rem; }
+.pw-lvl { font: 800 1.3rem var(--f-titre); }
+.pw ul { list-style: none; margin: 8px 0 0; padding: 0; font-size: 1rem; display: flex; flex-direction: column; gap: 4px; }
 .pw li.ok { color: var(--bon); font-weight: 700; }
-.pas { list-style: none; margin: 0; padding: 0; counter-reset: p; display: flex; flex-direction: column; gap: 8px; }
-.pas li { counter-increment: p; display: grid; grid-template-columns: 32px 1fr; gap: 10px; align-items: center; }
-.pas li::before { content: counter(p); display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; background: var(--aplat); color: var(--sur-aplat); font: 800 .95rem var(--f-titre); }
+.recette { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 700 1.05rem var(--f-code); }
+.recette span { background: var(--clair); border: 2px solid var(--texte); border-radius: 8px; padding: 6px 10px; }
+.recette .op { background: transparent; border: 0; padding: 0; color: var(--texte); }
+.pas { list-style: none; margin: 0; padding: 0; counter-reset: p; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.pas li { counter-increment: p; background: #fff; border: 2px solid var(--moyen); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px; font-size: 1.18rem; min-height: 330px; }
+.pas li::before { content: counter(p); display: grid; place-items: center; width: 50px; height: 50px; border-radius: 12px; background: var(--aplat); color: var(--sur-aplat); font: 800 1.5rem var(--f-titre); border: 3px solid var(--encre); }
+.pas li .ico { font-size: 3rem; line-height: 1; }
 
 /* ---------- turbo-check ---------- */
-.quiz-q { font: 700 1.15rem var(--f-titre); margin-bottom: 12px; }
-.quiz-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-.quiz-dots { display: flex; gap: 4px; }
-.quiz-dots i { width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--texte); }
-.quiz-dots i.ok { background: var(--bon); border-color: var(--bon); }
-.quiz-dots i.ko { background: var(--faux); border-color: var(--faux); }
+.quiz { flex: 1; min-height: 0; background: var(--blanc); border: 3px solid var(--aplat); border-radius: 18px; padding: 22px 28px; display: flex; flex-direction: column; overflow: auto; }
+.quiz-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.quiz-top b { font: 700 1.05rem var(--f-titre); color: var(--texte); }
+.quiz-dots { display: flex; gap: 6px; }
+.quiz-dots i { width: 20px; height: 20px; border-radius: 4px; border: 2.5px solid var(--encre); }
+.quiz-dots i.ok { background: var(--bon); }
+.quiz-dots i.ko { background: var(--faux); }
 .quiz-dots i.cur { background: var(--neon); }
+.quiz-q { font: 700 1.5rem var(--f-titre); margin-bottom: 16px; }
+.quiz .choix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.quiz .choix button { font-size: 1.1rem; padding: 14px 16px; }
 .score { text-align: center; }
-.score .big { font: 800 3rem var(--f-titre); color: var(--texte); }
-.score ul { text-align: left; max-width: 640px; margin: 12px auto; }
+.score .big { font: 800 3.6rem var(--f-titre); color: var(--texte); line-height: 1.1; }
+.score ul { text-align: left; max-width: 900px; margin: 10px auto; font-size: .95rem; }
 
-/* ---------- pied de page ---------- */
-.pied { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--discret); font-size: .88rem; border-top: 1.5px solid var(--filet); padding-top: 12px; }
-.pied b { color: var(--i-texte); font-family: var(--f-titre); letter-spacing: .08em; }
+/* ---------- fin ---------- */
+.fin-zone { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.fin-zone a { display: flex; flex-direction: column; gap: 10px; padding: 24px; border-radius: 18px; border: 3px solid var(--encre); background: var(--blanc); color: var(--encre); text-decoration: none; }
+.fin-zone a b { font: 800 1.5rem var(--f-titre); }
+.fin-zone a .go { margin-top: auto; font: 700 1.05rem var(--f-titre); color: var(--texte); }
+.fin-zone a.jeu { background: var(--s-clair); border-color: var(--s-texte); }
+.bilan { display: flex; align-items: center; gap: 18px; font-size: 1.1rem; }
+.bilan .octet-mini { display: flex; gap: 6px; }
+.bilan .octet-mini i { width: 28px; height: 28px; border-radius: 5px; border: 3px solid var(--encre); }
+.bilan .octet-mini i.on { background: var(--i-aplat); }
+.pied { font-size: .85rem; color: var(--discret); }
 .pied a { color: var(--i-texte); }
 
-/* ---------- petits écrans ---------- */
-@media (max-width: 980px) {
-  .page { grid-template-columns: 1fr; }
-  .toc { position: fixed; inset: 64px 12px auto 12px; max-height: calc(100vh - 80px); z-index: 40; background: #fff; border: 2px solid var(--i-moyen); border-radius: 16px; padding: 16px; box-shadow: 0 12px 40px rgba(27, 16, 48, .2); display: none; }
-  .toc.open { display: block; }
-  .btn-som { display: inline-flex; }
-  .ouv { grid-template-columns: 1fr; padding: 22px; }
-}
-@media (max-width: 720px) {
-  body { font-size: 17px; }
-  .duo, .cuisine, .calc { grid-template-columns: 1fr; }
-  .chap-in { padding: 18px 16px 0; }
-  .signaux { grid-template-columns: 1fr 1fr; }
-  .pictos { grid-template-columns: 1fr 1fr; }
-  .top-t { display: none; }
-  .prog { margin-left: auto; }
-  .q3 { grid-template-columns: 1fr; }
-  .conv-res { grid-template-columns: 1fr 1fr; }
-  .prog small { display: none; }
-  .duel { grid-template-columns: 1fr; }
-  .duel .vs { text-align: center; }
-  .bandeau .bin small { display: none; }
-}
+/* ---------- barre de navigation ---------- */
+#bar { flex: none; display: flex; align-items: center; gap: 10px; padding-top: 10px; color: #fff; }
+#bar button { background: #2E2247; border: 2px solid #4A3C6B; border-radius: 10px; padding: 8px 14px; color: #fff; font: 700 .95rem var(--f-titre); white-space: nowrap; }
+#bar button:hover { background: #3C2E5C; }
+#bar button.fleche { width: 52px; font-size: 1.15rem; padding: 6px 0; }
+#bar .accueil { color: var(--neon); font: 800 1rem var(--f-titre); letter-spacing: .08em; text-decoration: none; padding: 0 6px; }
+#count { font: 600 .9rem var(--f-code); min-width: 64px; text-align: center; }
+#pistes { flex: 1; display: flex; gap: 3px; min-width: 120px; height: 14px; }
+#pistes button { flex: 1; padding: 0 !important; border: 0 !important; border-radius: 3px !important; background: #3A2E55 !important; min-width: 0; }
+#pistes button.i { background: #4B3577 !important; } #pistes button.s { background: #245A3A !important; } #pistes button.c { background: #6B4A12 !important; }
+#pistes button.fait.i { background: var(--i-moyen) !important; } #pistes button.fait.s { background: var(--s-aplat) !important; } #pistes button.fait.c { background: var(--c-aplat) !important; } #pistes button.fait { background: #9C94AE !important; }
+#pistes button.ici { background: var(--neon) !important; transform: scaleY(1.5); }
+#octet { display: flex; gap: 3px; }
+#octet i { width: 13px; height: 13px; border-radius: 3px; border: 2px solid var(--i-moyen); }
+#octet i.on { background: var(--i-moyen); }
+#prog-t { font: 600 .82rem var(--f-code); color: #CFC8E0; white-space: nowrap; }
+@media (max-width: 760px) { #prog-t, #bar .accueil, #fs { display: none; } }
 
-/* ---------- impression : toute la théorie, sans les commandes ---------- */
+/* ---------- sommaire ---------- */
+#som { position: fixed; inset: 0; z-index: 50; background: rgba(27, 16, 48, .55); display: grid; place-items: center; padding: 16px; }
+#som .boite-som { background: var(--blanc); border-radius: 20px; width: min(980px, 100%); max-height: 100%; overflow: auto; padding: 24px 28px; border: 3px solid var(--encre); }
+#som h2 { font-size: 1.6rem; margin-bottom: 4px; }
+#som .som-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+#som .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+#som h3 { font: 700 .82rem var(--f-titre); letter-spacing: .12em; text-transform: uppercase; color: var(--texte); margin: 0 0 8px; }
+#som ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+#som li button { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 9px 12px; border-radius: 12px; border: 2px solid var(--moyen); background: var(--pale); font-size: 1rem; line-height: 1.25; }
+#som li button:hover { border-color: var(--texte); }
+#som li button .n { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--blanc); border: 2px solid var(--aplat); color: var(--texte); font: 800 .95rem var(--f-titre); }
+#som li button.vu .n { background: var(--aplat); color: var(--sur-aplat); }
+#som li button .etat-n { margin-left: auto; font-size: .8rem; color: var(--discret); white-space: nowrap; }
+#som li button.ici { border-color: var(--encre); box-shadow: 0 0 0 3px var(--neon); }
+#som .bas { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- impression : une diapo par page ---------- */
 @media print {
-  @page { size: A4; margin: 15mm; }
-  body { background: #fff; font-size: 12pt; }
-  .top, .toc, .fin, .ex, .btn-som { display: none !important; }
-  .page { display: block; padding: 0; }
-  main { gap: 8mm; }
-  .chap { break-inside: auto; border: 1px solid var(--moyen); }
-  .retenir, .bloc, table { break-inside: avoid; }
-  .ouv { border: 0; padding: 0; }
+  @page { size: A4 landscape; margin: 8mm; }
+  html, body { height: auto; overflow: visible; background: #fff; padding: 0; display: block; }
+  #bar, #som { display: none !important; }
+  #viewport { position: static; }
+  #stage { position: static !important; transform: none !important; width: 1280px; height: auto; zoom: .8; background: none; border-radius: 0; }
+  .slide, .slide[hidden] { position: relative !important; display: flex !important; width: 1280px; height: 720px; break-after: page; border: 1px solid #ddd; animation: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="top-in">
-    <a class="logo" href="../index.html" title="Retour à l'accueil">OCTET</a>
-    <span class="top-t">Stocker, vérifier, protéger</span>
-    <div class="prog" aria-live="polite">
-      <div class="octet" id="octet" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <small id="prog-t">0/9 notions</small>
+<div id="viewport">
+<div id="stage" role="region" aria-roledescription="diaporama" aria-label="Stocker, vérifier, protéger">
+
+<!-- ================= TITRE ================= -->
+<section class="slide s-titre ch-i" data-name="Titre">
+  <div class="corps">
+    <div class="octet-deco" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="kicker">OCTET · J'apprends · 1re secondaire</p>
+    <h1>Stocker, vérifier,<br><span class="neon">protéger</span></h1>
+    <p class="lead">Neuf notions pour ranger tes fichiers sans rien perdre, comprendre les tailles et les vitesses, trier le vrai du faux et garder le contrôle de tes comptes.</p>
+    <div class="parts">
+      <button class="part ch-i" data-aller="p1"><span class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><span><b>Partie 1 · Informations et données</b><small>Notions 1 à 5 : tailles, stockage, débit, fiabilité</small></span></button>
+      <button class="part ch-s" data-aller="p2"><span class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/></svg></span><span><b>Partie 2 · Sécurité</b><small>Notions 6 à 9 : PEGI, adresses, arnaques, comptes</small></span></button>
+      <button class="part ch-c" data-aller="turbo"><span class="pic">⚡</span><span><b>Turbo-check</b><small>10 questions pour te tester</small></span></button>
     </div>
-    <button class="btn second petit btn-som" id="btn-som" aria-expanded="false" aria-controls="toc">☰ Sommaire</button>
+    <p class="depart">Pour avancer : la flèche <kbd>→</kbd> du clavier ou le bouton en bas de l'écran.</p>
   </div>
-</header>
+</section>
 
-<div class="page">
-  <nav class="toc" id="toc" aria-label="Sommaire">
-    <h2 class="part-t ch-i" style="color:var(--i-texte)">Informations et données</h2>
-    <ol>
-      <li class="ch-i"><a href="#n1"><span class="n"><span>1</span></span>Du bit au téraoctet</a></li>
-      <li class="ch-i"><a href="#n2"><span class="n"><span>2</span></span>Mémoire vive ou stockage ?</a></li>
-      <li class="ch-i"><a href="#n3"><span class="n"><span>3</span></span>Faire de la place</a></li>
-      <li class="ch-i"><a href="#n4"><span class="n"><span>4</span></span>Débit et temps de téléchargement</a></li>
-      <li class="ch-i"><a href="#n5"><span class="n"><span>5</span></span>Vérifier une information</a></li>
+<!-- ================= MODE D'EMPLOI ================= -->
+<section class="slide ch-i" data-name="Mode d'emploi">
+  <div class="corps">
+    <p class="kicker">Avant de commencer</p>
+    <h2>Comment ça <span class="neon">marche</span> ?</h2>
+    <p class="lead">Chaque notion se découpe en quelques diapos. En haut, une étiquette te dit ce que tu fais.</p>
+    <div class="legende">
+      <div><span class="kind"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/></svg>Je découvre</span><p>Je lis et j'observe. C'est la théorie, expliquée avec des exemples.</p><p class="ex-mini">Prends le temps de lire chaque bloc.</p></div>
+      <div><span class="kind atoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>À toi !</span><p>Je clique, je trie, je calcule. L'écran me dit tout de suite si c'est juste.</p><p class="ex-mini">Tu te trompes ? Lis l'aide et réessaie.</p></div>
+      <div><span class="kind retiens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8L12 2z"/></svg>À retenir</span><p>Le résumé de la notion. Je coche « J'ai compris » quand c'est clair.</p><p class="ex-mini">Chaque case cochée remplit ton octet.</p></div>
+    </div>
+    <div class="reperes">
+      <div><span class="ico">☰</span><span>Le bouton <b>Sommaire</b> (en bas à gauche) te montre les 9 notions. Tu peux sauter où tu veux.</span></div>
+      <div><span class="ico" style="background:var(--i-aplat)">8</span><span>Tes notions comprises remplissent l'<b>octet</b> en bas. Ta progression reste sur cet ordinateur.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PARTIE 1 ================= -->
+<section class="slide s-partie ch-i" id="p1" data-name="Partie 1">
+  <div class="corps">
+    <p class="kicker">Partie 1 · notions 1 à 5</p>
+    <h1>Informations<br>et données</h1>
+    <p class="lead">Combien pèse un fichier, où le ranger, combien de temps pour le télécharger, et comment savoir si une info est vraie.</p>
+    <div class="chemin" data-notions="1,2,3,4,5"></div>
+  </div>
+</section>
+
+<!-- ================= 1. UNITÉS ================= -->
+<section class="slide ch-i" data-n="1" data-k="decouvre" data-name="Bit et octet">
+  <div class="corps">
+    <h2><span class="num">1</span>Du bit au <span class="neon">téraoctet</span></h2>
+    <div class="grille g2">
+      <div class="bloc">
+        <h3>Le bit et l'octet</h3>
+        <p>Un ordinateur ne connaît que deux états : <b>0</b> ou <b>1</b>. C'est un <b>bit</b>. On regroupe <b>8 bits</b> pour former <b>1 octet</b>.</p>
+        <p style="font-size:.92rem;color:var(--discret);margin-bottom:4px">Clique sur les bits pour changer l'octet :</p>
+        <div class="bits" id="bits" role="group" aria-label="Les 8 bits d'un octet"></div>
+        <p class="accolade">8 bits = 1 octet</p>
+        <div class="bits-out" aria-live="polite"><span>Cet octet code la lettre</span><b class="lettre" id="bits-l">A</b></div>
+      </div>
+      <div class="bloc">
+        <h3>L'escalier des unités</h3>
+        <div class="escalier" aria-label="ko, Mo, Go, To : chaque marche vaut 1 000 fois la précédente">
+          <div class="marche"><b style="height:58px">ko</b><small>kilooctet<br>un message</small></div>
+          <div class="marche"><b style="height:94px">Mo</b><small>mégaoctet<br>une photo</small></div>
+          <div class="marche"><b style="height:130px">Go</b><small>gigaoctet<br>un film</small></div>
+          <div class="marche"><b style="height:166px">To</b><small>téraoctet<br>un disque dur</small></div>
+        </div>
+        <p class="fleches">chaque marche vaut 1 000 fois la précédente</p>
+        <div class="sens">
+          <div><b>Je monte ↗ : ÷ 1 000</b>2 500 Mo = 2,5 Go</div>
+          <div><b>Je descends ↘ : × 1 000</b>2,5 Go = 2 500 Mo</div>
+        </div>
+      </div>
+    </div>
+    <p class="attention"><b>Le savais-tu ?</b> Les ordinateurs comptent souvent par 1 024 au lieu de 1 000. C'est pour ça qu'une clé USB vendue « 64 Go » affiche un peu moins. Rien n'a disparu ! En classe, on compte par 1 000.</p>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="1" data-k="atoi" data-name="Convertir et comparer">
+  <div class="corps">
+    <h2><span class="num">1</span>Convertir et <span class="neon">comparer</span></h2>
+    <div class="grille g2">
+      <div class="bloc">
+        <p class="consigne"><span class="pt">1</span>Le convertisseur : tape une taille, choisis son unité.</p>
+        <div class="conv">
+          <label class="sr" for="conv-v">Taille</label><input id="conv-v" type="text" inputmode="decimal" value="2,5" autocomplete="off">
+          <label class="sr" for="conv-u">Unité</label><select id="conv-u"><option>ko</option><option>Mo</option><option selected>Go</option><option>To</option></select>
+        </div>
+        <div class="conv-res" id="conv-res" aria-live="polite"></div>
+      </div>
+      <div class="bloc">
+        <p class="consigne"><span class="pt">2</span>Le plus lourd : clique sur le fichier le plus lourd.</p>
+        <div class="duels" id="duels"></div>
+        <p class="fb" id="duels-fb" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="1" data-k="retiens" data-name="À retenir : unités">
+  <div class="corps">
+    <h2><span class="num">1</span>Du bit au <span class="neon">téraoctet</span></h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span>1 octet = <b>8 bits</b>.</span></li>
+        <li><span>ko → Mo → Go → To : <b>× 1 000</b> à chaque marche.</span></li>
+        <li><span>Vers une unité <b>plus grande</b> : je <b>divise</b>. Vers une unité <b>plus petite</b> : je <b>multiplie</b>.</span></li>
+        <li><span>Pour comparer deux tailles, je les mets dans la <b>même unité</b>.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="1"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. RAM / STOCKAGE ================= -->
+<section class="slide ch-i" data-n="2" data-k="decouvre" data-name="RAM et stockage">
+  <div class="corps">
+    <h2><span class="num">2</span>Mémoire vive ou <span class="neon">stockage</span> ?</h2>
+    <p class="lead">Ton ordinateur, ta tablette et ton smartphone ont deux sortes de mémoire. Imagine la cuisine de la cantine.</p>
+    <div class="cuisine">
+      <div><span class="ico" aria-hidden="true">🍳</span><h3>Mémoire vive (RAM)</h3><span class="egal">= le plan de travail</span>
+        <ul><li>On y pose ce qu'on utilise <b>maintenant</b>.</li><li>Plus il est grand, plus on fait de choses <b>en même temps</b>.</li></ul>
+        <div class="etat vide">⏻ On éteint : il se vide.</div></div>
+      <div><span class="ico" aria-hidden="true">🗄️</span><h3>Stockage</h3><span class="egal">= les armoires</span>
+        <ul><li>On y <b>range</b> tout : applis, photos, documents.</li><li>C'est beaucoup plus grand que la RAM.</li></ul>
+        <div class="etat garde">⏻ On éteint : tout reste.</div></div>
+    </div>
+    <p class="attention"><b>Pourquoi ça rame ?</b> Quand tu ouvres une appli, une partie est copiée du stockage vers la RAM. Avec peu de RAM et trop d'applis ouvertes, l'appareil ralentit.</p>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="2" data-k="atoi" data-name="RAM ou stockage ?">
+  <div class="corps">
+    <h2><span class="num">2</span>RAM ou <span class="neon">stockage</span> ?</h2>
+    <p class="consigne"><span class="pt">1</span>Pour chaque phrase, choisis la bonne mémoire.</p>
+    <div class="tri" id="tri-ram"></div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="2" data-k="decouvre" data-name="Trois espaces de stockage">
+  <div class="corps">
+    <h2><span class="num">2</span>Trois espaces de <span class="neon">stockage</span></h2>
+    <div class="espaces">
+      <div class="espace"><span class="ico" aria-hidden="true">📦</span><h3>Interne</h3><p>Le stockage <b>dans</b> l'appareil. Souvent un <b>SSD</b> : des puces, sans pièce qui bouge, très rapide.</p><div class="ex2">Ex. : la mémoire de ton smartphone, le SSD de ton portable.</div><div class="plus"><div>✔ Les applis et les jeux doivent y être installés.</div><div>✘ La place est limitée.</div></div></div>
+      <div class="espace"><span class="ico" aria-hidden="true">💽</span><h3>Externe</h3><p>Un support qu'on <b>branche</b> sur l'appareil.</p><div class="ex2">Ex. : clé USB, disque dur externe, carte mémoire.</div><div class="plus"><div>✔ Pratique pour archiver ou transporter.</div><div>✘ Il peut se perdre ou tomber en panne.</div></div></div>
+      <div class="espace"><span class="ico" aria-hidden="true">☁️</span><h3>En ligne (cloud)</h3><p>Les serveurs d'une entreprise, accessibles <b>avec Internet</b>.</p><div class="ex2">Ex. : OneDrive de l'école, Google Drive, iCloud.</div><div class="plus"><div>✔ Accessible partout.</div><div>✘ Il faut un compte et Internet. L'espace gratuit est limité.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="2" data-k="retiens" data-name="À retenir : mémoires">
+  <div class="corps">
+    <h2><span class="num">2</span>Mémoire vive ou <span class="neon">stockage</span> ?</h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span>La <b>mémoire vive</b> (RAM) sert pendant l'utilisation et <b>se vide</b> quand on éteint.</span></li>
+        <li><span>Le <b>stockage</b> garde les fichiers, même éteint.</span></li>
+        <li><span>Trois espaces de stockage : <b>interne</b>, <b>externe</b> ou <b>en ligne</b>.</span></li>
+        <li><span>Bien organiser ses données, c'est choisir l'espace <b>adapté</b> à chaque fichier.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. FAIRE DE LA PLACE ================= -->
+<section class="slide ch-i" data-n="3" data-k="decouvre" data-name="Faire de la place">
+  <div class="corps">
+    <h2><span class="num">3</span>Faire de la <span class="neon">place</span></h2>
+    <p class="lead">« Stockage presque plein » : avant de supprimer au hasard, je calcule ce qui manque, puis je trie.</p>
+    <div class="grille g2">
+      <div class="bloc">
+        <h3>Étape 1 · Combien libérer ?</h3>
+        <p class="formule">Place à libérer = place demandée − place libre</p>
+        <p style="margin-bottom:10px">Une mise à jour demande <b>6 Go</b>. Il reste <b>2 Go</b> de libre.</p>
+        <div class="calc-ex"><span>6 Go</span>−<span>2 Go</span>=<span class="r">4 Go à libérer</span></div>
+      </div>
+      <div class="bloc">
+        <h3>Étape 2 · Garder, déplacer ou supprimer ?</h3>
+        <div class="flow">
+          <span class="q">Est-ce irremplaçable ?</span>
+          <div class="yn">
+            <div><b>Oui</b><br>photos, vidéos perso, travaux<span class="gros" aria-hidden="true">💽</span>je <b>déplace</b> ou je garde</div>
+            <div><b>Non</b><br>se retélécharge, doublon, jamais utilisé<span class="gros" aria-hidden="true">🗑️</span>je peux <b>supprimer</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="3" data-k="atoi" data-name="Le smartphone de Lou">
+  <div class="corps">
+    <h2><span class="num">3</span>Le smartphone de <span class="neon">Lou</span></h2>
+    <p class="consigne"><span class="pt">1</span>Une mise à jour demande 6 Go. Pour chaque élément : garder, déplacer ou supprimer. Ne perds rien d'important !</p>
+    <div class="phone">
+      <div class="jauge" aria-live="polite">
+        <span class="jauge-h">📱 Stockage utilisé</span>
+        <span class="jauge-big"><span id="ph-used"></span> / 64 Go</span>
+        <div class="jauge-bar"><i id="ph-bar"></i><em style="left:calc(58 / 64 * 100%)" title="Il faut descendre sous cette ligne"></em></div>
+        <small>Il faut au moins 6 Go de libre : la barre doit passer sous le trait noir.</small>
+        <b id="ph-free"></b>
+        <div class="rangee" style="margin-top:auto"><button class="btn" id="ph-check">Vérifier</button><button class="btn second" id="ph-reset">Recommencer</button></div>
+        <p class="fb" id="ph-fb" aria-live="polite" style="font-size:.92rem"></p>
+      </div>
+      <div class="items" id="ph-items"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="3" data-k="retiens" data-name="À retenir : faire de la place">
+  <div class="corps">
+    <h2><span class="num">3</span>Faire de la <span class="neon">place</span></h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span>Place à libérer = <b>place demandée − place libre</b>.</span></li>
+        <li><span>Avant de supprimer, je me demande : <b>est-ce irremplaçable ?</b> Si oui, je le <b>déplace</b>.</span></li>
+        <li><span>Ce qui se retélécharge (applis, musique en ligne, doublons) peut être <b>supprimé</b>.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="3"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. DÉBIT ================= -->
+<section class="slide ch-i" data-n="4" data-k="decouvre" data-name="Débit">
+  <div class="corps">
+    <h2><span class="num">4</span>Débit et temps de <span class="neon">téléchargement</span></h2>
+    <p class="lead">La vitesse d'une connexion, le <b>débit</b>, se donne en <b>Mbit/s</b> (mégabits par seconde). Mais les fichiers se mesurent en <b>octets</b>.</p>
+    <div class="grille g2">
+      <div class="bloc">
+        <h3>Des bits aux octets : ÷ 8</h3>
+        <div class="paquet" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p style="text-align:center;font-size:.95rem;color:var(--discret)">8 bits forment 1 octet, donc 8 Mbit = 1 Mo.</p>
+        <div class="debit-visu"><span>80 Mbit/s</span><span class="op">÷ 8</span><span>=</span><span class="r">10 Mo/s</span></div>
+        <p class="formule" style="margin:0">Temps (s) = taille (Mo) ÷ vitesse (Mo/s)</p>
+      </div>
+      <div class="bloc">
+        <h3>La règle de trois : je passe par 1</h3>
+        <div class="r3" aria-label="Exemple de règle de trois">
+          <span>en 4 s</span><span class="op">→</span><span>40 Mo</span>
+          <span>en 1 s</span><span class="op">÷ 4</span><span>10 Mo</span>
+          <span>en 60 s</span><span class="op">× 60</span><span>600 Mo</span>
+        </div>
+        <p style="margin:14px 0 0">Je ramène d'abord <b>à 1</b>, puis je multiplie.</p>
+        <p class="attention" style="margin-top:12px"><b>Pour les heures :</b> secondes ÷ 3 600 = heures (1 h = 60 × 60 s).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="4" data-k="atoi" data-name="Calculateur de téléchargement">
+  <div class="corps">
+    <h2><span class="num">4</span>Le calculateur de <span class="neon">téléchargement</span></h2>
+    <p class="consigne"><span class="pt">1</span>Change la vitesse et la taille : les étapes du calcul se mettent à jour.</p>
+    <div class="grille g12">
+      <div class="bloc">
+        <div class="calc" style="grid-template-columns:1fr">
+          <label for="dl-v">Vitesse de la connexion<span class="in"><input id="dl-v" type="text" inputmode="decimal" value="40"><em>Mbit/s</em></span></label>
+          <label for="dl-t">Taille du fichier<span class="in"><input id="dl-t" type="text" inputmode="decimal" value="1,2"><em>Go</em></span></label>
+        </div>
+        <p style="color:var(--discret);font-size:.92rem;margin:0">Repère : un épisode de série en HD pèse environ 1 à 2 Go.</p>
+      </div>
+      <ol class="etapes" id="dl-steps" aria-live="polite"></ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="4" data-k="atoi" data-name="Heures à virgule">
+  <div class="corps">
+    <h2><span class="num">4</span>Heures à virgule → <span class="neon">minutes</span></h2>
+    <div class="piege" aria-label="2,25 heures, ce n'est pas 2 heures 25, c'est 2 heures 15"><span>2,25 h</span><span>≠</span><span class="non">2 h 25</span><span>→</span><span class="oui">2 h 15</span></div>
+    <div class="grille g2">
+      <div class="bloc">
+        <h3>La méthode</h3>
+        <p>La partie <b>avant</b> la virgule : les heures.</p>
+        <p>La partie <b>après</b> la virgule : je la multiplie par <b>60</b> pour avoir les minutes.</p>
+        <p style="font-family:var(--f-code);background:var(--clair);border-radius:10px;padding:10px 14px;margin:0">0,25 × 60 = 15 min</p>
+      </div>
+      <div class="bloc">
+        <p class="consigne"><span class="pt">2</span>Tape une durée en heures.</p>
+        <div class="hconv"><label for="hc-in" class="sr">Durée en heures</label><input id="hc-in" type="text" inputmode="decimal" value="2,25"><b>h</b></div>
+        <div class="hconv-out" id="hc-out" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="4" data-k="retiens" data-name="À retenir : débit">
+  <div class="corps">
+    <h2><span class="num">4</span>Débit et temps de <span class="neon">téléchargement</span></h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span><b>Mbit/s ÷ 8 = Mo/s</b>. Exemple : 80 Mbit/s ÷ 8 = 10 Mo/s.</span></li>
+        <li><span><b>Temps (s) = taille (Mo) ÷ vitesse (Mo/s)</b>.</span></li>
+        <li><span>Secondes → heures : <b>÷ 3 600</b>.</span></li>
+        <li><span>Heures à virgule → minutes : la partie après la virgule <b>× 60</b>.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="4"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. VÉRIFIER UNE INFO ================= -->
+<section class="slide ch-i" data-n="5" data-k="decouvre" data-name="Vérifier une information">
+  <div class="corps">
+    <h2><span class="num">5</span>Vérifier une <span class="neon">information</span></h2>
+    <p class="lead">Sur les réseaux, une fausse info peut faire le tour de l'école en une heure. Avant de croire ou de partager, je mène l'enquête avec 3 questions.</p>
+    <div class="q3">
+      <div><span class="ico" aria-hidden="true">👤</span><b>Qui ?</b><small>Qui publie ? Un compte officiel, un média connu ou un inconnu ?</small></div>
+      <div><span class="ico" aria-hidden="true">📅</span><b>Quand ?</b><small>C'est récent ? Une vieille info peut être dépassée.</small></div>
+      <div><span class="ico" aria-hidden="true">🔎</span><b>Comment ?</b><small>Comment le sait-il ? Y a-t-il une preuve, une source ?</small></div>
+    </div>
+    <div class="grille g2">
+      <div class="bloc"><h3>✔ Des sources souvent fiables</h3><p style="margin:0">Le site officiel de l'organisation (école, commune, entreprise), les médias connus, <code>enseignement.be</code> pour l'école en Fédération Wallonie-Bruxelles.</p></div>
+      <div class="bloc"><h3>⚠ Méfiance si…</h3><p style="margin:0">capture d'écran sans source, « partage vite ! », compte créé récemment, message qui joue sur la peur ou la colère.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="5" data-k="atoi" data-name="Fiable ou à vérifier ?">
+  <div class="corps">
+    <h2><span class="num">5</span>Fiable ou à <span class="neon">vérifier</span> ?</h2>
+    <p class="consigne"><span class="pt">1</span>Pour chaque publication (exemples inventés), choisis ta réponse.</p>
+    <div class="posts" id="posts"></div>
+  </div>
+</section>
+
+<section class="slide ch-i" data-n="5" data-k="retiens" data-name="À retenir : vérifier">
+  <div class="corps">
+    <h2><span class="num">5</span>Vérifier une <span class="neon">information</span></h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span>Je me pose les 3 questions : <b>Qui ? Quand ? Comment le sait-il ?</b></span></li>
+        <li><span>Je <b>recoupe</b> : je cherche la même info dans au moins <b>deux sources fiables</b>.</span></li>
+        <li><span>Je vérifie l'<b>identifiant exact</b> d'un compte, lettre par lettre (un « 0 » à la place d'un « o », un « _officiel » ajouté…).</span></li>
+        <li><span>Un compte officiel ne demande <b>jamais</b> de mot de passe ni d'argent par message.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="5"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PARTIE 2 ================= -->
+<section class="slide s-partie ch-s" id="p2" data-name="Partie 2">
+  <div class="corps">
+    <p class="kicker">Partie 2 · notions 6 à 9</p>
+    <h1>Sécurité</h1>
+    <p class="lead">Lire une étiquette de jeu, démasquer une fausse adresse, repérer une arnaque et protéger tes comptes.</p>
+    <div class="chemin" data-notions="6,7,8,9"></div>
+  </div>
+</section>
+
+<!-- ================= 6. PEGI ================= -->
+<section class="slide ch-s" data-n="6" data-k="decouvre" data-name="PEGI">
+  <div class="corps">
+    <h2><span class="num">6</span>Lire une étiquette <span class="neon">PEGI</span></h2>
+    <p class="lead"><b>PEGI</b> est la signalétique européenne des jeux vidéo et de beaucoup d'applis. Elle protège les plus jeunes. Une étiquette, c'est deux informations.</p>
+    <div class="grille g2">
+      <div class="bloc">
+        <h3>① Le chiffre : l'âge conseillé</h3>
+        <div class="ages" aria-label="Âges PEGI : 3, 7, 12, 16 et 18 ans"><span class="age a3">3</span><span class="age a7">7</span><span class="age a12">12</span><span class="age a16">16</span><span class="age a18">18</span></div>
+        <div class="vs-x"><div class="oui"><b>✔ C'est</b>un conseil d'âge pour protéger.</div><div class="non"><b>✘ Ce n'est pas</b>une note de qualité, ni la difficulté.</div></div>
+      </div>
+      <div class="bloc">
+        <h3>② Les pictogrammes : pourquoi</h3>
+        <div class="etiq"><span class="age a12" style="width:62px;height:72px;font-size:1.6rem">12</span><span class="plus">+</span><span class="pics"><span class="mini" title="Violence">👊</span><span class="mini" title="Achats intégrés">💳</span></span></div>
+        <p>Ils disent <b>ce que le jeu contient</b> : violence, peur, gros mots, achats avec de l'argent réel…</p>
+        <p style="margin:0">Le <b>contrôle parental</b> des consoles et des smartphones s'appuie sur PEGI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="6" data-k="atoi" data-name="Les 8 pictogrammes">
+  <div class="corps">
+    <h2><span class="num">6</span>Les 8 <span class="neon">pictogrammes</span></h2>
+    <p class="consigne"><span class="pt">1</span>Clique sur chaque pictogramme pour voir ce qu'il signifie (dessins simplifiés).</p>
+    <div class="pictos" id="pictos"></div>
+    <div class="picto-def" id="picto-def" aria-live="polite">Clique sur un pictogramme.</div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="6" data-k="atoi" data-name="Décode la boîte">
+  <div class="corps">
+    <h2><span class="num">6</span>Décode la <span class="neon">boîte</span></h2>
+    <p class="consigne"><span class="pt">2</span>Voici l'étiquette d'un jeu inventé. Que t'apprend-elle ?</p>
+    <div class="grille g12">
+      <div class="col">
+        <div class="boite"><span class="age a12" style="width:76px;height:88px;font-size:2rem">12</span><div><span class="jeu">Galaxy Racers</span><span style="font-size:.85rem;color:var(--discret);display:block;margin-bottom:8px">jeu inventé</span><div class="lbl"><span class="mini" title="Violence">👊</span><span class="mini" title="Achats intégrés">💳</span></div></div></div>
+        <p class="attention">Aide : regarde <b>le chiffre</b>, puis <b>chaque pictogramme</b>.</p>
+      </div>
+      <div><div class="choix" id="pegi-q"></div><p class="fb" id="pegi-fb" aria-live="polite"></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="6" data-k="retiens" data-name="À retenir : PEGI">
+  <div class="corps">
+    <h2><span class="num">6</span>Lire une étiquette <span class="neon">PEGI</span></h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span>Le <b>chiffre</b> = l'âge conseillé : 3, 7, 12, 16 ou 18 ans.</span></li>
+        <li><span>Les <b>pictogrammes</b> = pourquoi : ce que le jeu contient.</span></li>
+        <li><span>PEGI n'est <b>pas</b> une note ni un niveau de difficulté.</span></li>
+        <li><span>Le contrôle parental des consoles et des smartphones s'appuie sur PEGI.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="6"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. ADRESSE WEB ================= -->
+<section class="slide ch-s" data-n="7" data-k="decouvre" data-name="Anatomie d'une adresse">
+  <div class="corps">
+    <h2><span class="num">7</span>Lire une adresse <span class="neon">web</span></h2>
+    <p class="lead">Une adresse web (une <b>URL</b>) se lit comme une adresse postale. Le <b>nom de domaine</b> dit <b>vraiment</b> chez qui tu arrives. Clique sur chaque morceau.</p>
+    <div>
+      <div class="anat" id="anat"><button data-k="proto">https://</button><button data-k="sous">monecole.</button><button data-k="dom">smartschool.be</button><button data-k="chemin">/login</button></div>
+      <div class="anat-leg" aria-hidden="true"><span style="--c:#9C94AE">protocole</span><span style="--c:var(--i-moyen)">sous-domaine</span><span style="--c:var(--neon)">nom de domaine</span><span style="--c:#F1B2D8">chemin</span></div>
+    </div>
+    <div class="anat-def" id="anat-def" aria-live="polite">Clique sur un morceau de l'adresse.</div>
+    <div class="bloc cadenas"><span class="ico" aria-hidden="true">🔒</span><div><h3 style="margin-bottom:4px">Et le cadenas HTTPS ?</h3>Le <b>S</b> veut dire que les échanges sont <b>chiffrés</b> : personne ne peut les lire en route. Mais un faux site peut aussi avoir un cadenas ! HTTPS <b>ne prouve pas</b> qu'un site est honnête.</div></div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="7" data-k="atoi" data-name="Chez qui j'arrive ?">
+  <div class="corps">
+    <h2><span class="num">7</span>Chez qui <span class="neon">j'arrive</span> ?</h2>
+    <p class="consigne"><span class="pt">1</span>Dans chaque adresse, clique sur le nom de domaine (juste avant la première « / »).</p>
+    <div class="urls" id="urls"></div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="7" data-k="retiens" data-name="À retenir : adresse web">
+  <div class="corps">
+    <h2><span class="num">7</span>Lire une adresse <span class="neon">web</span></h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span>Le vrai propriétaire d'un site = le <b>nom de domaine</b>, juste <b>avant la première « / »</b> (avec son extension : .be, .com, .net…).</span></li>
+        <li><span>Ce qui est à gauche du nom de domaine peut être un <b>déguisement</b> : <code>bpost.be.suivi-colis.info</code> appartient à <code>suivi-colis.info</code>.</span></li>
+        <li><span>Le cadenas <b>HTTPS</b> = échanges chiffrés. Il ne prouve <b>pas</b> que le site est honnête.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="7"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 8. ARNAQUES ================= -->
+<section class="slide ch-s" data-n="8" data-k="decouvre" data-name="Les 6 signaux">
+  <div class="corps">
+    <h2><span class="num">8</span>Repérer une <span class="neon">arnaque</span></h2>
+    <p class="lead">Faux SMS, faux concours, « Robux gratuits » : les arnaques changent de forme, mais utilisent toujours les mêmes ficelles.</p>
+    <div class="signaux">
+      <div class="signal"><span aria-hidden="true">⏰</span><b>Urgence</b><small>« Plus que 24 h ! », « Dernière chance »</small></div>
+      <div class="signal"><span aria-hidden="true">🎁</span><b>Trop beau</b><small>Gratuit, cadeau, gain surprise</small></div>
+      <div class="signal"><span aria-hidden="true">🔗</span><b>Adresse bizarre</b><small>Nom de domaine inconnu, lettres changées</small></div>
+      <div class="signal"><span aria-hidden="true">🔑</span><b>Données demandées</b><small>Mot de passe, carte bancaire, code reçu</small></div>
+      <div class="signal"><span aria-hidden="true">📦</span><b>Fichier suspect</b><small>Pièce jointe .exe, « logiciel de triche »</small></div>
+      <div class="signal"><span aria-hidden="true">✍️</span><b>Fautes, inconnu</b><small>Fautes, expéditeur inconnu, faux avis</small></div>
+    </div>
+    <div class="compteur"><b>1 signal</b> = méfiance.<b style="margin-left:18px">Plusieurs signaux</b> = arnaque presque sûre.</div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="8" data-k="atoi" data-name="Enquête sur un SMS">
+  <div class="corps">
+    <h2><span class="num">8</span>Enquête sur un <span class="neon">SMS</span></h2>
+    <p class="consigne"><span class="pt">1</span>Exemple inventé. Clique dans le message sur les 4 signaux d'alerte.</p>
+    <div class="grille g2">
+      <div class="sms"><div class="sms-h">+32 470 00 00 00 · aujourd'hui 16:42</div>
+        <div class="bulle" id="sms">
+          <span class="hot" role="button" tabindex="0" data-s="exp">Message de bpost</span> : votre colis est <span class="hot" role="button" tabindex="0" data-s="urg">bloqué. Réglez avant 24 h</span> les frais de livraison de <span class="hot" role="button" tabindex="0" data-s="arg">1,99 € avec votre carte bancaire</span> ici : <span class="hot" role="button" tabindex="0" data-s="lien">bpost-livraison.info/payer</span> Merci.
+        </div>
+      </div>
+      <div class="col">
+        <p class="fb" id="sms-fb" aria-live="polite" style="margin:0;font-size:1.2rem">0 / 4 signaux trouvés</p>
+        <ul class="trouves" id="sms-list"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="8" data-k="decouvre" data-name="Le réflexe STOP">
+  <div class="corps">
+    <h2><span class="num">8</span>Le réflexe <span class="neon">STOP</span></h2>
+    <p class="lead">Face à un message douteux, quatre lettres pour ne pas tomber dans le piège.</p>
+    <div class="stop">
+      <div><b>S</b><small><strong>Stop</strong>Je m'arrête, je ne clique pas.</small></div>
+      <div><b>T</b><small><strong>Teste</strong>Je teste l'adresse (le nom de domaine).</small></div>
+      <div><b>O</b><small><strong>Observe</strong>J'observe les signaux.</small></div>
+      <div><b>P</b><small><strong>Préviens</strong>Je préviens un adulte.</small></div>
+    </div>
+    <div class="grille g2">
+      <div class="bloc"><h3>📨 Un message suspect ?</h3><p style="margin:0">Je peux le transférer à <code>suspect@safeonweb.be</code> (service belge), puis je le supprime.</p></div>
+      <div class="bloc"><h3>😬 Déjà cliqué ?</h3><p style="margin:0">Pas de honte, ça arrive. Je préviens <b>vite</b> un adulte et je change mon mot de passe depuis l'appli officielle.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="8" data-k="retiens" data-name="À retenir : arnaques">
+  <div class="corps">
+    <h2><span class="num">8</span>Repérer une <span class="neon">arnaque</span></h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span>6 signaux : <b>urgence</b>, <b>trop beau</b>, <b>adresse bizarre</b>, <b>données demandées</b>, <b>fichier suspect</b>, <b>fautes ou inconnu</b>.</span></li>
+        <li><span>Un signal = méfiance ; plusieurs = arnaque presque sûre.</span></li>
+        <li><span>Face à un message douteux : <b>STOP</b> (Stop, Teste, Observe, Préviens).</span></li>
+        <li><span><b>Déjà cliqué ?</b> Je préviens vite un adulte et je change mon mot de passe.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="8"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 9. DONNÉES ET COMPTES ================= -->
+<section class="slide ch-s" data-n="9" data-k="atoi" data-name="Partager ou garder ?">
+  <div class="corps">
+    <h2><span class="num">9</span>Protéger mes <span class="neon">données</span></h2>
+    <p class="lead" style="font-size:1rem">Ton <b>identité numérique</b>, c'est tout ce qui te représente en ligne : comptes, profil, publications… et les <b>traces</b> que tu laisses. Tes <b>données personnelles</b> permettent de te reconnaître ou de te retrouver.</p>
+    <div class="rangee" style="justify-content:space-between">
+      <p class="consigne" style="margin:0"><span class="pt">1</span>Sur un profil public : choisis un bouton, puis clique sur les cartes.</p>
+      <div class="mode" role="group" aria-label="Ma réponse"><button aria-pressed="true" data-m="ok">✔ Je peux partager</button><button aria-pressed="false" data-m="ko">✘ Je garde pour moi</button></div>
+    </div>
+    <div class="share" id="share"></div>
+    <p class="fb" id="share-fb" aria-live="polite" style="margin:0"></p>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="9" data-k="decouvre" data-name="Appareil partagé et compte">
+  <div class="corps">
+    <h2><span class="num">9</span>Protéger mon <span class="neon">compte</span></h2>
+    <div class="grille g2">
+      <div class="bloc">
+        <h3>💻 Sur un appareil partagé</h3>
+        <p style="font-size:.95rem;color:var(--discret)">Ordinateur de l'école, de la bibliothèque, tablette d'un ami :</p>
+        <ul class="check">
+          <li><span aria-hidden="true">🕶️</span><span>J'utilise la <b>navigation privée</b>.</span></li>
+          <li><span aria-hidden="true">🚪</span><span>Je me <b>déconnecte</b> avant de partir (fermer l'onglet ne suffit pas).</span></li>
+          <li><span aria-hidden="true">🙅</span><span>Je réponds <b>« Jamais »</b> quand le navigateur propose d'enregistrer mon mot de passe.</span></li>
+          <li><span aria-hidden="true">🧽</span><span>J'efface l'historique et mes fichiers téléchargés.</span></li>
+        </ul>
+      </div>
+      <div class="bloc">
+        <h3>🛡️ Un compte bien protégé</h3>
+        <ul class="check">
+          <li><span aria-hidden="true">🔐</span><span>Une <b>phrase de passe</b> : 4 mots sans lien + un chiffre + un symbole.</span></li>
+          <li><span aria-hidden="true">🔁</span><span>Un mot de passe <b>différent</b> pour chaque compte.</span></li>
+          <li><span aria-hidden="true">📲</span><span>La <b>double authentification</b> : un code arrive sur un autre appareil. Le pirate qui connaît ton mot de passe reste bloqué.</span></li>
+          <li><span aria-hidden="true">🔒</span><span>Un profil <b>privé</b>, sans position partagée.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="9" data-k="atoi" data-name="Atelier phrase de passe">
+  <div class="corps">
+    <h2><span class="num">9</span>Atelier <span class="neon">phrase de passe</span></h2>
+    <div class="grille g12">
+      <div class="bloc">
+        <h3>La recette</h3>
+        <div class="recette"><span>Girafe</span><span class="op">+</span><span>Volcan</span><span class="op">+</span><span>Tartine</span><span class="op">+</span><span>Radio</span><span class="op">+</span><span>!</span><span class="op">+</span><span>7</span></div>
+        <p style="margin:14px 0 0">4 mots <b>sans lien</b> entre eux, faciles à retenir pour toi, impossibles à deviner pour les autres.</p>
+        <p class="attention" style="margin-top:14px"><b>Important :</b> invente un exemple. N'écris jamais ton vrai mot de passe ici ! Rien n'est enregistré ni envoyé.</p>
+      </div>
+      <div class="bloc pw">
+        <p class="consigne"><span class="pt">2</span>Tape une phrase de passe d'exemple.</p>
+        <label for="pw" class="sr">Phrase de passe d'exemple</label>
+        <input id="pw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ex. Girafe-Volcan-Tartine-Radio!7">
+        <div class="pw-bar" aria-hidden="true"><i id="pw-bar"></i></div>
+        <b class="pw-lvl" id="pw-lvl">—</b>
+        <ul id="pw-crit"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide ch-s" data-n="9" data-k="decouvre" data-name="Compte piraté">
+  <div class="corps">
+    <h2><span class="num">9</span>Mon compte est <span class="neon">piraté</span> : que faire ?</h2>
+    <p class="lead">Tes amis reçoivent des messages bizarres « de toi » ? Tu ne peux plus te connecter ? Pas de panique : 4 étapes, dans l'ordre.</p>
+    <ol class="pas">
+      <li><span class="ico" aria-hidden="true">🧑‍🏫</span><span>Je préviens un <b>adulte de confiance</b>.</span></li>
+      <li><span class="ico" aria-hidden="true">🔑</span><span>Je change le mot de passe <b>depuis l'appli ou le site officiel</b> (jamais par un lien reçu).</span></li>
+      <li><span class="ico" aria-hidden="true">📲</span><span>Je déconnecte les appareils inconnus et j'active la <b>double authentification</b>.</span></li>
+      <li><span class="ico" aria-hidden="true">💬</span><span>Je préviens mes amis que les messages ne venaient <b>pas de moi</b>.</span></li>
     </ol>
-    <h2 class="part-t" style="color:var(--s-texte)">Sécurité</h2>
-    <ol>
-      <li class="ch-s"><a href="#n6"><span class="n"><span>6</span></span>Lire une étiquette PEGI</a></li>
-      <li class="ch-s"><a href="#n7"><span class="n"><span>7</span></span>Lire une adresse web</a></li>
-      <li class="ch-s"><a href="#n8"><span class="n"><span>8</span></span>Repérer une arnaque</a></li>
-      <li class="ch-s"><a href="#n9"><span class="n"><span>9</span></span>Protéger mes données et mon compte</a></li>
-    </ol>
-    <h2 class="part-t" style="color:var(--c-texte)">Je vérifie</h2>
-    <ol>
-      <li class="ch-c"><a href="#turbo"><span class="n"><span>⚡</span></span>Turbo-check</a></li>
-    </ol>
-  </nav>
+  </div>
+</section>
 
-  <main id="main">
+<section class="slide ch-s" data-n="9" data-k="retiens" data-name="À retenir : données et comptes">
+  <div class="corps">
+    <h2><span class="num">9</span>Protéger mes données et mon <span class="neon">compte</span></h2>
+    <div class="retenir-zone">
+      <div class="retenir"><ul>
+        <li><span>Adresse, téléphone, école, mot de passe, photos de moi : je ne les publie <b>pas</b> et je ne les encode <b>jamais</b> sur un site inconnu.</span></li>
+        <li><span>Sur un appareil partagé : <b>navigation privée</b>, <b>déconnexion</b>, jamais de mot de passe enregistré.</span></li>
+        <li><span>Une <b>phrase de passe</b> par compte + la <b>double authentification</b>.</span></li>
+        <li><span>Compte piraté : adulte, mot de passe changé depuis l'appli officielle, double authentification, amis prévenus.</span></li>
+      </ul></div>
+      <div class="compris" data-vu="9"></div>
+    </div>
+  </div>
+</section>
 
-    <!-- ================= OUVERTURE ================= -->
-    <section class="ouv" aria-labelledby="titre">
-      <div>
-        <p class="kicker">OCTET · J'apprends · 1re secondaire</p>
-        <h1 id="titre">Stocker, vérifier, <span class="neon">protéger</span></h1>
-        <p class="lead">Neuf notions pour ranger tes fichiers sans rien perdre, comprendre les tailles et les vitesses, trier le vrai du faux et garder le contrôle de tes comptes.</p>
-        <div class="howto">
-          <span class="ch-i"><span class="bit" style="width:26px;height:26px;font-size:.8rem">1</span> À toi : une activité à faire</span>
-          <span>☑ « J'ai compris » remplit ton octet</span>
-          <span>⚡ Le turbo-check à la fin</span>
-        </div>
-      </div>
-      <div class="parts">
-        <a class="part-card ch-i" href="#n1"><span class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><span><b>Informations et données</b><small>Notions 1 à 5 : tailles, stockage, débit, fiabilité</small></span></a>
-        <a class="part-card ch-s" href="#n6"><span class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/></svg></span><span><b>Sécurité</b><small>Notions 6 à 9 : PEGI, adresses, arnaques, comptes</small></span></a>
-        <a class="part-card ch-c" href="#turbo"><span class="pic">⚡</span><span><b>Turbo-check</b><small>10 questions pour te tester</small></span></a>
-      </div>
-    </section>
+<!-- ================= TURBO-CHECK ================= -->
+<section class="slide ch-c" id="turbo" data-k="turbo" data-name="Turbo-check">
+  <div class="corps">
+    <h2>⚡ Turbo-<span class="neon">check</span></h2>
+    <p class="lead" style="font-size:1rem">10 questions tirées au hasard parmi les 9 notions. Recommence autant que tu veux : les questions changent.</p>
+    <div class="quiz" id="quiz" aria-live="polite"></div>
+  </div>
+</section>
 
-    <!-- ================= 1. UNITÉS ================= -->
-    <section class="chap ch-i" id="n1" data-n="1" aria-labelledby="t1">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>J'apprends · Informations et données<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t1"><span class="num">1</span>Du bit au <span class="neon">téraoctet</span></h2>
-        <p class="essentiel">Un ordinateur ne connaît que deux états : <b>0</b> ou <b>1</b>. C'est un <b>bit</b>. On regroupe <b>8 bits</b> pour former <b>1 octet</b> : assez pour coder une lettre. Les fichiers étant énormes, on utilise des multiples de l'octet.</p>
-        <div class="duo">
-          <div class="bloc">
-            <h3>L'escalier des unités</h3>
-            <div class="escalier" aria-label="ko, Mo, Go, To : chaque marche vaut 1 000 fois la précédente">
-              <div class="marche"><b style="height:44px">ko</b><small>kilooctet<br>un message</small></div>
-              <div class="marche"><b style="height:72px">Mo</b><small>mégaoctet<br>une photo</small></div>
-              <div class="marche"><b style="height:100px">Go</b><small>gigaoctet<br>un film</small></div>
-              <div class="marche"><b style="height:128px">To</b><small>téraoctet<br>un disque dur</small></div>
-            </div>
-            <p class="fois">→ × 1 000 à chaque marche · ← ÷ 1 000</p>
-          </div>
-          <div class="retenir">
-            <b>À retenir</b>
-            <ul>
-              <li>1 octet = <b>8 bits</b>.</li>
-              <li>ko → Mo → Go → To : <b>× 1 000</b> à chaque marche.</li>
-              <li>Vers une unité <b>plus grande</b> : je <b>divise</b>. Vers une unité <b>plus petite</b> : je <b>multiplie</b>.</li>
-              <li>Pour comparer deux tailles, je les mets dans la <b>même unité</b>.</li>
-            </ul>
-          </div>
-        </div>
-        <p class="attention"><b>Le savais-tu ?</b> Les ordinateurs comptent souvent par 1 024 au lieu de 1 000. C'est pour ça qu'une clé USB vendue « 64 Go » affiche un peu moins dans l'explorateur de fichiers. Rien n'a disparu, c'est une autre façon de compter. En classe, on compte par 1 000.</p>
-        <div class="duo">
-          <div class="ex">
-            <div class="ex-h"><span class="bit">1</span><span><b>Le convertisseur</b><small>Tape une taille et choisis son unité.</small></span></div>
-            <div class="conv">
-              <label class="sr" for="conv-v">Taille</label><input id="conv-v" type="text" inputmode="decimal" value="2,5" autocomplete="off">
-              <label class="sr" for="conv-u">Unité</label><select id="conv-u"><option>ko</option><option>Mo</option><option selected>Go</option><option>To</option></select>
-            </div>
-            <div class="conv-res" id="conv-res" aria-live="polite"></div>
-          </div>
-          <div class="ex">
-            <div class="ex-h"><span class="bit">2</span><span><b>Le plus lourd</b><small>Dans chaque duel, clique sur le fichier le plus lourd.</small></span></div>
-            <div class="duels" id="duels"></div>
-            <p class="fb" id="duels-fb" aria-live="polite"></p>
-          </div>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="1">J'ai compris cette notion</label><a href="#n2">Notion suivante →</a></div>
-      </div>
-    </section>
+<!-- ================= FIN ================= -->
+<section class="slide ch-i" data-name="Fin">
+  <div class="corps">
+    <p class="kicker">Et maintenant ?</p>
+    <h2>Bravo, tu as fait le <span class="neon">tour</span> !</h2>
+    <div class="bilan"><div class="octet-mini" id="fin-octet" aria-hidden="true"></div><span id="fin-t"></span></div>
+    <div class="fin-zone">
+      <a class="jeu" href="../gta/index.html"><span class="kind atoi" style="align-self:flex-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Je m'entraîne</span><b>GTA · Gère. Traque. Agis.</b><span>Utilise ces notions dans 5 missions : stockage, faux sites, rumeurs, compte piraté.</span><span class="go">Jouer →</span></a>
+      <a href="../index.html#securite"><span class="kind" style="align-self:flex-start">☰ OCTET</span><b>Retour à l'accueil</b><span>Retrouve tous les supports du cours de formation numérique.</span><span class="go">Accueil →</span></a>
+    </div>
+    <p class="pied">Tommy Berben · <a href="https://www.esciences.be">eSCIENCES.be</a> · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a></p>
+  </div>
+</section>
 
-    <!-- ================= 2. RAM / STOCKAGE ================= -->
-    <section class="chap ch-i" id="n2" data-n="2" aria-labelledby="t2">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>J'apprends · Informations et données<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t2"><span class="num">2</span>Mémoire vive ou <span class="neon">stockage</span> ?</h2>
-        <p class="essentiel">Ton ordinateur, ta tablette et ton smartphone ont deux sortes de mémoire. Elles ne font pas du tout le même travail. Imagine la cuisine de la cantine.</p>
-        <div class="duo">
-          <div class="bloc">
-            <div class="cuisine">
-              <div><span class="ico" aria-hidden="true">🍳</span><b>Mémoire vive (RAM)</b>= le <b>plan de travail</b>. On y pose ce qu'on utilise <b>maintenant</b>. Plus il est grand, plus on fait de choses en même temps. On éteint : <b>il se vide</b>.</div>
-              <div><span class="ico" aria-hidden="true">🗄️</span><b>Stockage</b>= les <b>armoires</b>. On y range tout : applis, photos, documents. On éteint : <b>tout reste</b>.</div>
-            </div>
-            <p class="attention" style="margin:12px 0 0">Quand tu ouvres une appli, une partie est copiée du stockage vers la RAM. C'est pour ça qu'un appareil avec peu de RAM rame quand trop d'applis sont ouvertes.</p>
-          </div>
-          <div class="ex">
-            <div class="ex-h"><span class="bit">1</span><span><b>RAM ou stockage ?</b><small>Pour chaque phrase, choisis la bonne mémoire.</small></span></div>
-            <div class="tri" id="tri-ram"></div>
-          </div>
-        </div>
-        <h3>Trois espaces de stockage</h3>
-        <table class="tab">
-          <thead><tr><th>Espace</th><th>C'est quoi ?</th><th>Exemples</th><th>À savoir</th></tr></thead>
-          <tbody>
-            <tr><td>📦 Interne</td><td>Le stockage <b>dans</b> l'appareil. Souvent un <b>SSD</b> : des puces électroniques, sans pièce qui bouge, très rapide.</td><td>La mémoire de ton smartphone, le SSD de ton ordinateur portable.</td><td>Une appli ou un jeu doit y être installé pour fonctionner. La place est limitée.</td></tr>
-            <tr><td>💽 Externe</td><td>Un support qu'on <b>branche</b>.</td><td>Clé USB, disque dur externe, carte mémoire.</td><td>Pratique pour archiver ou transporter. Il peut se perdre ou tomber en panne.</td></tr>
-            <tr><td>☁️ En ligne (cloud)</td><td>Les serveurs d'une entreprise, accessibles <b>avec Internet</b>.</td><td>OneDrive de l'école, Google Drive, iCloud.</td><td>Accessible partout, mais avec un compte et Internet. L'espace gratuit est limité.</td></tr>
-          </tbody>
-        </table>
-        <div class="retenir">
-          <b>À retenir</b>
-          <ul>
-            <li>La <b>mémoire vive</b> (RAM) sert pendant l'utilisation et <b>se vide</b> quand on éteint.</li>
-            <li>Le <b>stockage</b> garde les fichiers, même éteint : <b>interne</b>, <b>externe</b> ou <b>en ligne</b>.</li>
-            <li>Bien organiser ses données, c'est choisir l'espace <b>adapté</b> à chaque fichier.</li>
-          </ul>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="2">J'ai compris cette notion</label><a href="#n3">Notion suivante →</a></div>
-      </div>
-    </section>
+</div>
+</div>
 
-    <!-- ================= 3. FAIRE DE LA PLACE ================= -->
-    <section class="chap ch-i" id="n3" data-n="3" aria-labelledby="t3">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>J'apprends · Informations et données<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t3"><span class="num">3</span>Faire de la <span class="neon">place</span></h2>
-        <p class="essentiel">« Stockage presque plein » : tout le monde a déjà vu ce message. Avant de supprimer au hasard, il faut calculer ce qui manque, puis trier.</p>
-        <div class="duo">
-          <div class="bloc">
-            <h3>Combien libérer ?</h3>
-            <p class="formule">Place à libérer = place demandée − place libre</p>
-            <p style="margin:10px 0 0">Exemple : une mise à jour demande <b>6 Go</b>. Il reste <b>2 Go</b> de libre. Il faut libérer 6 − 2 = <b>4 Go</b>.</p>
-          </div>
-          <div class="bloc">
-            <h3>Garder, déplacer ou supprimer ?</h3>
-            <div class="flow">
-              <span class="q">Est-ce irremplaçable ?</span>
-              <div class="yn"><div><b>Oui</b> (photos, vidéos perso, travaux)<br>→ 💽 je <b>déplace</b> ou je garde</div><div><b>Non</b> (je peux le retélécharger, doublon, jamais utilisé)<br>→ 🗑️ je peux <b>supprimer</b></div></div>
-            </div>
-          </div>
-        </div>
-        <div class="ex">
-          <div class="ex-h"><span class="bit">1</span><span><b>Le smartphone de Lou</b><small>Une mise à jour demande 6 Go. Choisis pour chaque élément : garder, déplacer (vers le cloud ou l'ordinateur) ou supprimer. Ne perds rien d'important !</small></span></div>
-          <div class="phone">
-            <div class="jauge" aria-live="polite"><div class="jauge-h"><span>📱 Stockage : <span id="ph-used"></span> / 64 Go</span><span id="ph-free"></span></div><div class="jauge-bar"><i id="ph-bar"></i><em style="left:calc(58 / 64 * 100%)" title="Il faut descendre sous cette ligne"></em></div><small>Il faut au moins 6 Go de libre (sous le trait).</small></div>
-            <div class="items" id="ph-items"></div>
-            <div class="rangee"><button class="btn" id="ph-check">Vérifier</button><button class="btn second" id="ph-reset">Recommencer</button></div>
-            <p class="fb" id="ph-fb" aria-live="polite"></p>
-          </div>
-        </div>
-        <div class="retenir">
-          <b>À retenir</b>
-          <ul>
-            <li>Place à libérer = <b>place demandée − place libre</b>.</li>
-            <li>Avant de supprimer, je me demande : <b>est-ce irremplaçable ?</b> Si oui, je le <b>déplace</b>.</li>
-            <li>Ce qui se retélécharge (applis, musique en ligne, doublons) peut être supprimé.</li>
-          </ul>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="3">J'ai compris cette notion</label><a href="#n4">Notion suivante →</a></div>
-      </div>
-    </section>
+<nav id="bar" aria-label="Navigation du diaporama">
+  <a class="accueil" href="../index.html" title="Retour à l'accueil">OCTET</a>
+  <button id="btn-som" aria-haspopup="dialog" aria-controls="som">☰ Sommaire</button>
+  <button id="prev" class="fleche" aria-label="Diapo précédente">←</button>
+  <span id="count">1 / 1</span>
+  <button id="next" class="fleche" aria-label="Diapo suivante">→</button>
+  <div id="pistes" aria-hidden="true"></div>
+  <div id="octet" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <span id="prog-t" aria-live="polite">0/9 notions</span>
+  <button id="fs">Plein écran</button>
+</nav>
 
-    <!-- ================= 4. DÉBIT ================= -->
-    <section class="chap ch-i" id="n4" data-n="4" aria-labelledby="t4">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>J'apprends · Informations et données<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t4"><span class="num">4</span>Débit et temps de <span class="neon">téléchargement</span></h2>
-        <p class="essentiel">La vitesse d'une connexion, le <b>débit</b>, se donne en <b>Mbit/s</b> (mégabits par seconde). Mais les fichiers se mesurent en <b>octets</b>. Comme 1 octet = 8 bits, il faut diviser par 8.</p>
-        <div class="duo">
-          <div class="retenir">
-            <b>À retenir</b>
-            <ul>
-              <li><b>Mbit/s ÷ 8 = Mo/s</b>. Exemple : 80 Mbit/s ÷ 8 = 10 Mo/s.</li>
-              <li><b>Temps (s) = taille (Mo) ÷ vitesse (Mo/s)</b>.</li>
-              <li>Secondes → heures : <b>÷ 3 600</b> (1 h = 60 × 60 s).</li>
-              <li>Heures à virgule → minutes : la partie après la virgule <b>× 60</b>.</li>
-            </ul>
-          </div>
-          <div class="bloc">
-            <h3>La règle de trois : je passe par 1</h3>
-            <div class="r3" aria-label="Exemple de règle de trois">
-              <span>en 4 s</span><span class="op">→</span><span>40 Mo</span>
-              <span>en 1 s</span><span class="op">÷ 4</span><span>10 Mo</span>
-              <span>en 60 s</span><span class="op">× 60</span><span>600 Mo</span>
-            </div>
-            <p style="margin:10px 0 0">Je ramène d'abord <b>à 1</b>, puis je multiplie.</p>
-          </div>
-        </div>
-        <div class="duo">
-          <div class="ex">
-            <div class="ex-h"><span class="bit">1</span><span><b>Le calculateur de téléchargement</b><small>Change la vitesse et la taille : les étapes du calcul se mettent à jour.</small></span></div>
-            <div class="calc">
-              <label for="dl-v">Vitesse de la connexion<span class="in"><input id="dl-v" type="text" inputmode="decimal" value="40"><em>Mbit/s</em></span></label>
-              <label for="dl-t">Taille du fichier<span class="in"><input id="dl-t" type="text" inputmode="decimal" value="1,2"><em>Go</em></span></label>
-            </div>
-            <ol class="etapes" id="dl-steps" aria-live="polite"></ol>
-            <p class="small" style="color:var(--discret);font-size:.88rem;margin:8px 0 0">Exemple : un épisode de série en HD pèse environ 1 à 2 Go.</p>
-          </div>
-          <div class="ex">
-            <div class="ex-h"><span class="bit">2</span><span><b>Heures à virgule → heures et minutes</b><small>2,25 h, ce n'est pas 2 h 25 ! Tape une durée en heures.</small></span></div>
-            <div class="hconv"><label for="hc-in" class="sr">Durée en heures</label><input id="hc-in" type="text" inputmode="decimal" value="2,25"><b>h</b></div>
-            <div class="hconv-out" id="hc-out" aria-live="polite"></div>
-          </div>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="4">J'ai compris cette notion</label><a href="#n5">Notion suivante →</a></div>
-      </div>
-    </section>
-
-    <!-- ================= 5. VÉRIFIER UNE INFO ================= -->
-    <section class="chap ch-i" id="n5" data-n="5" aria-labelledby="t5">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>J'apprends · Informations et données<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t5"><span class="num">5</span>Vérifier une <span class="neon">information</span></h2>
-        <p class="essentiel">Sur les réseaux, une fausse info peut faire le tour de l'école en une heure. Avant de croire ou de partager, je mène une petite enquête.</p>
-        <div class="q3">
-          <div><b>Qui ?</b><small>Qui publie ? Un compte officiel, un média connu ou un inconnu ?</small></div>
-          <div><b>Quand ?</b><small>C'est récent ? Une vieille info peut être dépassée.</small></div>
-          <div><b>Comment ?</b><small>Comment le sait-il ? Y a-t-il une preuve, une source ?</small></div>
-        </div>
-        <div class="duo">
-          <div class="retenir">
-            <b>À retenir</b>
-            <ul>
-              <li>Je me pose les 3 questions : <b>Qui ? Quand ? Comment le sait-il ?</b></li>
-              <li>Je <b>recoupe</b> : je cherche la même info dans au moins <b>deux sources fiables</b>.</li>
-              <li>Je vérifie l'<b>identifiant exact</b> d'un compte, lettre par lettre (un « 0 » à la place d'un « o », un « _officiel » ajouté…).</li>
-              <li>Un compte officiel ne demande <b>jamais</b> de mot de passe ni d'argent par message.</li>
-            </ul>
-          </div>
-          <div class="bloc">
-            <h3>Des sources souvent fiables</h3>
-            <p>Le site officiel de l'organisation concernée (école, commune, entreprise), les médias connus, les sites officiels comme <code>enseignement.be</code> pour l'école en Fédération Wallonie-Bruxelles.</p>
-            <p style="margin:0"><b>Méfiance</b> : capture d'écran sans source, « partage vite ! », compte créé récemment, message qui joue sur la peur ou la colère.</p>
-          </div>
-        </div>
-        <div class="ex">
-          <div class="ex-h"><span class="bit">1</span><span><b>Fiable ou à vérifier ?</b><small>Pour chaque publication (exemples inventés), choisis ta réponse.</small></span></div>
-          <div class="posts" id="posts"></div>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="5">J'ai compris cette notion</label><a href="#n6">Notion suivante →</a></div>
-      </div>
-    </section>
-
-    <!-- ================= 6. PEGI ================= -->
-    <section class="chap ch-s" id="n6" data-n="6" aria-labelledby="t6">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/></svg>J'apprends · Sécurité<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t6"><span class="num">6</span>Lire une étiquette <span class="neon">PEGI</span></h2>
-        <p class="essentiel"><b>PEGI</b> est la signalétique européenne des jeux vidéo et de beaucoup d'applis. Elle protège les plus jeunes en indiquant un <b>âge conseillé</b> et le <b>type de contenu</b>.</p>
-        <div class="duo">
-          <div class="bloc">
-            <h3>Le chiffre : l'âge conseillé</h3>
-            <div class="ages" aria-label="Âges PEGI : 3, 7, 12, 16 et 18 ans">
-              <span class="age a3">3</span><span class="age a7">7</span><span class="age a12">12</span><span class="age a16">16</span><span class="age a18">18</span>
-            </div>
-            <p style="margin:12px 0 0">Ce n'est <b>pas</b> une note de qualité, ni le niveau de difficulté du jeu. C'est un conseil pour protéger.</p>
-          </div>
-          <div class="retenir">
-            <b>À retenir</b>
-            <ul>
-              <li>Le <b>chiffre</b> = l'âge conseillé : 3, 7, 12, 16 ou 18 ans.</li>
-              <li>Les <b>pictogrammes</b> = pourquoi : ce que le jeu contient.</li>
-              <li>Le contrôle parental des consoles et des smartphones s'appuie sur PEGI.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="ex">
-          <div class="ex-h"><span class="bit">1</span><span><b>Les 8 pictogrammes</b><small>Clique sur un pictogramme pour voir ce qu'il signifie (dessins simplifiés).</small></span></div>
-          <div class="pictos" id="pictos"></div>
-          <div class="picto-def" id="picto-def" aria-live="polite">Clique sur un pictogramme.</div>
-        </div>
-        <div class="ex">
-          <div class="ex-h"><span class="bit">2</span><span><b>Décode la boîte</b><small>Un jeu inventé. Que t'apprend son étiquette ?</small></span></div>
-          <div class="boite"><span class="age a12" style="width:46px;height:52px;font-size:1.2rem">12</span><div><span class="jeu">Galaxy Racers (jeu inventé)</span><div class="lbl"><span class="mini" title="Violence">👊</span><span class="mini" title="Achats intégrés">💳</span></div></div></div>
-          <div class="choix" id="pegi-q"></div>
-          <p class="fb" id="pegi-fb" aria-live="polite"></p>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="6">J'ai compris cette notion</label><a href="#n7">Notion suivante →</a></div>
-      </div>
-    </section>
-
-    <!-- ================= 7. ADRESSE WEB ================= -->
-    <section class="chap ch-s" id="n7" data-n="7" aria-labelledby="t7">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/></svg>J'apprends · Sécurité<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t7"><span class="num">7</span>Lire une adresse <span class="neon">web</span></h2>
-        <p class="essentiel">Une adresse web (une <b>URL</b>) se lit comme une adresse postale. Une partie dit <b>vraiment</b> chez qui tu arrives : le <b>nom de domaine</b>. Les escrocs déguisent tout le reste.</p>
-        <div class="ex">
-          <div class="ex-h"><span class="bit">1</span><span><b>Les morceaux d'une adresse</b><small>Clique sur chaque morceau.</small></span></div>
-          <div class="anat" id="anat"><button data-k="proto">https://</button><button data-k="sous">monecole.</button><button data-k="dom">smartschool.be</button><button data-k="chemin">/login</button></div>
-          <div class="anat-def" id="anat-def" aria-live="polite">Clique sur un morceau de l'adresse.</div>
-        </div>
-        <div class="duo">
-          <div class="retenir">
-            <b>À retenir</b>
-            <ul>
-              <li>Le vrai propriétaire d'un site = le <b>nom de domaine</b>, juste <b>avant la première « / »</b> (avec son extension : .be, .com, .net…).</li>
-              <li>Ce qui est à gauche du nom de domaine peut être un <b>déguisement</b> : <code>bpost.be.suivi-colis.info</code> appartient à <code>suivi-colis.info</code>.</li>
-            </ul>
-          </div>
-          <div class="bloc cadenas"><span class="ico" aria-hidden="true">🔒</span><div><h3 style="margin-bottom:4px">Et le cadenas HTTPS ?</h3>Le <b>S</b> de HTTPS veut dire que les échanges sont <b>chiffrés</b> : personne ne peut les lire en route. Mais un faux site peut aussi avoir un cadenas ! HTTPS <b>ne prouve pas</b> qu'un site est honnête.</div></div>
-        </div>
-        <div class="ex">
-          <div class="ex-h"><span class="bit">2</span><span><b>Chez qui j'arrive ?</b><small>Dans chaque adresse, clique sur le nom de domaine.</small></span></div>
-          <div class="urls" id="urls"></div>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="7">J'ai compris cette notion</label><a href="#n8">Notion suivante →</a></div>
-      </div>
-    </section>
-
-    <!-- ================= 8. ARNAQUES ================= -->
-    <section class="chap ch-s" id="n8" data-n="8" aria-labelledby="t8">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/></svg>J'apprends · Sécurité<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t8"><span class="num">8</span>Repérer une <span class="neon">arnaque</span></h2>
-        <p class="essentiel">Faux SMS, faux concours, « Robux gratuits », faux site de vente : les arnaques changent de forme, mais elles utilisent toujours les mêmes ficelles. Un signal = méfiance. Plusieurs signaux = arnaque presque sûre.</p>
-        <div class="signaux">
-          <div class="signal"><span aria-hidden="true">⏰</span><b>Urgence</b><small>« Plus que 24 h ! », « Dernière chance »</small></div>
-          <div class="signal"><span aria-hidden="true">🎁</span><b>Trop beau</b><small>Gratuit, cadeau, gain surprise</small></div>
-          <div class="signal"><span aria-hidden="true">🔗</span><b>Adresse bizarre</b><small>Nom de domaine inconnu, lettres changées</small></div>
-          <div class="signal"><span aria-hidden="true">🔑</span><b>Données demandées</b><small>Mot de passe, carte bancaire, code reçu</small></div>
-          <div class="signal"><span aria-hidden="true">📦</span><b>Fichier suspect</b><small>Pièce jointe .exe, « logiciel de triche »</small></div>
-          <div class="signal"><span aria-hidden="true">✍️</span><b>Fautes, inconnu</b><small>Fautes, expéditeur inconnu, faux avis</small></div>
-        </div>
-        <div class="duo">
-          <div class="ex">
-            <div class="ex-h"><span class="bit">1</span><span><b>Enquête sur un SMS</b><small>Exemple inventé. Clique sur les 4 signaux d'alerte.</small></span></div>
-            <div class="sms"><div class="sms-h">+32 470 00 00 00 · aujourd'hui 16:42</div>
-              <div class="bulle" id="sms">
-                <span class="hot" role="button" tabindex="0" data-s="exp">Message de bpost</span> : votre colis est <span class="hot" role="button" tabindex="0" data-s="urg">bloqué. Réglez avant 24 h</span> les frais de livraison de <span class="hot" role="button" tabindex="0" data-s="arg">1,99 € avec votre carte bancaire</span> ici : <span class="hot" role="button" tabindex="0" data-s="lien">bpost-livraison.info/payer</span> Merci.
-              </div>
-            </div>
-            <p class="fb" id="sms-fb" aria-live="polite">0 / 4 signaux trouvés</p>
-            <ul class="trouves" id="sms-list"></ul>
-          </div>
-          <div class="col" style="display:flex;flex-direction:column;gap:var(--gap)">
-            <div class="bloc">
-              <h3>Le réflexe STOP</h3>
-              <div class="stop">
-                <div><b>S</b><small>Je m'arrête, je ne clique pas.</small></div>
-                <div><b>T</b><small>Je teste l'adresse (le nom de domaine).</small></div>
-                <div><b>O</b><small>J'observe les signaux.</small></div>
-                <div><b>P</b><small>Je préviens un adulte.</small></div>
-              </div>
-            </div>
-            <div class="retenir">
-              <b>À retenir</b>
-              <ul>
-                <li>Un signal = méfiance ; plusieurs = arnaque presque sûre.</li>
-                <li>Face à un message douteux : <b>STOP</b>.</li>
-                <li>Un message suspect ? On peut le transférer à <code>suspect@safeonweb.be</code> (service belge), puis le supprimer.</li>
-                <li><b>Déjà cliqué ?</b> Pas de honte. Je préviens vite un adulte et je change mon mot de passe depuis l'appli officielle.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="8">J'ai compris cette notion</label><a href="#n9">Notion suivante →</a></div>
-      </div>
-    </section>
-
-    <!-- ================= 9. DONNÉES ET COMPTES ================= -->
-    <section class="chap ch-s" id="n9" data-n="9" aria-labelledby="t9">
-      <div class="bandeau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/></svg>J'apprends · Sécurité<span class="grow"></span><span class="bin"></span></div>
-      <div class="chap-in">
-        <h2 id="t9"><span class="num">9</span>Protéger mes données et mon <span class="neon">compte</span></h2>
-        <p class="essentiel">Ton <b>identité numérique</b>, c'est tout ce qui te représente en ligne : tes comptes, ton profil, tes publications… et les <b>traces</b> que tu laisses. Tes <b>données personnelles</b> permettent de te reconnaître ou de te retrouver.</p>
-        <div class="ex">
-          <div class="ex-h"><span class="bit">1</span><span><b>Je partage ou je garde pour moi ?</b><small>Sur un profil public ou un site inconnu, que peux-tu partager ? Clique sur chaque carte.</small></span></div>
-          <div class="mode" role="group" aria-label="Ma réponse"><button aria-pressed="true" data-m="ok">✔ Je peux partager</button><button aria-pressed="false" data-m="ko">✘ Je garde pour moi</button></div>
-          <div class="share" id="share"></div>
-          <p class="fb" id="share-fb" aria-live="polite"></p>
-        </div>
-        <div class="duo">
-          <div class="bloc">
-            <h3>Sur un appareil partagé</h3>
-            <p style="margin-bottom:8px">Ordinateur de l'école, de la bibliothèque, tablette d'un ami :</p>
-            <ul class="check">
-              <li><span aria-hidden="true">🕶️</span><span>J'utilise la <b>navigation privée</b>.</span></li>
-              <li><span aria-hidden="true">🚪</span><span>Je me <b>déconnecte</b> avant de partir (fermer l'onglet ne suffit pas).</span></li>
-              <li><span aria-hidden="true">🙅</span><span>Je réponds <b>« Jamais »</b> quand le navigateur propose d'enregistrer mon mot de passe.</span></li>
-              <li><span aria-hidden="true">🧽</span><span>J'efface les données de navigation et mes fichiers téléchargés.</span></li>
-            </ul>
-          </div>
-          <div class="bloc">
-            <h3>Un compte bien protégé</h3>
-            <ul class="check">
-              <li><span aria-hidden="true">🔐</span><span>Une <b>phrase de passe</b> : 4 mots sans lien + un chiffre + un symbole.</span></li>
-              <li><span aria-hidden="true">🔁</span><span>Un mot de passe <b>différent</b> pour chaque compte.</span></li>
-              <li><span aria-hidden="true">📲</span><span>La <b>double authentification</b> : un code arrive sur un autre appareil. Le pirate qui connaît ton mot de passe reste bloqué.</span></li>
-              <li><span aria-hidden="true">🔒</span><span>Un profil <b>privé</b>, sans position partagée, messages des amis seulement.</span></li>
-            </ul>
-          </div>
-        </div>
-        <div class="duo">
-          <div class="ex pw">
-            <div class="ex-h"><span class="bit">2</span><span><b>Atelier phrase de passe</b><small>Invente un exemple. Rien n'est enregistré ni envoyé. N'écris pas ton vrai mot de passe !</small></span></div>
-            <label for="pw" class="sr">Phrase de passe d'exemple</label>
-            <input id="pw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ex. Girafe-Volcan-Tartine-Radio!7">
-            <div class="pw-bar" aria-hidden="true"><i id="pw-bar"></i></div>
-            <b id="pw-lvl">—</b>
-            <ul id="pw-crit"></ul>
-          </div>
-          <div class="bloc">
-            <h3>Mon compte est piraté : que faire ?</h3>
-            <ol class="pas">
-              <li><span>Je préviens un <b>adulte de confiance</b>.</span></li>
-              <li><span>Je change le mot de passe <b>depuis l'appli ou le site officiel</b> (jamais par un lien reçu).</span></li>
-              <li><span>Je déconnecte les appareils inconnus et j'active la <b>double authentification</b>.</span></li>
-              <li><span>Je préviens mes amis que les messages envoyés ne venaient pas de moi.</span></li>
-            </ol>
-          </div>
-        </div>
-        <div class="retenir">
-          <b>À retenir</b>
-          <ul>
-            <li>Adresse, téléphone, école, mot de passe, photos de moi : je ne les publie <b>pas</b> et je ne les encode <b>jamais</b> sur un site inconnu.</li>
-            <li>Sur un appareil partagé : <b>navigation privée</b>, <b>déconnexion</b>, jamais de mot de passe enregistré.</li>
-            <li>Une <b>phrase de passe</b> par compte + la <b>double authentification</b>.</li>
-          </ul>
-        </div>
-        <div class="fin"><label><input type="checkbox" data-vu="9">J'ai compris cette notion</label><a href="#turbo">Turbo-check →</a></div>
-      </div>
-    </section>
-
-    <!-- ================= TURBO-CHECK ================= -->
-    <section class="chap ch-c" id="turbo" aria-labelledby="tt">
-      <div class="bandeau"><span aria-hidden="true">⚡</span>Je vérifie · Turbo-check<span class="grow"></span></div>
-      <div class="chap-in">
-        <h2 id="tt">Turbo-<span class="neon">check</span></h2>
-        <p class="essentiel">10 questions tirées au hasard parmi les 9 notions. Tu peux recommencer autant que tu veux : les questions changent.</p>
-        <div class="ex" id="quiz" aria-live="polite"></div>
-      </div>
-    </section>
-
-    <footer class="pied"><span><b>OCTET</b> · Informations et données · Sécurité · J'apprends</span><span>Tommy Berben · <a href="https://www.esciences.be">eSCIENCES.be</a> · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr">CC BY-NC-SA 4.0</a></span></footer>
-  </main>
+<div id="som" role="dialog" aria-modal="true" aria-labelledby="som-t" hidden>
+  <div class="boite-som">
+    <div class="som-h"><div><h2 id="som-t">Sommaire</h2><span style="color:var(--discret);font-size:.95rem">Clique sur une notion pour y aller. ✓ = « J'ai compris » coché.</span></div><button class="btn second" id="som-x" style="--texte:var(--encre)">✕ Fermer</button></div>
+    <div class="cols">
+      <div class="ch-i"><h3>Partie 1 · Informations et données</h3><ol id="som-1"></ol></div>
+      <div class="ch-s"><h3>Partie 2 · Sécurité</h3><ol id="som-2"></ol></div>
+    </div>
+    <div class="bas ch-c"><button class="btn" data-aller="turbo">⚡ Turbo-check</button><button class="btn second" data-aller="0" style="--texte:var(--encre)">↩ Début</button></div>
+  </div>
 </div>
 
 <script>
@@ -834,36 +1125,150 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
   const KEY = "octet.stocker-verifier-proteger.v1";
   const store = { get() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
 
-  /* ---------- numéro de chaque notion en binaire (l'octet du bandeau) ---------- */
-  $$(".chap[data-n]").forEach((c) => {
-    const n = +c.dataset.n, bits = n.toString(2).padStart(8, "0");
-    $(".bin", c).innerHTML = bits.split("").map((b) => `<i class="${b === "1" ? "on" : ""}"></i>`).join("") + `<small>${n} = ${bits}</small>`;
-    $(".bin", c).setAttribute("aria-label", `Notion ${n}, en binaire ${bits}`);
+  const NOTIONS = { 1: "Du bit au téraoctet", 2: "Mémoire vive ou stockage ?", 3: "Faire de la place", 4: "Débit et temps de téléchargement", 5: "Vérifier une information", 6: "Lire une étiquette PEGI", 7: "Lire une adresse web", 8: "Repérer une arnaque", 9: "Protéger mes données et mon compte" };
+  const ICO = {
+    decouvre: ['Je découvre', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/></svg>', ""],
+    atoi: ['À toi !', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>', "atoi"],
+    retiens: ['À retenir', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8L12 2z"/></svg>', "retiens"],
+    turbo: ['Je vérifie', '<span aria-hidden="true">⚡</span>', "atoi"],
+  };
+
+  const stage = $("#stage"), vp = $("#viewport");
+  const slides = $$(".slide");
+  let cur = 0;
+
+  /* ---------- bandeau du haut de chaque diapo ---------- */
+  slides.forEach((s) => {
+    const k = s.dataset.k; if (!k) return;
+    const n = s.dataset.n;
+    const head = document.createElement("header");
+    head.className = "sh";
+    let html = "";
+    if (n) {
+      const soeurs = slides.filter((x) => x.dataset.n === n), pos = soeurs.indexOf(s);
+      const champ = +n <= 5 ? "Informations et données" : "Sécurité";
+      const bits = (+n).toString(2).padStart(8, "0");
+      html += `<span class="sh-n" title="${n} = ${bits} en binaire">${n}</span><span class="sh-t"><small>${champ}</small>Notion ${n} · ${NOTIONS[n]}</span>`;
+      html += `<span class="sh-pas" aria-label="Diapo ${pos + 1} sur ${soeurs.length} de cette notion">${soeurs.map((_, i) => `<i class="${i <= pos ? "on" : ""}"></i>`).join("")}</span>`;
+    } else {
+      html += `<span class="sh-n">⚡</span><span class="sh-t"><small>Je vérifie</small>Les 9 notions</span>`;
+    }
+    const [lab, svg, cls] = ICO[k];
+    html += `<span class="grow"></span><span class="kind ${cls}">${svg}${lab}</span>`;
+    head.innerHTML = html;
+    s.prepend(head);
   });
+
+  /* ---------- mise à l'échelle ---------- */
+  function fit() {
+    const W = vp.clientWidth, H = vp.clientHeight, sc = Math.min(W / 1280, H / 720);
+    stage.style.transform = "scale(" + sc + ")";
+    stage.style.left = (W - 1280 * sc) / 2 + "px";
+    stage.style.top = (H - 720 * sc) / 2 + "px";
+  }
+  addEventListener("resize", fit); fit();
+
+  /* ---------- piste de progression : un trait par diapo ---------- */
+  const pistes = $("#pistes");
+  slides.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.className = s.classList.contains("ch-s") ? "s" : s.classList.contains("ch-c") ? "c" : "i";
+    b.tabIndex = -1; b.title = (i + 1) + " · " + (s.dataset.name || "");
+    b.addEventListener("click", () => go(i));
+    pistes.appendChild(b);
+  });
+
+  /* ---------- navigation ---------- */
+  function go(i, sansAnim) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    const sens = i < cur ? "back" : "enter";
+    slides[cur].hidden = true;
+    cur = i;
+    const s = slides[cur]; s.hidden = false;
+    s.classList.remove("enter", "back");
+    if (!sansAnim) { void s.offsetWidth; s.classList.add(sens); }
+    $("#count").textContent = cur + 1 + " / " + slides.length;
+    $$("#pistes button").forEach((b, k) => { b.classList.toggle("fait", k < cur); b.classList.toggle("ici", k === cur); });
+    $("#prev").disabled = cur === 0; $("#next").disabled = cur === slides.length - 1;
+    try { history.replaceState(null, "", "#diapo-" + (cur + 1)); } catch (e) {}
+  }
+  const idx = (cible) => {
+    if (cible === undefined || cible === null) return -1;
+    if (/^\d+$/.test(String(cible))) return +cible;
+    const m = /^n(\d)$/.exec(cible);
+    if (m) return slides.findIndex((s) => s.dataset.n === m[1]);
+    return slides.findIndex((s) => s.id === cible);
+  };
+  $("#prev").addEventListener("click", () => go(cur - 1));
+  $("#next").addEventListener("click", () => go(cur + 1));
+  $("#fs").addEventListener("click", () => { try { if (document.fullscreenElement) document.exitFullscreen(); else { const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); if (p && p.catch) p.catch(() => {}); } } catch (e) {} });
+  document.addEventListener("keydown", (e) => {
+    if (!$("#som").hidden) { if (e.key === "Escape") fermerSom(); return; }
+    const tag = (e.target.tagName || "").toUpperCase();
+    if (["SELECT", "TEXTAREA"].includes(tag) || (tag === "INPUT" && e.target.type !== "checkbox")) return;
+    if (["ArrowRight", "PageDown"].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+    else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+    else if (e.key === " " && tag !== "BUTTON" && !e.target.getAttribute("role")) { e.preventDefault(); go(cur + 1); }
+    else if (e.key === "Home") go(0); else if (e.key === "End") go(slides.length - 1);
+  });
+  /* glisser du doigt sur tablette */
+  let tx = null, ty = null;
+  vp.addEventListener("touchstart", (e) => { const t = e.touches[0]; tx = t.clientX; ty = t.clientY; }, { passive: true });
+  vp.addEventListener("touchend", (e) => {
+    if (tx === null) return; const t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty; tx = null;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5 && !["INPUT", "SELECT"].includes(e.target.tagName)) go(cur + (dx < 0 ? 1 : -1));
+  });
+  /* liens « aller à » (titre, parties, sommaire) */
+  document.addEventListener("click", (e) => { const b = e.target.closest("[data-aller]"); if (!b) return; const i = idx(b.dataset.aller); if (i >= 0) { fermerSom(); go(i); } });
+
+  /* ---------- parcours des parties ---------- */
+  $$(".chemin").forEach((c) => {
+    c.innerHTML = c.dataset.notions.split(",").map((n) => `<button data-aller="n${n}" data-chemin="${n}"><b>${n}</b><span>${NOTIONS[n]}</span></button>`).join("");
+  });
+
+  /* ---------- sommaire ---------- */
+  const som = $("#som");
+  function remplirSom() {
+    const ligne = (n) => { const first = idx("n" + n), last = slides.map((s) => s.dataset.n).lastIndexOf(String(n)); const ici = cur >= first && cur <= last; return `<li><button data-aller="n${n}" class="${vu.has(String(n)) ? "vu" : ""} ${ici ? "ici" : ""}"><span class="n">${vu.has(String(n)) ? "✓" : n}</span><span>${NOTIONS[n]}</span><span class="etat-n">${last - first + 1} diapos</span></button></li>`; };
+    $("#som-1").innerHTML = [1, 2, 3, 4, 5].map(ligne).join("");
+    $("#som-2").innerHTML = [6, 7, 8, 9].map(ligne).join("");
+  }
+  function ouvrirSom() { remplirSom(); som.hidden = false; $("#som-x").focus(); }
+  function fermerSom() { if (som.hidden) return; som.hidden = true; $("#btn-som").focus(); }
+  $("#btn-som").addEventListener("click", ouvrirSom);
+  $("#som-x").addEventListener("click", fermerSom);
+  som.addEventListener("click", (e) => { if (e.target === som) fermerSom(); });
 
   /* ---------- progression : « J'ai compris » remplit l'octet ---------- */
   const saved = store.get();
-  const vu = new Set(saved.vu || []);
+  const vu = new Set((saved.vu || []).map(String));
+  $$(".compris[data-vu]").forEach((c) => {
+    const n = c.dataset.vu;
+    c.innerHTML = `<label><input type="checkbox" data-vu="${n}">J'ai compris la notion ${n}</label><div class="octet-mini" aria-hidden="true">${"<i></i>".repeat(8)}</div><p>Pas encore sûr ? Reviens en arrière avec la flèche ←, ou passe à la suite et reviens plus tard.</p><button class="btn" data-suivant>Notion suivante →</button>`;
+    if (n === "9") $("[data-suivant]", c).textContent = "Turbo-check →";
+  });
+  $$("[data-suivant]").forEach((b) => b.addEventListener("click", () => go(cur + 1)));
   function majProg() {
     const n = vu.size, on = Math.round((n / 9) * 8);
-    $$("#octet i").forEach((i, k) => i.classList.toggle("on", k < on));
+    $$("#octet i, .octet-mini i").forEach((i) => { const k = Array.prototype.indexOf.call(i.parentNode.children, i); i.classList.toggle("on", k < on); });
     $("#prog-t").textContent = `${n}/9 notions`;
-    $$(".toc a").forEach((a) => { const id = a.getAttribute("href").slice(2); a.classList.toggle("vu", vu.has(id)); });
+    $$("[data-chemin]").forEach((b) => b.classList.toggle("vu", vu.has(b.dataset.chemin)));
+    $("#fin-t").innerHTML = n === 9 ? "<b>9 notions sur 9 comprises : ton octet est plein !</b>" : `<b>${n} notion${n > 1 ? "s" : ""} sur 9</b> cochée${n > 1 ? "s" : ""}. Ouvre le sommaire pour revoir les autres.`;
     store.set({ vu: [...vu] });
   }
-  $$("[data-vu]").forEach((cb) => { cb.checked = vu.has(cb.dataset.vu); cb.addEventListener("change", () => { cb.checked ? vu.add(cb.dataset.vu) : vu.delete(cb.dataset.vu); majProg(); }); });
+  $("#fin-octet").innerHTML = "<i></i>".repeat(8);
+  $$("input[data-vu]").forEach((cb) => { cb.checked = vu.has(cb.dataset.vu); cb.addEventListener("change", () => { cb.checked ? vu.add(cb.dataset.vu) : vu.delete(cb.dataset.vu); majProg(); }); });
   majProg();
 
-  /* ---------- sommaire : chapitre en cours + menu mobile ---------- */
-  const links = $$(".toc a");
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) links.forEach((a) => a.classList.toggle("ici", a.getAttribute("href") === "#" + e.target.id)); }), { rootMargin: "-40% 0px -55% 0px" });
-    $$(".chap").forEach((c) => io.observe(c));
+  /* ---------- 1. les bits de l'octet ---------- */
+  let octet = [0, 1, 0, 0, 0, 0, 0, 1];
+  function drawBits() {
+    $("#bits").innerHTML = octet.map((b, k) => `<button class="${b ? "on" : ""}" data-k="${k}" aria-label="Bit ${k + 1} : ${b}">${b}</button>`).join("");
+    const v = parseInt(octet.join(""), 2);
+    $("#bits-l").textContent = v >= 33 && v <= 126 ? String.fromCharCode(v) : v === 32 ? "espace" : "—";
   }
-  const toc = $("#toc"), bs = $("#btn-som");
-  bs.addEventListener("click", () => { const o = toc.classList.toggle("open"); bs.setAttribute("aria-expanded", o); });
-  links.forEach((a) => a.addEventListener("click", () => { toc.classList.remove("open"); bs.setAttribute("aria-expanded", "false"); }));
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && toc.classList.contains("open")) { toc.classList.remove("open"); bs.setAttribute("aria-expanded", "false"); bs.focus(); } });
+  $("#bits").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; octet[+b.dataset.k] ^= 1; drawBits(); $$("#bits button")[+b.dataset.k].focus(); });
+  drawBits();
 
   /* ---------- 1. convertisseur ---------- */
   const U = ["ko", "Mo", "Go", "To"];
@@ -902,11 +1307,11 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
     { t: "Contient les onglets ouverts en ce moment.", r: "ram", why: "Ce qu'on utilise maintenant est dans la RAM." },
     { t: "Se compte souvent en centaines de Go, voire en To.", r: "sto", why: "Le stockage est bien plus grand que la RAM (souvent 8 à 16 Go de RAM)." },
   ];
-  $("#tri-ram").innerHTML = shuffle(RAM).map((s) => `<div class="tri-l" data-r="${s.r}"><span>${s.t}<small class="why" hidden>${s.why}</small></span><span class="rangee"><button class="btn second petit" data-c="ram">RAM</button><button class="btn second petit" data-c="sto">Stockage</button></span></div>`).join("");
+  $("#tri-ram").innerHTML = shuffle(RAM).map((s) => `<div class="tri-l" data-i="${RAM.indexOf(s)}"><span>${s.t}<small class="why" hidden></small></span><span class="rangee"><button class="btn second petit" data-c="ram">🍳 RAM</button><button class="btn second petit" data-c="sto">🗄️ Stockage</button></span></div>`).join("");
   $$("#tri-ram .tri-l").forEach((l) => $$("button", l).forEach((b) => b.addEventListener("click", () => {
-    const ok = b.dataset.c === l.dataset.r;
+    const s = RAM[+l.dataset.i], ok = b.dataset.c === s.r;
     l.classList.remove("ok", "ko"); l.classList.add(ok ? "ok" : "ko");
-    const w = $(".why", l); w.hidden = false; w.textContent = (ok ? "✔ " : "✘ Non. ") + RAM.find((x) => l.textContent.startsWith(x.t)).why;
+    const w = $(".why", l); w.hidden = false; w.textContent = (ok ? "✔ " : "✘ Non. ") + (ok ? s.why : "Relis la cuisine de la cantine, puis réessaie.");
     if (ok) $$("button", l).forEach((x) => (x.disabled = true));
   })));
 
@@ -924,13 +1329,14 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
   const used = () => PH.sys + ITEMS.filter((it) => choix[it.id] === "keep").reduce((a, it) => a + it.s, 0);
   function drawPhone() {
     const u = used(), free = PH.cap - u;
-    $("#ph-used").textContent = fmt(u) + " Go";
-    $("#ph-free").textContent = `Libre : ${fmt(free)} Go ${free >= PH.need ? "✔" : "✘"}`;
+    $("#ph-used").textContent = fmt(u);
+    $("#ph-free").textContent = `Libre : ${fmt(free)} Go ${free >= PH.need ? "✔ assez de place" : "✘ pas assez"}`;
+    $("#ph-free").style.color = free >= PH.need ? "var(--bon)" : "var(--faux)";
     $("#ph-bar").style.width = (u / PH.cap) * 100 + "%";
   }
   function resetPhone() {
     ITEMS.forEach((it) => (choix[it.id] = "keep"));
-    $("#ph-items").innerHTML = `<div class="item"><span class="nm">⚙️ Système du smartphone<small>obligatoire</small></span><span>${PH.sys} Go</span></div>` + ITEMS.map((it) => `<div class="item" data-id="${it.id}"><span class="nm">${it.n} · <b>${it.s} Go</b><small>${it.d}</small></span>
+    $("#ph-items").innerHTML = `<div class="item"><span class="nm">⚙️ Système du smartphone · <b>${PH.sys} Go</b><small>obligatoire, on n'y touche pas</small></span><span></span></div>` + ITEMS.map((it) => `<div class="item" data-id="${it.id}"><span class="nm">${it.n} · <b>${it.s} Go</b><small>${it.d}</small></span>
       <span class="seg" role="group" aria-label="${it.n}">${[["keep", "Garder"], ["move", "Déplacer"], ["del", "Supprimer"]].map(([k, t]) => `<button data-k="${k}" aria-pressed="${k === "keep"}">${t}</button>`).join("")}</span></div>`).join("");
     $$("#ph-items .item[data-id]").forEach((row) => $$("button", row).forEach((b) => b.addEventListener("click", () => {
       choix[row.dataset.id] = b.dataset.k;
@@ -943,7 +1349,7 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
   $("#ph-check").addEventListener("click", () => {
     const errs = [];
     ITEMS.forEach((it) => { if (it.irr && choix[it.id] === "del") errs.push(`Les « ${it.n.slice(3)} » sont irremplaçables : déplace-les plutôt.`); });
-    if (choix.apps !== "keep") errs.push("Lou utilise ses applis chaque jour : elles doivent rester sur le smartphone.");
+    if (choix.apps !== "keep") errs.push("Lou utilise ses applis chaque jour : elles restent sur le smartphone.");
     const free = PH.cap - used();
     if (free < PH.need) errs.push(`Il n'y a que ${fmt(free)} Go de libre. Il en faut ${PH.need}.`);
     const fb = $("#ph-fb");
@@ -984,16 +1390,16 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
   /* ---------- 5. publications ---------- */
   const POSTS = [
     { av: "IE", c: "#9C94AE", who: "@info_ecoles_be", meta: "compte créé il y a 3 jours · 12 abonnés", txt: "🚨 URGENT !!! Toutes les écoles seront fermées demain à cause de la neige. PARTAGE VITE à tout le monde !!!", r: "doute", why: "Compte inconnu et récent, aucune source, urgence et majuscules. Je vérifie sur le site de l'école ou auprès d'un adulte." },
-    { av: "FW", c: "#6C2BD9", who: "enseignement.be", meta: "site officiel de la Fédération Wallonie-Bruxelles", txt: "Calendrier scolaire : les dates des prochains congés sont publiées sur cette page.", r: "fiable", why: "Site officiel de l'enseignement en Fédération Wallonie-Bruxelles : c'est la source la mieux placée pour les dates de congés." },
-    { av: "AP", c: "#D9248F", who: "@App1e_Officiel", meta: "publication sponsorisée", txt: "🎁 Smartphone OFFERT aux 100 premiers ! Envoie ton nom, ton adresse et ton numéro en message privé.", r: "doute", why: "Identifiant copié (un « 1 » à la place du « l »), cadeau trop beau et données personnelles demandées : c'est une arnaque." },
+    { av: "FW", c: "#6C2BD9", who: "enseignement.be", meta: "site officiel de la Fédération Wallonie-Bruxelles", txt: "Calendrier scolaire : les dates des prochains congés sont publiées sur cette page.", r: "fiable", why: "Site officiel de l'enseignement : la source la mieux placée pour les dates de congés." },
+    { av: "AP", c: "#D9248F", who: "@App1e_Officiel", meta: "publication sponsorisée", txt: "🎁 Smartphone OFFERT aux 100 premiers ! Envoie ton nom, ton adresse et ton numéro en message privé.", r: "doute", why: "Identifiant copié (un « 1 » à la place du « l »), cadeau trop beau, données demandées : arnaque." },
   ];
-  $("#posts").innerHTML = POSTS.map((p, i) => `<article class="post" data-i="${i}"><div class="post-h"><span class="av" style="background:${p.c}">${p.av}</span><div><b>${p.who}</b><small>${p.meta}</small></div><span class="tag-f" style="margin-left:auto">Exemple inventé</span></div>
-    <p>${p.txt}</p><div class="rangee"><button class="btn second petit" data-r="fiable">✔ Fiable</button><button class="btn second petit" data-r="doute">🔍 À vérifier / douteux</button></div><p class="fb" aria-live="polite"></p></article>`).join("");
+  $("#posts").innerHTML = POSTS.map((p, i) => `<article class="post" data-i="${i}"><div class="post-h"><span class="av" style="background:${p.c}">${p.av}</span><div><b>${p.who}</b><small>${p.meta}</small></div></div><span class="tag-f" style="align-self:flex-start;margin-bottom:8px">Exemple inventé</span>
+    <p>${p.txt}</p><div class="rangee"><button class="btn second petit" data-r="fiable">✔ Fiable</button><button class="btn second petit" data-r="doute">🔍 À vérifier</button></div><p class="fb" aria-live="polite"></p></article>`).join("");
   $$(".post").forEach((el) => $$("button", el).forEach((b) => b.addEventListener("click", () => {
     const p = POSTS[+el.dataset.i], ok = b.dataset.r === p.r;
     el.classList.remove("ok", "ko"); el.classList.add(ok ? "ok" : "ko");
     $(".fb", el).className = "fb " + (ok ? "ok" : "ko");
-    $(".fb", el).innerHTML = (ok ? "✔ Oui. " : "✘ Regarde mieux. ") + `<span>${p.why}</span>`;
+    $(".fb", el).innerHTML = (ok ? "✔ Oui. " : "✘ Regarde mieux. ") + `<span>${ok ? p.why : "Pose-toi les 3 questions : Qui ? Quand ? Comment ?"}</span>`;
     if (ok) $$("button", el).forEach((x) => (x.disabled = true));
   })));
 
@@ -1008,11 +1414,13 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
     ["🎲", "Jeux de hasard", "Le jeu imite ou encourage les jeux d'argent (casino, paris)."],
     ["💳", "Achats intégrés", "On peut payer avec de l'argent réel dans le jeu (objets, monnaie virtuelle, coffres)."],
   ];
+  const vusP = new Set();
   $("#pictos").innerHTML = PICTOS.map(([i, t], k) => `<button class="picto" data-k="${k}" aria-expanded="false"><span aria-hidden="true">${i}</span>${t}</button>`).join("");
   $$(".picto").forEach((b) => b.addEventListener("click", () => {
     $$(".picto").forEach((x) => x.setAttribute("aria-expanded", x === b));
+    b.classList.add("vu"); vusP.add(b.dataset.k);
     const p = PICTOS[+b.dataset.k];
-    $("#picto-def").innerHTML = `<b>${p[1]}</b> : ${p[2]}`;
+    $("#picto-def").innerHTML = `<b>${p[0]} ${p[1]}</b> : ${p[2]}<br><small style="color:var(--discret)">${vusP.size} / 8 pictogrammes découverts${vusP.size === 8 ? " ✔" : ""}</small>`;
   }));
   const PEGIQ = [
     { t: "Il est conseillé à partir de 12 ans, il contient de la violence et on peut y dépenser de l'argent réel.", ok: true, why: "L'âge ET les deux pictogrammes : bien décodé !" },
@@ -1054,17 +1462,18 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
 
   /* ---------- 8. SMS ---------- */
   const SMS = {
-    exp: "Expéditeur : un numéro de portable inconnu, pas le vrai service.",
-    urg: "Urgence : « bloqué », « avant 24 h » pour te pousser à agir vite.",
-    arg: "Données demandées : de l'argent et ta carte bancaire, même pour une petite somme.",
-    lien: "Adresse bizarre : le domaine est bpost-livraison.info, pas bpost.be.",
+    exp: "👤 Expéditeur : un numéro de portable inconnu, pas le vrai service.",
+    urg: "⏰ Urgence : « bloqué », « avant 24 h » pour te pousser à agir vite.",
+    arg: "🔑 Données demandées : de l'argent et ta carte bancaire, même pour une petite somme.",
+    lien: "🔗 Adresse bizarre : le domaine est bpost-livraison.info, pas bpost.be.",
   };
   const found = new Set();
-  $$("#sms .hot").forEach((b) => b.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); b.click(); } }));
+  const drawFound = () => { $("#sms-list").innerHTML = [...found].map((k) => `<li>${SMS[k]}</li>`).join("") + "<li class='vide'>?</li>".repeat(4 - found.size); };
+  drawFound();
+  $$("#sms .hot").forEach((b) => b.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); b.click(); } }));
   $$("#sms .hot").forEach((b) => b.addEventListener("click", () => {
     if (found.has(b.dataset.s)) return;
-    found.add(b.dataset.s); b.classList.add("found");
-    $("#sms-list").insertAdjacentHTML("beforeend", `<li>${SMS[b.dataset.s]}</li>`);
+    found.add(b.dataset.s); b.classList.add("found"); drawFound();
     const fb = $("#sms-fb");
     fb.textContent = `${found.size} / 4 signaux trouvés`;
     if (found.size === 4) { fb.className = "fb ok"; fb.innerHTML = "✔ 4 / 4 ! <span>Plusieurs signaux : c'est une arnaque. Je ne clique pas et je supprime.</span>"; }
@@ -1087,7 +1496,7 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
   $$("#share button").forEach((b) => b.addEventListener("click", () => {
     const s = SHARE[+b.dataset.t], ok = mode === s.r;
     b.classList.remove("ok", "ko"); b.classList.add(ok ? "ok" : "ko");
-    $("small", b).textContent = (ok ? (s.r === "ok" ? "✔ Je peux partager. " : "✔ Je garde pour moi. ") : "✘ Réessaie avec l'autre bouton. ") + (ok ? s.why : "");
+    $("small", b).textContent = ok ? (s.r === "ok" ? "✔ Je peux partager. " : "✔ Je garde pour moi. ") + s.why : "✘ Réessaie avec l'autre bouton.";
     const done = $$("#share button.ok").length;
     $("#share-fb").className = "fb" + (done === SHARE.length ? " ok" : "");
     $("#share-fb").textContent = done === SHARE.length ? "✔ 8 / 8 : tu protèges tes données !" : `${done} / ${SHARE.length} cartes correctes`;
@@ -1115,26 +1524,26 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
 
   /* ---------- turbo-check ---------- */
   const BANK = [
-    { q: "Combien de bits dans 1 octet ?", o: ["8", "2", "10", "1 000"], why: "1 octet = 8 bits." },
-    { q: "Quelle taille est la plus grande ?", o: ["2 To", "900 Go", "5 000 Mo", "800 000 ko"], why: "2 To = 2 000 Go, bien plus que les autres." },
-    { q: "1,5 Go, c'est…", o: ["1 500 Mo", "150 Mo", "15 Mo", "15 000 Mo"], why: "Go → Mo : × 1 000." },
-    { q: "Que fait la mémoire vive (RAM) quand on éteint l'appareil ?", o: ["Elle se vide", "Elle garde tout", "Elle part dans le cloud", "Elle se copie sur une clé USB"], why: "La RAM est le plan de travail : elle se vide." },
-    { q: "Une clé USB, c'est un stockage…", o: ["externe", "interne", "en ligne", "de mémoire vive"], why: "On la branche : c'est un stockage externe." },
-    { q: "Une mise à jour demande 5 Go. Il reste 2 Go. Combien faut-il libérer ?", o: ["3 Go", "7 Go", "2 Go", "5 Go"], why: "5 − 2 = 3 Go." },
-    { q: "Ton stockage est plein. Que fais-tu des photos de famille ?", o: ["Je les déplace (cloud, ordinateur, disque)", "Je les supprime", "Je les laisse et je supprime le système", "Rien, tant pis"], why: "Irremplaçable = je déplace." },
-    { q: "Une connexion de 80 Mbit/s, c'est combien de Mo/s ?", o: ["10 Mo/s", "80 Mo/s", "640 Mo/s", "8 Mo/s"], why: "Mbit/s ÷ 8 = Mo/s." },
-    { q: "3,5 h, c'est…", o: ["3 h 30 min", "3 h 50 min", "3 h 05 min", "35 min"], why: "0,5 × 60 = 30 min." },
-    { q: "Avant de partager une info, je me demande…", o: ["Qui ? Quand ? Comment le sait-il ?", "Est-ce que c'est drôle ?", "Combien de likes ?", "Est-ce que c'est long ?"], why: "Puis je recoupe avec deux sources fiables." },
-    { q: "Un compte « officiel » te demande ton mot de passe par message. C'est…", o: ["une arnaque", "normal", "obligatoire", "un cadeau"], why: "Un compte officiel ne le demande jamais." },
-    { q: "Sur une boîte de jeu, le chiffre PEGI indique…", o: ["l'âge conseillé", "la note du jeu", "le prix", "la difficulté"], why: "C'est un âge conseillé, pas une note." },
-    { q: "Le pictogramme PEGI 💳 veut dire…", o: ["achats intégrés avec de l'argent réel", "jeu gratuit", "jeu de cartes", "jeu en ligne"], why: "On peut payer dans le jeu." },
-    { q: "Dans https://bpost.be.suivi-colis.info/payer, le nom de domaine est…", o: ["suivi-colis.info", "bpost.be", "payer", "https"], why: "Juste avant la première « / »." },
-    { q: "Le cadenas HTTPS prouve que…", o: ["les échanges sont chiffrés", "le site est honnête", "le site est belge", "le site est gratuit"], why: "Chiffré ne veut pas dire honnête." },
-    { q: "« Votre colis est bloqué, payez 1,99 € avant 24 h » : quel signal ?", o: ["l'urgence", "une adresse officielle", "aucun", "un fichier trop léger"], why: "L'urgence pousse à agir sans réfléchir." },
-    { q: "Que veut dire le P de STOP ?", o: ["Je préviens un adulte", "Je paie", "Je partage", "Je publie"], why: "S'arrêter, Tester, Observer, Prévenir." },
-    { q: "Sur l'ordinateur de la bibliothèque, le navigateur propose d'enregistrer ton mot de passe :", o: ["Jamais", "Oui", "Plus tard", "Oui, juste aujourd'hui"], why: "Sur un appareil partagé, jamais." },
-    { q: "La double authentification sert à…", o: ["bloquer un pirate qui connaît ton mot de passe", "jouer à deux", "aller plus vite", "ne plus avoir de mot de passe"], why: "Un code arrive sur un autre appareil." },
-    { q: "Quelle info peux-tu partager sur un profil public ?", o: ["Ton pseudo", "Ton adresse", "Ton numéro de téléphone", "Ton mot de passe"], why: "Le reste permet de te trouver ou de te piéger." },
+    { q: "Combien de bits dans 1 octet ?", o: ["8", "2", "10", "1 000"], why: "1 octet = 8 bits.", n: 1 },
+    { q: "Quelle taille est la plus grande ?", o: ["2 To", "900 Go", "5 000 Mo", "800 000 ko"], why: "2 To = 2 000 Go, bien plus que les autres.", n: 1 },
+    { q: "1,5 Go, c'est…", o: ["1 500 Mo", "150 Mo", "15 Mo", "15 000 Mo"], why: "Go → Mo : × 1 000.", n: 1 },
+    { q: "Que fait la mémoire vive (RAM) quand on éteint l'appareil ?", o: ["Elle se vide", "Elle garde tout", "Elle part dans le cloud", "Elle se copie sur une clé USB"], why: "La RAM est le plan de travail : elle se vide.", n: 2 },
+    { q: "Une clé USB, c'est un stockage…", o: ["externe", "interne", "en ligne", "de mémoire vive"], why: "On la branche : c'est un stockage externe.", n: 2 },
+    { q: "Une mise à jour demande 5 Go. Il reste 2 Go. Combien faut-il libérer ?", o: ["3 Go", "7 Go", "2 Go", "5 Go"], why: "5 − 2 = 3 Go.", n: 3 },
+    { q: "Ton stockage est plein. Que fais-tu des photos de famille ?", o: ["Je les déplace (cloud, ordinateur, disque)", "Je les supprime", "Je les laisse et je supprime le système", "Rien, tant pis"], why: "Irremplaçable = je déplace.", n: 3 },
+    { q: "Une connexion de 80 Mbit/s, c'est combien de Mo/s ?", o: ["10 Mo/s", "80 Mo/s", "640 Mo/s", "8 Mo/s"], why: "Mbit/s ÷ 8 = Mo/s.", n: 4 },
+    { q: "3,5 h, c'est…", o: ["3 h 30 min", "3 h 50 min", "3 h 05 min", "35 min"], why: "0,5 × 60 = 30 min.", n: 4 },
+    { q: "Avant de partager une info, je me demande…", o: ["Qui ? Quand ? Comment le sait-il ?", "Est-ce que c'est drôle ?", "Combien de likes ?", "Est-ce que c'est long ?"], why: "Puis je recoupe avec deux sources fiables.", n: 5 },
+    { q: "Un compte « officiel » te demande ton mot de passe par message. C'est…", o: ["une arnaque", "normal", "obligatoire", "un cadeau"], why: "Un compte officiel ne le demande jamais.", n: 5 },
+    { q: "Sur une boîte de jeu, le chiffre PEGI indique…", o: ["l'âge conseillé", "la note du jeu", "le prix", "la difficulté"], why: "C'est un âge conseillé, pas une note.", n: 6 },
+    { q: "Le pictogramme PEGI 💳 veut dire…", o: ["achats intégrés avec de l'argent réel", "jeu gratuit", "jeu de cartes", "jeu en ligne"], why: "On peut payer dans le jeu.", n: 6 },
+    { q: "Dans https://bpost.be.suivi-colis.info/payer, le nom de domaine est…", o: ["suivi-colis.info", "bpost.be", "payer", "https"], why: "Juste avant la première « / ».", n: 7 },
+    { q: "Le cadenas HTTPS prouve que…", o: ["les échanges sont chiffrés", "le site est honnête", "le site est belge", "le site est gratuit"], why: "Chiffré ne veut pas dire honnête.", n: 7 },
+    { q: "« Votre colis est bloqué, payez 1,99 € avant 24 h » : quel signal ?", o: ["l'urgence", "une adresse officielle", "aucun", "un fichier trop léger"], why: "L'urgence pousse à agir sans réfléchir.", n: 8 },
+    { q: "Que veut dire le P de STOP ?", o: ["Je préviens un adulte", "Je paie", "Je partage", "Je publie"], why: "Stop, Teste, Observe, Préviens.", n: 8 },
+    { q: "Sur l'ordinateur de la bibliothèque, le navigateur propose d'enregistrer ton mot de passe :", o: ["Jamais", "Oui", "Plus tard", "Oui, juste aujourd'hui"], why: "Sur un appareil partagé, jamais.", n: 9 },
+    { q: "La double authentification sert à…", o: ["bloquer un pirate qui connaît ton mot de passe", "jouer à deux", "aller plus vite", "ne plus avoir de mot de passe"], why: "Un code arrive sur un autre appareil.", n: 9 },
+    { q: "Quelle info peux-tu partager sur un profil public ?", o: ["Ton pseudo", "Ton adresse", "Ton numéro de téléphone", "Ton mot de passe"], why: "Le reste permet de te trouver ou de te piéger.", n: 9 },
   ];
   const quiz = $("#quiz");
   let Q = [], qi = 0, res = [];
@@ -1142,13 +1551,14 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
   function dots() { return `<div class="quiz-dots" aria-hidden="true">${Q.map((_, k) => `<i class="${k < res.length ? (res[k] ? "ok" : "ko") : k === qi ? "cur" : ""}"></i>`).join("")}</div>`; }
   function showQ() {
     const q = Q[qi];
-    quiz.innerHTML = `<div class="quiz-top"><span class="ex-h" style="margin:0"><span class="bit">${qi + 1}</span><b>Question ${qi + 1} / ${Q.length}</b></span>${dots()}</div>
-      <p class="quiz-q">${q.q}</p><div class="choix">${q.opts.map((o, k) => `<button data-k="${k}">${o.t}</button>`).join("")}</div><p class="fb" aria-live="polite"></p><div class="rangee" style="margin-top:8px"><button class="btn" id="q-next" hidden>${qi + 1 < Q.length ? "Question suivante →" : "Voir mon score"}</button></div>`;
+    quiz.innerHTML = `<div class="quiz-top"><b>Question ${qi + 1} / ${Q.length} · notion ${q.n}</b>${dots()}</div>
+      <p class="quiz-q">${q.q}</p><div class="choix">${q.opts.map((o, k) => `<button data-k="${k}">${o.t}</button>`).join("")}</div><p class="fb" aria-live="polite"></p><div class="rangee" style="margin-top:auto;justify-content:flex-end"><button class="btn" id="q-next" hidden>${qi + 1 < Q.length ? "Question suivante →" : "Voir mon score"}</button></div>`;
     $$(".choix button", quiz).forEach((b) => b.addEventListener("click", () => {
       const o = q.opts[+b.dataset.k];
       $$(".choix button", quiz).forEach((x, k) => { x.disabled = true; if (q.opts[k].ok) x.classList.add("ok"); });
       if (!o.ok) b.classList.add("ko");
       res.push(o.ok);
+      $(".quiz-dots", quiz).outerHTML = dots();
       const fb = $(".fb", quiz); fb.className = "fb " + (o.ok ? "ok" : "ko"); fb.innerHTML = (o.ok ? "✔ Exact. " : "✘ Non. ") + `<span>${q.why}</span>`;
       const nx = $("#q-next", quiz); nx.hidden = false; nx.focus();
       nx.addEventListener("click", () => { qi++; qi < Q.length ? showQ() : score(); });
@@ -1158,13 +1568,22 @@ table.tab { width: 100%; border-collapse: collapse; font-size: .96rem; backgroun
     const n = res.filter(Boolean).length;
     const msg = n === 10 ? "Parfait ! Tu maîtrises tout." : n >= 8 ? "Très bien ! Relis les notions des questions ratées." : n >= 5 ? "C'est un bon début. Relis les notions, puis réessaie." : "Relis les notions avec calme, puis retente ta chance.";
     const ratees = Q.filter((_, k) => !res[k]);
-    quiz.innerHTML = `<div class="score"><div class="big">${n} / 10</div>${dots()}<p style="margin-top:10px"><b>${msg}</b></p>
-      ${ratees.length ? `<ul>${ratees.map((q) => `<li>${q.q} → <b>${q.o[0]}</b>. ${q.why}</li>`).join("")}</ul>` : ""}<button class="btn" id="q-again">⚡ Nouveau turbo-check</button></div>`;
-    $(".quiz-dots", quiz).style.justifyContent = "center";
+    const aRevoir = [...new Set(ratees.map((q) => q.n))].sort((a, b) => a - b);
+    quiz.innerHTML = `<div class="score"><div class="big">${n} / 10</div><div style="display:flex;justify-content:center;margin:6px 0">${dots()}</div><p style="margin:8px 0"><b>${msg}</b></p>
+      ${ratees.length ? `<ul>${ratees.map((q) => `<li>${q.q} → <b>${q.o[0]}</b>. ${q.why}</li>`).join("")}</ul>` : ""}
+      <div class="rangee" style="justify-content:center">${aRevoir.map((k) => `<button class="btn second petit" data-aller="n${k}">Revoir la notion ${k}</button>`).join("")}<button class="btn" id="q-again">⚡ Nouveau turbo-check</button></div></div>`;
     $("#q-again", quiz).addEventListener("click", startQuiz);
     $("#q-again", quiz).focus();
   }
   startQuiz();
+
+  /* ---------- démarrage : #diapo-12, ou anciens liens #n6, #turbo ---------- */
+  const cibleHash = () => { const h = location.hash.slice(1), md = /^diapo-(\d+)$/.exec(h); return md ? +md[1] - 1 : idx(h); };
+  slides.forEach((s) => (s.hidden = true));
+  slides[0].hidden = false;
+  const depart = cibleHash();
+  go(depart > 0 ? depart : 0, true);
+  addEventListener("hashchange", () => { const i = cibleHash(); if (i >= 0 && i !== cur) go(i); });
 })();
 </script>
 </body>
