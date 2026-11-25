@@ -1,7 +1,9 @@
-# Panne à bord du Néon-86
+# Panne à bord du Néon-86 (version 2)
 
 Escape game numérique pour la **formation numérique en 1re secondaire** (12-13 ans).
 Application statique HTML/CSS/JavaScript : sans serveur, sans base de données, sans compte élève.
+
+**Version 2 :** scénario en 2056, quatre lieux dessinés et explorables qui évoluent à chaque réparation, inscription de 1 à 4 membres, atelier A1 en lots nominatifs, tableau de branchement (B1), piste de programmation (C3), disquettes à insérer (finale), tutoriel et aide « Je suis perdu ».
 
 ## Contenu du dossier
 
@@ -12,7 +14,8 @@ escape-neon86/
 ├── css/style.css              ← apparence (couleurs en haut du fichier)
 ├── js/data.js                 ← TEXTES, ÉNIGMES, INDICES (à modifier ici)
 ├── js/engine.js               ← moteur du jeu
-├── js/art.js                  ← illustrations SVG
+├── js/art.js                  ← portraits SVG (GLADYS, Boulon, journal)
+├── js/scenes.js               ← décors des 4 lieux + positions des objets cliquables
 ├── ressources/
 │   ├── archives_neon86.zip    ← archive téléchargée par les élèves (A2, C4)
 │   └── archives_neon86/       ← même contenu, déjà extrait (plan B / consultation)
@@ -55,13 +58,15 @@ Tous les chemins sont relatifs : le jeu fonctionne dans n'importe quel sous-doss
 
 L'écran titre demande un **code d'accès** (par défaut : voir le guide enseignant, §8). Une fois saisi, il est retenu par le navigateur de l'ordinateur.
 Pour le changer : `outils/empreinte.html`, puis remplacer `codeAcces` dans `js/data.js` (mettre `null` pour supprimer le verrou).
+Le nombre maximal d'élèves par ordinateur se règle dans `js/data.js` (`equipage.max`, 4 par défaut).
 Ce verrou empêche l'accès par simple curiosité ; un élève très débrouillard pourrait le contourner en modifiant la page.
 
 ## Progression des élèves
 
-- Enregistrée **dans le navigateur** de l'ordinateur (localStorage), sous la clé `neon86-sauvegarde-v1`. Rien n'est envoyé sur Internet.
+- Enregistrée **dans le navigateur** de l'ordinateur (localStorage), sous la clé `neon86-sauvegarde-v2` (prénoms, lots de A1, réparations, indices, saisies). Rien n'est envoyé sur Internet.
+- **Ancienne version :** une partie de la v1 (`neon86-sauvegarde-v1`) est détectée à l'ouverture. Le jeu propose de la continuer (il faut inscrire l'équipage, les réparations sont conservées) ou d'en commencer une nouvelle. L'ancienne sauvegarde n'est jamais effacée.
 - **Reprendre :** l'écran titre propose « Reprendre la partie ».
-- **Remise à zéro :** bouton « Recommencer » (avec confirmation).
+- **Remise à zéro :** Carnet > « Recommencer une nouvelle partie » (avec confirmation). Le code d'accès reste mémorisé.
 - La progression est perdue en navigation privée, si la session est effacée à la déconnexion ou si l'élève change d'ordinateur. La fiche papier permet de noter les réponses pour les ressaisir rapidement.
 
 ## Réponses et modification

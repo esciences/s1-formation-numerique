@@ -12,31 +12,25 @@
   <a class="evitement" href="#app">Aller au contenu</a>
   <header id="entete" class="entete" hidden>
     <div class="ent-logo" aria-hidden="true">NÉON-86</div>
-    <span id="equipe-aff" class="ent-equipe"></span>
+    <span id="equipe-aff" class="ent-equipe" aria-label="Équipage"></span>
     <span id="compteur" class="ent-compteur"></span>
     <nav class="ent-nav" aria-label="Menu du jeu">
-      <button class="btn btn-mini" id="btn-hub">Poste de pilotage</button>
-      <button class="btn btn-mini" id="btn-carnet">📒 Carnet de mission</button>
-      <button class="btn btn-mini" id="btn-son" aria-pressed="false">Son : coupé</button>
-      <button class="btn btn-mini" id="btn-bilan">Bilan</button>
-      <button class="btn btn-mini btn-danger" id="btn-reset">Recommencer</button>
+      <button class="btn btn-mini" id="btn-hub">🛰 Poste de pilotage</button>
+      <button class="btn btn-mini" id="btn-carnet">📒 Carnet</button>
+      <button class="btn btn-mini btn-perdu" id="btn-perdu">❓ Je suis perdu</button>
+      <button class="btn btn-mini" id="btn-son" aria-pressed="false">🔇 Son coupé</button>
     </nav>
   </header>
+  <div id="objectif" class="objectif" hidden><span class="obj-lieu">📍 <span id="obj-lieu"></span></span><span class="obj-txt">🎯 <span id="obj-txt"></span></span></div>
 
   <main id="app" class="app"></main>
 
-  <div id="carnet" class="carnet" role="dialog" aria-modal="true" aria-labelledby="carnet-titre" hidden>
-    <div class="carnet-boite">
-      <div class="carnet-tete"><h2 id="carnet-titre">📒 Carnet de mission</h2><button class="btn btn-mini" id="carnet-fermer">Fermer ✕</button></div>
-      <div id="carnet-corps"></div>
-    </div>
-  </div>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-
   <footer class="pied">Panne à bord du Néon-86 · Tommy Berben · eSCIENCES.be · Formation numérique S1 · Licence CC BY-NC-SA 4.0</footer>
 
   <script src="js/data.js"></script>
   <script src="js/art.js"></script>
+  <script src="js/scenes.js"></script>
   <script src="js/engine.js"></script>
 </body>
 </html>
