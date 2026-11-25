@@ -1,9 +1,9 @@
-# Panne à bord du Néon-86 (version 2)
+# Panne à bord du Néon-86 (version 2.1)
 
 Escape game numérique pour la **formation numérique en 1re secondaire** (12-13 ans).
 Application statique HTML/CSS/JavaScript : sans serveur, sans base de données, sans compte élève.
 
-**Version 2 :** scénario en 2056, quatre lieux dessinés et explorables qui évoluent à chaque réparation, inscription de 1 à 4 membres, atelier A1 en lots nominatifs, tableau de branchement (B1), piste de programmation (C3), disquettes à insérer (finale), tutoriel et aide « Je suis perdu ».
+**Version 2.1 :** interface allégée (consigne d’une phrase, aide et indices sur demande, astuces au bon moment). **Version 2 :** scénario en 2056, quatre lieux dessinés et explorables qui évoluent à chaque réparation, inscription de 1 à 4 membres, atelier A1 en lots nominatifs, tableau de branchement (B1), piste de programmation (C3), disquettes à insérer (finale), tutoriel et aide « Je suis perdu ».
 
 ## Contenu du dossier
 

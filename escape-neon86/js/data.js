@@ -9,7 +9,7 @@
 
 window.NEON = {
   titre: "Panne à bord du Néon-86",
-  version: "2.0",
+  version: "2.1",
 
   /* Code d'accès donné par l'enseignant (empreinte). null = pas de verrou. */
   codeAcces: "0lc5caz",
@@ -19,52 +19,32 @@ window.NEON = {
 
   /* ---------------------------------------------------- RÉCIT D'ACCUEIL */
   intro: [
-    { titre: "Où sommes-nous ?", lieu: "hub",
-      lignes: [
-        { qui: "journal", txt: "Année 2056. Vous êtes l'équipe de maintenance stagiaire de l'Agence orbitale. La navette du matin vient de vous déposer sur NÉON-86." },
-        { qui: "journal", txt: "NÉON-86 est la dernière station « modèle 86 » : elle a été construite d'après les plans du programme orbital de 1986. Ses écrans cathodiques, ses disquettes et ses commutateurs résistent aux tempêtes solaires. C'est pour ça qu'on la garde." }
-      ] },
-    { titre: "Que s'est-il passé ?", lieu: "A",
-      lignes: [
-        { qui: "boulon", txt: "Bonjour, stagiaires ! Je suis BOULON, robot de maintenance. Cette nuit, j'ai lancé une « optimisation générale ». Je me suis démonté, j'ai compressé les archives, j'ai recâblé l'antenne… et j'ai fait un peu de ménage dans la mémoire de GLADYS." },
-        { qui: "gladys", txt: "Mémoire de démarrage : effacée. Je fonctionne en mode de secours. Je ne boude pas. Je… économise mon énergie." }
-      ] },
-    { titre: "Votre mission", lieu: "hub",
-      lignes: [
-        { qui: "journal", txt: "Le vaisseau de ravitaillement COMÈTE approche. Sans antenne, sans balise et sans GLADYS, il ne peut pas s'amarrer. Il attend en orbite d'attente : il n'y a pas de compte à rebours." },
-        { qui: "journal", txt: "GLADYS n'a pas de bras et Boulon n'a plus de tête : il faut des mains humaines. Réparez les trois secteurs. Chaque système réparé imprime une disquette de maintenance qui contient une notion." },
-        { qui: "gladys", txt: "Avec les 11 disquettes, vous reconstruirez ma mémoire de démarrage. Ensuite, la balise enverra le signal d'amarrage. Simple. Pour des humains." }
-      ] }
+    { lieu: "hub", txt: "2056. Bienvenue à bord du NÉON-86." },
+    { lieu: "A", txt: "BOULON a tout « optimisé ». La station est en panne." },
+    { lieu: "hub", txt: "Réparez les trois secteurs pour accueillir le vaisseau COMÈTE." }
   ],
 
-  tutoriel: [
-    { cible: ".hotspot[data-o='porteA']", txt: "Les objets avec un anneau sont interactifs, comme cette porte. Survole-les ou utilise la touche Tab pour lire leur nom. Clique pour les examiner ou pour changer de lieu." },
-    { cible: "#btn-carnet", txt: "Le carnet de mission garde tout : vos disquettes, les consignes hors du jeu et l'équipage." },
-    { cible: "#btn-hub", txt: "Le bouton « Poste de pilotage » te ramène ici depuis n'importe quel lieu. Le bouton « Je suis perdu » propose une prochaine action." }
-  ],
-
-  regles: [
-    "Pas d'ordre imposé : les trois secteurs sont ouverts dès le départ.",
-    "Une énigme vous bloque ? Allez dans un autre secteur et revenez plus tard.",
-    "Chaque énigme propose 3 indices, du plus léger au plus précis.",
-    "Certaines missions se font hors du jeu : sur papier, dans vos fichiers ou dans le navigateur.",
-    "Pas de compte à rebours : l'heure de bord de l'histoire n'est pas l'heure de votre cours.",
-    "La progression est enregistrée sur cet ordinateur : vous pouvez reprendre plus tard."
-  ],
+  /* Astuces montrées une seule fois, au moment utile */
+  astuces: {
+    porte: "Clique sur la porte pour entrer.",
+    pilotage: "Ce bouton te ramène au poste de pilotage.",
+    indice: "Bloqué ? Demande un indice ici.",
+    carnet: "Tes disquettes sont rangées dans le carnet."
+  },
 
   /* ------------------------------------------------------------ LIEUX */
   lieux: {
-    hub: { nom: "Poste de pilotage", objectif: "Choisir un secteur à réparer. Quand les 9 systèmes fonctionnent, réveiller GLADYS à sa console." },
-    A: { nom: "Salle des machines", objectif: "Remonter Boulon et retrouver la sauvegarde de mémoire de GLADYS.", enigmes: ["A1", "A2"] },
-    B: { nom: "Antenne de communication", objectif: "Rebrancher l'antenne, capter la balise et trouver l'heure d'amarrage.", enigmes: ["B1", "B2", "B3"] },
-    C: { nom: "Atelier pixels & robotique", objectif: "Réparer l'écran, retrouver la pile de Boulon, le recharger et calibrer le capteur.", enigmes: ["C1", "C2", "C3", "C4"] }
+    hub: { nom: "Poste de pilotage", objectif: "Choisis un secteur à réparer." },
+    A: { nom: "Salle des machines", objectif: "Remonte Boulon. Retrouve la sauvegarde de GLADYS.", enigmes: ["A1", "A2"] },
+    B: { nom: "Antenne de communication", objectif: "Rebranche l'antenne. Capte la balise.", enigmes: ["B1", "B2", "B3"] },
+    C: { nom: "Atelier pixels & robotique", objectif: "Répare l'écran, guide Boulon, règle le capteur.", enigmes: ["C1", "C2", "C3", "C4"] }
   },
 
   infos: {
-    hublot: "Par le hublot, le vaisseau COMÈTE attend en orbite d'attente. Plus vous réparez de systèmes, plus il se rapproche. Il ne repartira pas : prenez le temps qu'il faut.",
-    imprimante: "L'imprimante à papier continu imprime une disquette de maintenance chaque fois qu'un système est réparé. Vos disquettes sont rangées dans le carnet de mission.",
-    courant: "Tableau électrique : un voyant s'allume pour chaque système réparé dans cette salle. Quand les deux sont verts, la salle retrouve la pleine lumière.",
-    oscillo: "Console de diagnostic : elle mesure la force du signal de l'antenne. Chaque réparation du secteur B le renforce."
+    hublot: "Le vaisseau COMÈTE attend. Il se rapproche à chaque réparation.",
+    imprimante: "Chaque réparation imprime une disquette. Elles sont dans le carnet.",
+    courant: "Un voyant vert par système réparé dans cette salle.",
+    oscillo: "La force du signal monte à chaque réparation du secteur B."
   },
 
   /* Disquettes de maintenance (cartes-mémoire) */
@@ -86,16 +66,13 @@ window.NEON = {
 
     /* ---------------------------------------------------------------- A1 */
     A1: {
-      titre: "L'atelier de Boulon",
+      titre: "Remonte BOULON",
       notion: "Matériel, logiciel et système d'exploitation",
       statut: "Révision", lieu: "Dans le jeu", duree: 6, salle: "A",
+      consigne: "{nom}, range tes {n} éléments dans les bons bacs.",
+      replique: { qui: "boulon", txt: "J'ai mis TOUTES mes pièces dans le même bac. Audacieux, non ?" },
+      aide: "Glisse un élément vers un bac, ou clique sur l'élément puis sur le bac. Clique sur un élément rangé pour le reprendre.",
       type: "atelier",
-      panne: "Boulon s'est démonté pour « s'améliorer ». Toutes ses pièces, et même ses logiciels, sont mélangés sur l'établi.",
-      afaire: "Chaque membre range les pièces de son lot dans le bon bac. Glisse une pièce vers un bac, ou clique sur la pièce puis sur le bac.",
-      valider: "Chaque membre vérifie son lot. Quand tous les lots sont justes, Boulon est remonté.",
-      recit: [
-        { qui: "boulon", txt: "J'ai mis TOUTES mes pièces dans le même bac. Même celles qu'on ne peut pas toucher. C'était audacieux." }
-      ],
       bacs: [
         { id: "mat", nom: "Matériel", aide: "ce qu'on peut toucher" },
         { id: "os",  nom: "Systèmes d'exploitation", aide: "logiciel qui démarre en premier", famille: "logiciel" },
@@ -118,83 +95,68 @@ window.NEON = {
         { nom: "Imprimante", cat: "mat", ico: "🖨" }
       ],
       indices: [
-        "Pose-toi la question : est-ce que je peux le toucher, le prendre dans ma main ? Si oui, c'est du matériel.",
-        "Les systèmes d'exploitation sont peu nombreux : ce sont eux qui démarrent l'ordinateur (on les retrouve à l'école et à la maison). Les applications sont les programmes qu'on ouvre ensuite.",
-        "Il y a 6 pièces de matériel, 3 systèmes d'exploitation (Windows, macOS, ChromeOS) et 3 applications (Firefox, Minecraft Education, Word)."
+        "Peux-tu le toucher ? Alors c'est du matériel.",
+        "Un système d'exploitation démarre l'ordinateur. Une application, on la lance ensuite.",
+        "Systèmes d'exploitation : Windows, macOS, ChromeOS. Applications : Firefox, Minecraft, Word."
       ],
       recompense: ["materiel", "os"],
-      changement: "Boulon est remonté et se tient debout sur l'établi. Il file vers l'atelier : la grille de déplacement (C3) est maintenant utilisable.",
-      succes: "Clac, clic, vrrr… « J'étais déjà parfait. Maintenant, je suis parfait ET rangé. »"
+      changement: "BOULON est remonté. Sa borne de recharge est accessible.",
     },
 
     /* ---------------------------------------------------------------- A2 */
     A2: {
-      titre: "La sauvegarde perdue",
+      titre: "Retrouve la sauvegarde de GLADYS",
       notion: "Fichier, extension, dossier, arborescence, téléchargement",
       statut: "Révision + découverte (fichier ZIP, versions)", lieu: "Sur l'ordinateur", duree: 8, salle: "A",
+      consigne: "Trouve la sauvegarde la plus récente au format texte.",
+      replique: { qui: "gladys", txt: "Les images, je ne sais pas les lire." },
       type: "champs",
-      panne: "Boulon a compressé toutes les archives dans un seul fichier ZIP. La sauvegarde de mémoire de GLADYS est perdue dedans.",
-      afaire: "Télécharger les archives, les extraire, puis explorer les dossiers dans le vrai explorateur de fichiers de l'ordinateur.",
-      valider: "Le mot de passe de la bonne sauvegarde et le nom du dossier où elle se trouvait.",
-      recit: [
-        { qui: "gladys", txt: "Ma sauvegarde est la version la plus récente… au format TEXTE. Les images, je ne sais pas les lire. Je suis une ordinatrice, pas une galerie d'art." }
-      ],
       learn: {
-        titre: "Découverte : le fichier compressé (.zip)",
-        txt: "Un fichier .zip regroupe plusieurs fichiers et dossiers dans un seul fichier, plus léger. Pour voir son contenu, il faut l'extraire (le décompresser)."
+        titre: "Nouveau : le fichier .zip",
+        txt: "Un .zip range plusieurs fichiers dans un seul. Pour les voir, il faut l'extraire.",
+        exemple: "📦 archives.zip  →  📁 archives"
       },
       telechargement: { fichier: "ressources/archives_neon86.zip", label: "Télécharger les archives (archives_neon86.zip)" },
       mission: {
-        titre: "Mission sur l'ordinateur : retrouver la sauvegarde",
-        etapes: [
-          "Clique sur le bouton de téléchargement des archives.",
-          "Ouvre ton dossier Téléchargements et retrouve le fichier archives_neon86.zip.",
-          "Extrais-le (voir l'aide selon ton ordinateur), puis ouvre le dossier archives_neon86.",
-          "Lis le fichier LISEZ-MOI.txt : il explique quelle sauvegarde est la bonne.",
-          "Explore les dossiers et les sous-dossiers pour la trouver."
-        ],
-        rapporter: "le mot de passe écrit dans la bonne sauvegarde et le nom du dossier où elle se trouvait.",
+        etapes: ["Télécharge les archives.", "Extrais le ZIP et ouvre le dossier.", "Lis LISEZ-MOI.txt pour trouver la bonne sauvegarde."],
         aide: {
-          "Windows": "Clic droit sur le fichier .zip > « Extraire tout… » > « Extraire ». Un dossier normal apparaît à côté du .zip.",
-          "macOS": "Double-clique sur le fichier .zip : un dossier archives_neon86 apparaît à côté.",
-          "ChromeOS": "Dans l'application Fichiers, double-clique sur le .zip : son contenu s'ouvre. Tu peux copier le dossier archives_neon86 dans « Mes fichiers »."
+          "Windows": "Clic droit sur le .zip > « Extraire tout… » > « Extraire ».",
+          "macOS": "Double-clique sur le .zip : un dossier apparaît à côté.",
+          "ChromeOS": "Dans Fichiers, double-clique sur le .zip, puis copie le dossier dans « Mes fichiers »."
         }
       },
+
       champs: [
-        { id: "mdp", label: "Mot de passe de la bonne sauvegarde", ok: ["1sh5p74"],
+        { id: "mdp", label: "Mot de passe", ok: ["1sh5p74"],
           pieges: {
-            "1ncmvgg": "C'est le mot de la version 01 : elle est périmée. Cherche une version plus récente.",
-            "16c1mgi": "C'est le mot de la version 02. Une version plus récente existe : Boulon l'a peut-être mal rangée.",
-            "1ou9miq": "Ce mot vient d'une image (.png). Relis le LISEZ-MOI : GLADYS ne lit que les fichiers texte. Regarde bien les extensions."
+            "1ncmvgg": "Version 01 : périmée. Cherche plus récent.",
+            "16c1mgi": "Version 02 : une version plus récente existe.",
+            "1ou9miq": "Ce mot vient d'une image (.png). GLADYS ne lit que les fichiers texte (.txt)."
           } },
-        { id: "dossier", label: "Nom du dossier qui contenait cette sauvegarde", ok: ["0reuuz4"],
+        { id: "dossier", label: "Dossier où elle se trouvait", ok: ["0reuuz4"],
           pieges: {
-            "01xchx2": "C'est le dossier « 03_images ». La sauvegarde est rangée encore un niveau plus bas, dans un sous-dossier.",
-            "1m7qf4f": "Le dossier « sauvegardes » contient les anciennes versions. La plus récente en texte a été rangée ailleurs par Boulon."
+            "01xchx2": "Presque : regarde un sous-dossier plus bas.",
+            "1m7qf4f": "Ce dossier contient les anciennes versions. La v03 est ailleurs."
           } }
       ],
       indices: [
-        "Les sauvegardes s'appellent memoire_gladys_v01, v02, v03… Le numéro le plus élevé est le plus récent. Mais attention à l'extension !",
-        "La v04 est une image (.png) : ce n'est pas un fichier texte. La bonne sauvegarde est la v03 en .txt. Boulon l'a rangée parmi des photos… Tu peux aussi utiliser la recherche de ton explorateur de fichiers.",
-        "Chemin complet : archives_neon86 > 03_images > vacances_boulon > memoire_gladys_v03.txt. Ouvre ce fichier pour lire le mot de passe."
+        "Le numéro le plus grand est la version la plus récente. Regarde aussi l'extension.",
+        "La v04 est une image (.png). Cherche la v03 en .txt.",
+        "Elle est dans 03_images > vacances_boulon."
       ],
       recompense: ["fichier"],
-      changement: "Le terminal des archives affiche « ARCHIVES RESTAURÉES » et le tiroir du meuble est refermé.",
-      succes: "GLADYS : « Mémoire v03 chargée. La v04 en image, c'était une blague de Boulon ? »"
+      changement: "Archives restaurées : GLADYS retrouve sa mémoire.",
     },
 
     /* ---------------------------------------------------------------- B1 */
     B1: {
-      titre: "Le tableau de branchement",
+      titre: "Répare les connexions",
       notion: "Internet, Web, navigateur, moteur de recherche, lien, courriel",
       statut: "Révision", lieu: "Dans le jeu", duree: 5, salle: "B",
+      consigne: "Relie chaque mot à sa description.",
+      replique: { qui: "boulon", txt: "J'ai TOUT branché. Enfin, presque correctement." },
+      aide: "Clique sur un mot, puis sur sa description. Tu peux aussi glisser le mot. Les bons câbles peuvent rester.",
       type: "branchement",
-      panne: "Boulon a recâblé le tableau de l'antenne « selon ses connaissances ». Certains câbles relient un mot à la mauvaise description. QUESTOR, le moteur de recherche de la station, ne démarre plus.",
-      afaire: "Diagnostiquer chaque câble. Pour rebrancher : clique sur une prise de gauche (un mot), puis sur la bonne prise de droite (sa description). Les câbles justes peuvent rester en place.",
-      valider: "Lancer le test du tableau : les 6 câbles doivent être justes.",
-      recit: [
-        { qui: "boulon", txt: "J'ai TOUT branché. Enfin, presque tout correctement. Statistiquement, au moins un câble doit être juste." }
-      ],
       prises: [
         { id: "internet", mot: "Internet" },
         { id: "web", mot: "Le Web" },
@@ -204,136 +166,115 @@ window.NEON = {
         { id: "courriel", mot: "Le courriel (e-mail)" }
       ],
       descriptions: [
-        { id: "d-reseau", txt: "Réseau mondial qui relie des appareils grâce à des câbles, des antennes et des routeurs.", bonne: "internet" },
-        { id: "d-pages", txt: "Ensemble de pages reliées entre elles par des liens ; il utilise Internet pour voyager.", bonne: "web" },
-        { id: "d-logiciel", txt: "Logiciel qui affiche les pages : Firefox, Chrome, Edge, Safari.", bonne: "navigateur" },
-        { id: "d-cherche", txt: "Site qui propose des pages à partir de mots-clés : Google, Qwant, Bing, Ecosia.", bonne: "moteur" },
-        { id: "d-clic", txt: "Élément sur lequel on clique pour aller vers une autre page.", bonne: "lien" },
-        { id: "d-message", txt: "Service qui envoie des messages par Internet, sans être une page du Web.", bonne: "courriel" }
+        { id: "d-reseau", txt: "Réseau mondial qui relie les appareils.", bonne: "internet" },
+        { id: "d-pages", txt: "Pages reliées par des liens. Il utilise Internet.", bonne: "web" },
+        { id: "d-logiciel", txt: "Logiciel qui affiche les pages (Firefox, Chrome…).", bonne: "navigateur" },
+        { id: "d-cherche", txt: "Site qui trouve des pages avec des mots-clés (Google, Qwant…).", bonne: "moteur" },
+        { id: "d-clic", txt: "On clique dessus pour aller vers une autre page.", bonne: "lien" },
+        { id: "d-message", txt: "Messages envoyés par Internet, sans être une page du Web.", bonne: "courriel" }
       ],
       /* Câblage de départ de Boulon : 2 erreurs croisées + 2 câbles justes + 2 câbles débranchés */
       depart: { internet: "d-pages", web: "d-reseau", navigateur: "d-cherche", moteur: "d-logiciel", lien: "d-clic", courriel: null },
       explications: {
-        internet: "Internet est le RÉSEAU (câbles, antennes, routeurs). Les pages, c'est le Web.",
-        web: "Le Web, ce sont les PAGES reliées par des liens. Il utilise Internet, mais ce n'est pas le réseau lui-même.",
-        navigateur: "Un navigateur est un LOGICIEL qui affiche les pages (Firefox, Chrome…). Google, c'est un moteur de recherche.",
-        moteur: "Un moteur de recherche est un SITE qui cherche des pages à partir de mots-clés.",
-        lien: "Un lien hypertexte, c'est ce sur quoi on clique pour changer de page.",
-        courriel: "Le courriel utilise Internet, mais un e-mail n'est pas une page du Web."
+        internet: "Internet = le réseau. Les pages, c'est le Web.",
+        web: "Le Web = des pages reliées par des liens.",
+        navigateur: "Navigateur = logiciel qui affiche les pages. Google est un moteur de recherche.",
+        moteur: "Moteur de recherche = site qui cherche avec des mots-clés.",
+        lien: "Lien = on clique pour changer de page.",
+        courriel: "Le courriel passe par Internet, mais ce n'est pas une page du Web."
       },
       indices: [
-        "Commence par les câbles dont tu es sûr(e). Puis distingue un LOGICIEL qui affiche les pages (navigateur) d'un SITE qui cherche des pages (moteur de recherche).",
-        "Internet, c'est la « route » qui relie les ordinateurs. Le Web, c'est l'un des « véhicules » qui roulent dessus, comme le courriel.",
-        "Boulon a croisé Internet et le Web, puis le navigateur et le moteur de recherche. Le câble du courriel est débranché : il va vers « Service qui envoie des messages… »."
+        "Commence par les câbles dont tu es sûr.",
+        "Internet est la route. Le Web et le courriel roulent dessus.",
+        "Boulon a inversé Internet et le Web, puis le navigateur et le moteur de recherche."
       ],
       recompense: ["navigateur", "internet"],
-      changement: "Les câbles du tableau sont droits et les voyants passent au vert. QUESTOR s'allume : sa console (B3) est maintenant utilisable.",
-      succes: "Boulon : « Je le savais. Je voulais juste vérifier que VOUS le saviez. »"
+      changement: "L'antenne est rebranchée. QUESTOR s'allume.",
     },
 
     /* ---------------------------------------------------------------- B2 */
     B2: {
-      titre: "La balise relais",
+      titre: "Capte la balise",
       notion: "URL, barre d'adresse, favoris",
       statut: "Révision", lieu: "Dans le navigateur", duree: 5, salle: "B",
+      consigne: "Lis l'adresse de la balise, puis ajoute-la à tes favoris.",
+      replique: { qui: "gladys", txt: "Elle est timide : son message est dans son adresse." },
       type: "champs",
-      panne: "La balise relais ALT… flotte près de la station, mais elle est timide : elle n'écrit rien d'utile sur sa page. Son message est caché dans sa propre adresse.",
-      afaire: "Ouvrir la balise dans un nouvel onglet, lire son URL dans la vraie barre d'adresse et l'ajouter aux favoris.",
-      valider: "Le nom de la page de la balise et la fréquence lue dans l'URL.",
-      recit: [
-        { qui: "boulon", txt: "Une adresse, c'est la même chose qu'une page, non ? Non ? Ah." }
-      ],
       relais: { fichier: "relais.html?station=neon86&frequence=147", label: "Ouvrir la balise relais (nouvel onglet)" },
       mission: {
-        titre: "Mission dans le navigateur : lire l'adresse de la balise",
-        etapes: [
-          "Ouvre la balise relais : elle s'affiche dans un nouvel onglet.",
-          "Clique dans la barre d'adresse pour voir l'URL complète de la page.",
-          "Repère le nom de la page (le fichier qui se termine par .html) et la fréquence indiquée dans l'URL.",
-          "Ajoute la balise à tes favoris : elle va se cacher, et vous en aurez besoin pour la mission finale.",
-          "Reviens dans l'onglet du jeu pour noter tes réponses."
-        ],
-        rapporter: "le nom de la page de la balise et la valeur de la fréquence lue dans l'URL.",
+        etapes: ["Ouvre la balise (nouvel onglet).", "Clique dans la barre d'adresse et lis toute l'URL.", "Ajoute la page aux favoris, puis reviens ici."],
         aide: {
-          "Favori (Windows / ChromeOS)": "Appuie sur Ctrl + D, ou clique sur l'étoile ☆ dans la barre d'adresse.",
-          "Favori (macOS)": "Appuie sur Cmd + D, ou clique sur l'étoile ☆ (ou « Ajouter un signet » dans Safari).",
-          "Voir l'adresse complète": "Certains navigateurs raccourcissent l'adresse. Clique une fois dans la barre d'adresse pour l'afficher en entier."
+          "Windows / ChromeOS": "Favori : Ctrl + D, ou l'étoile ☆ dans la barre d'adresse.",
+          "macOS": "Favori : Cmd + D, ou l'étoile ☆ (« Ajouter un signet » dans Safari).",
+          "Adresse raccourcie ?": "Clique une fois dans la barre d'adresse pour la voir en entier."
         }
       },
+
       champs: [
-        { id: "page", label: "Nom de la page de la balise (fichier .html)", ok: ["17xj0qm", "0ussh83"],
-          pieges: { "15dwwo3": "Ça, c'est le nom de la station écrit dans l'URL. Le nom de la page est le fichier qui se termine par .html, juste avant le « ? »." } },
-        { id: "freq", label: "Fréquence lue dans l'URL", ok: ["0wsa76l"] }
+        { id: "page", label: "Nom de la page (.html)", ok: ["17xj0qm", "0ussh83"],
+          pieges: { "15dwwo3": "C'est le nom de la station. La page se termine par .html." } },
+        { id: "freq", label: "Fréquence", ok: ["0wsa76l"] }
       ],
       indices: [
-        "Le message n'est pas écrit sur la page de la balise. Regarde tout en haut de la fenêtre du navigateur, dans la barre d'adresse.",
-        "Après le « ? », l'URL contient des informations de la forme nom=valeur, séparées par « & ». Cherche celle qui commence par frequence=.",
-        "La page s'appelle relais.html. Dans l'URL, tu peux lire : frequence=147."
+        "Le message n'est pas sur la page. Regarde la barre d'adresse.",
+        "Après le « ? », cherche frequence=…",
+        "La page s'appelle relais.html. La fréquence est 147."
       ],
       recompense: ["url"],
-      changement: "La balise est captée sur la fréquence 147. Gênée, elle se cache : le lien disparaît du jeu. Retrouvez-la plus tard avec vos favoris ou l'historique.",
-      succes: "GLADYS : « Fréquence 147 enregistrée. Gardez bien cette balise dans vos favoris. »"
+      changement: "Balise captée sur la fréquence 147. Elle se cache dans tes favoris.",
     },
 
     /* ---------------------------------------------------------------- B3 */
     B3: {
-      titre: "QUESTOR, le moteur de recherche",
+      titre: "Trouve l'heure d'amarrage",
       notion: "Mot-clé, lien hypertexte, fiabilité d'une source (https)",
       statut: "Révision + découverte (https et cadenas)", lieu: "Dans le jeu", duree: 6, salle: "B",
+      consigne: "Cherche l'heure d'amarrage du vaisseau COMÈTE. Choisis une source fiable.",
+      replique: { qui: "boulon", txt: "Moi, je prends toujours le premier résultat." },
+      aide: "Tape quelques mots-clés précis. Ouvre plusieurs résultats et compare leurs adresses.",
       type: "recherche",
       requiert: ["B1"],
-      verrou: "QUESTOR est éteint : il faut d'abord réparer le tableau de branchement (B1) dans cette salle.",
-      panne: "Personne ne connaît l'heure d'amarrage prévue pour le vaisseau COMÈTE. Plusieurs pages donnent des heures différentes.",
-      afaire: "Chercher avec des mots-clés précis, ouvrir les résultats et choisir une source fiable.",
-      valider: "L'heure d'amarrage (heure de bord) et les indices qui montrent qu'un site n'est pas fiable.",
-      recit: [
-        { qui: "boulon", txt: "Moi, je prends toujours le premier résultat. C'est le plus rapide. Donc le meilleur. Logique." }
-      ],
+      verrou: "QUESTOR est éteint. Répare d'abord les connexions (B1).",
       learn: {
-        titre: "Découverte : http ou https ?",
-        txt: "Une adresse qui commence par https:// (avec un cadenas) indique une connexion sécurisée : les données sont protégées pendant leur trajet. Attention : le cadenas ne prouve pas que le site dit la vérité. Il faut aussi regarder qui a écrit la page."
+        titre: "Nouveau : http ou https ?",
+        txt: "https (🔒) protège le trajet des données. Mais le cadenas ne prouve pas que la page dit vrai.",
+        exemple: "🔒 https://…  ·  ⚠ http://…"
       },
       champs: [
-        { id: "heure", label: "Heure d'amarrage du vaisseau COMÈTE, en heure de bord (ex. : 10h30)", ok: ["1xd89cl", "0kdlb5d"],
+        { id: "heure", label: "Heure d'amarrage", ok: ["1xd89cl", "0kdlb5d"],
           pieges: {
-            "0zqky07": "13 h 00 vient du site « comète gratuite ». Est-ce une source fiable ? Regarde son adresse et ce qu'il te demande.",
-            "0i3jjin": "13 h 00 vient du site « comète gratuite ». Est-ce une source fiable ? Regarde son adresse et ce qu'il te demande.",
-            "08mw5u4": "18 h vient d'un forum de rumeurs (« mon cousin a dit… »). Ce n'est pas une source officielle.",
-            "1bdppgs": "18 h vient d'un forum de rumeurs (« mon cousin a dit… »). Ce n'est pas une source officielle."
+            "0zqky07": "13 h vient d'un site douteux. Vérifie son adresse.",
+            "0i3jjin": "13 h vient d'un site douteux. Vérifie son adresse.",
+            "08mw5u4": "18 h vient d'un forum de rumeurs.",
+            "1bdppgs": "18 h vient d'un forum de rumeurs."
           } }
       ],
       choixMultiple: {
-        question: "Quels indices montrent que le site « COMÈTE GRATUITE » n'est pas fiable ? (plusieurs réponses)",
+        question: "Pourquoi « COMÈTE GRATUITE » n'est pas fiable ?",
         options: [
-          { txt: "Son adresse commence par http:// (sans S, pas de cadenas)", ok: true },
-          { txt: "Il promet un cadeau gratuit", ok: true },
-          { txt: "Il demande ton mot de passe", ok: true },
-          { txt: "Il apparaît en premier dans les résultats", ok: false },
-          { txt: "Son titre contient le mot « comète »", ok: false }
+          { txt: "Adresse en http:// (pas de cadenas)", ok: true },
+          { txt: "Promet un cadeau gratuit", ok: true },
+          { txt: "Demande ton mot de passe", ok: true },
+          { txt: "Apparaît en premier", ok: false },
+          { txt: "Contient le mot « comète »", ok: false }
         ]
       },
       indices: [
-        "Un seul mot comme « comète » donne trop de résultats. Ajoute des mots-clés plus précis : que cherches-tu exactement ?",
-        "Essaie : horaire amarrage comète. Puis ouvre chaque résultat et regarde son adresse : qui a écrit la page ?",
-        "La page fiable est celle de l'agence orbitale (https://horaires.agence-orbitale.neon). Le premier résultat n'est pas forcément le meilleur !"
+        "Un seul mot donne trop de résultats. Ajoute des mots précis.",
+        "Essaie : horaire amarrage comète. Compare les adresses.",
+        "La page fiable est celle de l'agence orbitale (https)."
       ],
       recompense: ["motcle"],
-      changement: "La console QUESTOR affiche l'heure d'amarrage confirmée. La parabole se tourne vers la COMÈTE.",
-      succes: "GLADYS : « Une source officielle, enfin. Boulon, le premier résultat n'est pas toujours le bon. » Boulon : « Je le savais. »"
+      changement: "Heure confirmée. La parabole se tourne vers la COMÈTE.",
     },
 
     /* ---------------------------------------------------------------- C1 */
     C1: {
-      titre: "L'écran en panne",
+      titre: "Retrouve l'image",
       notion: "Pixel, image numérique, codage en 0 et 1",
       statut: "Révision", lieu: "Sur papier", duree: 6, salle: "C",
+      consigne: "Sur ta fiche : colorie les 1 et laisse les 0 blancs.",
       type: "champs",
-      panne: "L'écran de l'atelier n'affiche plus d'image : seulement des 0 et des 1.",
-      afaire: "Redessiner l'image sur la grille de la fiche papier : 1 = pixel allumé (colorié), 0 = pixel éteint (blanc).",
-      valider: "Le nombre de pixels allumés et l'objet qui apparaît.",
-      recit: [
-        { qui: "gladys", txt: "Cet écran ne m'obéit plus. Il n'affiche que des 0 et des 1. C'est vexant pour un écran." }
-      ],
       pixels: [
         "1111111100",
         "1100001110",
@@ -347,43 +288,32 @@ window.NEON = {
         "1111111111"
       ],
       mission: {
-        titre: "Mission sur papier : redessiner l'écran",
-        etapes: [
-          "Prends la fiche de mission (grille C1, 10 × 10).",
-          "Pour chaque ligne, colorie les cases qui correspondent à un 1. Laisse en blanc les cases qui correspondent à un 0.",
-          "Note le nombre de pixels allumés au bout de chaque ligne, puis fais le total.",
-          "Regarde le dessin obtenu : quel objet apparaît ?"
-        ],
-        rapporter: "le nombre de pixels allumés et l'objet dessiné.",
-        aide: { "Pas de fiche ?": "Dessine une grille de 10 cases sur 10 sur du papier quadrillé, puis colorie-la ligne par ligne." }
+        etapes: ["Prends la grille C1 de ta fiche.", "Colorie chaque 1, laisse chaque 0 blanc.", "Compte les cases coloriées."],
+        aide: { "Pas de fiche ?": "Dessine une grille de 10 × 10 cases sur du papier quadrillé." }
       },
+
       champs: [
-        { id: "nb", label: "Nombre de pixels allumés (coloriés)", ok: ["147ccp1"],
-          pieges: { "15bsqkk": "Ça, c'est le nombre de pixels ÉTEINTS (les 0). Compte les pixels allumés (les 1)." } },
-        { id: "objet", label: "Objet dessiné", type: "choix", options: ["Une fusée", "Une disquette", "Un robot", "Une clé"], bonne: 1 }
+        { id: "nb", label: "Pixels coloriés", ok: ["147ccp1"],
+          pieges: { "15bsqkk": "Ça, ce sont les 0. Compte les 1." } },
+        { id: "objet", label: "Objet reconnu", type: "choix", options: ["Une fusée", "Une disquette", "Un robot", "Une clé"], bonne: 1 }
       ],
       indices: [
-        "La grille a 10 lignes de 10 pixels : 100 pixels en tout. Avance ligne par ligne, de gauche à droite.",
-        "Compte les 1 de chaque ligne et note le total au bout de la ligne. Il ne reste qu'à additionner les 10 totaux.",
-        "Totaux par ligne : 8, 5, 6, 10, 10, 2, 8, 4, 8, 10. L'objet est rectangulaire avec une étiquette : c'est une disquette."
+        "Avance ligne par ligne, de gauche à droite.",
+        "Note le total de chaque ligne, puis additionne.",
+        "Totaux : 8, 5, 6, 10, 10, 2, 8, 4, 8, 10. C'est une disquette."
       ],
       recompense: ["pixel"],
-      changement: "L'écran de l'atelier affiche une disquette en pixels verts.",
-      succes: "GLADYS : « C'est mon portrait de famille. Mon arrière-grand-mère était une disquette 3½. »"
+      changement: "L'écran affiche à nouveau une image.",
     },
 
     /* ---------------------------------------------------------------- C2 */
     C2: {
-      titre: "Boulon s'est perdu",
+      titre: "Retrouve BOULON",
       notion: "Algorithme, instruction, boucle « répéter »",
       statut: "Révision", lieu: "Sur papier", duree: 5, salle: "C",
+      consigne: "Sur ta fiche : suis le programme depuis ★ et note les lettres.",
+      replique: { qui: "boulon", txt: "J'ai suivi ce programme parfaitement. Je ne sais juste plus où je suis." },
       type: "champs",
-      panne: "Pendant son optimisation, Boulon a suivi un programme pour aller chercher sa pile de secours. Personne ne sait où il s'est arrêté.",
-      afaire: "Rejouer le programme de Boulon sur la carte de la soute (fiche papier), case par case.",
-      valider: "Le mot de 4 lettres formé par les lettres notées.",
-      recit: [
-        { qui: "boulon", txt: "J'ai exécuté ce programme parfaitement. Je ne sais juste plus où je suis." }
-      ],
       carte: [
         "KAZTRUW",
         "NYFCXHJ",
@@ -399,170 +329,141 @@ window.NEON = {
         { t: "avancer" }
       ],
       mission: {
-        titre: "Mission sur papier : rejouer le programme",
-        etapes: [
-          "Sur la fiche de mission (carte C2), pose ton crayon sur la case ★. Boulon regarde vers le HAUT.",
-          "« avancer » = 1 case dans la direction où il regarde. « tourner à droite » = il pivote sur place, sans avancer.",
-          "À la fin de CHAQUE répétition de la boucle, note la lettre de la case où il se trouve.",
-          "À la fin du programme, note aussi la lettre de la dernière case."
-        ],
-        rapporter: "le mot de 4 lettres formé par les lettres notées.",
-        aide: { "Astuce": "Trace le chemin au crayon et dessine une petite flèche pour savoir où regarde Boulon après chaque virage." }
+        etapes: ["Pose ton crayon sur ★ : BOULON regarde vers le HAUT.", "Suis le programme case par case.", "Note la lettre à la fin de chaque répétition, puis la dernière."],
+        aide: { "Avancer ou tourner ?": "« avancer » = 1 case. « tourner » = pivoter sur place, sans changer de case." }
       },
+
       champs: [
-        { id: "mot", label: "Mot de 4 lettres", ok: ["0b7e68d"],
-          pieges: { "1r4nn78": "BOUM ! Tu as oublié la toute première instruction « avancer », celle qui se trouve AVANT la boucle." } }
+        { id: "mot", label: "Mot trouvé (4 lettres)", ok: ["0b7e68d"],
+          pieges: { "1r4nn78": "BOUM ! Tu as oublié le « avancer » avant la boucle." } }
       ],
       indices: [
-        "Le programme a 3 parties : une instruction avant la boucle, la boucle (3 répétitions), puis une instruction après.",
-        "Une répétition = avancer, avancer, tourner à droite. Après la première répétition, Boulon est 3 cases au-dessus de ★ et regarde vers la droite.",
-        "Les lettres notées sont P (fin de la 1re répétition), I, L, puis E. Le mot est PILE."
+        "N'oublie pas le « avancer » placé avant la boucle.",
+        "Après la 1re répétition, BOULON est 3 cases au-dessus de ★.",
+        "Les lettres sont P, I, L, E."
       ],
       recompense: ["algorithme"],
-      changement: "Le chemin de Boulon s'affiche en rouge sur la table lumineuse : sa pile de secours est retrouvée.",
-      succes: "Boulon : « Je savais exactement où j'étais. Je testais votre sens de l'orientation. »"
+      changement: "Le chemin de BOULON s'allume sur la table lumineuse.",
     },
 
     /* ---------------------------------------------------------------- C3 */
     C3: {
-      titre: "Ramène Boulon à sa borne",
+      titre: "Ramène BOULON à sa borne",
       notion: "Programmer avec une boucle « répéter »",
       statut: "Révision", lieu: "Dans le jeu", duree: 6, salle: "C",
+      consigne: "Construis un programme de 6 blocs maximum pour atteindre ⚡.",
+      aide: "Glisse un bloc vers « ＋ », ou clique le bloc puis « ＋ ». Les blocs placés se déplacent pareil. ✕ supprime.",
       type: "code",
       requiert: ["A1"],
-      verrou: "Boulon est encore en pièces dans la Salle des machines. Remontez-le d'abord (A1, l'atelier de Boulon).",
-      panne: "La batterie de Boulon est à 2 % et sa mémoire ne retient que 6 blocs. Des caisses bloquent le passage vers la borne ⚡.",
-      afaire: "Construire un programme sur la piste : glisse les blocs ou utilise les boutons. Tu peux insérer, déplacer et supprimer des blocs.",
-      valider: "Exécuter le programme : Boulon doit arriver sur la borne ⚡ avec 6 blocs maximum.",
-      recit: [
-        { qui: "boulon", txt: "Je pars en regardant vers la DROITE. Et vite, avant que je m'endorme. Zzz… non, je plaisante. Vite quand même." }
-      ],
+      verrou: "BOULON est en pièces. Remonte-le d'abord (salle des machines, A1).",
       grille: { l: 6, h: 6, depart: [0, 5], dir: "E", arrivee: [3, 2],
                 caisses: [[2, 5], [0, 3], [4, 4], [5, 1], [1, 1], [4, 2]] },
       maxBlocs: 6,
       indices: [
-        "Fais d'abord le chemin dans ta tête ou sur une feuille : le seul passage libre ressemble à un escalier.",
-        "Une marche de l'escalier = avancer, tourner à gauche, avancer, tourner à droite. Combien de marches faut-il ?",
-        "Programme possible : répéter 3 fois [ avancer, tourner à gauche, avancer, tourner à droite ]. Cela fait 5 blocs."
+        "Le passage libre ressemble à un escalier.",
+        "Une marche = avancer, gauche, avancer, droite.",
+        "répéter 3 fois [avancer, gauche, avancer, droite]."
       ],
       recompense: ["boucle"],
-      changement: "Boulon est branché sur la borne de recharge : le voyant de la borne est vert.",
-      succes: "Bip-bip ⚡ « 100 % ! Je suis prêt à faire des erreurs à pleine puissance. »"
+      changement: "BOULON est sur sa borne : 100 % de batterie.",
     },
 
     /* ---------------------------------------------------------------- C4 */
     C4: {
-      titre: "Le capteur d'étoiles",
+      titre: "Règle le capteur d'étoiles",
       notion: "Résolution d'une image",
       statut: "Découverte accompagnée", lieu: "Sur l'ordinateur", duree: 5, salle: "C",
+      consigne: "Trouve la taille en pixels de l'image capteur_etoile.png.",
       type: "champs",
-      panne: "Pour guider le vaisseau COMÈTE, le capteur d'étoiles doit connaître la résolution de sa dernière photo, rangée dans les archives.",
-      afaire: "Ouvrir l'image capteur_etoile.png dans les archives extraites et trouver ses dimensions en pixels.",
-      valider: "La largeur, la hauteur et le nombre total de pixels.",
-      recit: [
-        { qui: "boulon", txt: "La résolution ? C'est quand on prend une bonne résolution, genre « je range ma chambre » ? Non ? Encore ?" }
-      ],
       learn: {
-        titre: "Découverte : la résolution d'une image",
-        txt: "La résolution d'une image, c'est son nombre de pixels en largeur et en hauteur. On l'écrit « largeur × hauteur ». Exemple : une image de 100 × 50 pixels a 100 × 50 = 5 000 pixels. Plus il y a de pixels, plus l'image peut être détaillée."
+        titre: "Nouveau : la résolution",
+        txt: "C'est le nombre de pixels en largeur × hauteur.",
+        exemple: "100 × 50 pixels = 5 000 pixels"
       },
       telechargement: { fichier: "ressources/archives_neon86.zip", label: "Télécharger les archives (si ce n'est pas déjà fait)" },
       mission: {
-        titre: "Mission sur l'ordinateur : mesurer l'image",
-        etapes: [
-          "Dans les archives extraites, ouvre le dossier 03_images.",
-          "Ouvre capteur_etoile.png et agrandis-la (zoom) : observe les petits carrés.",
-          "Trouve ses dimensions en pixels (voir l'aide selon ton ordinateur).",
-          "Calcule le nombre total de pixels : largeur × hauteur."
-        ],
-        rapporter: "la largeur, la hauteur et le nombre total de pixels.",
+        etapes: ["Dans les archives, ouvre 03_images.", "Ouvre capteur_etoile.png et zoome.", "Trouve sa largeur et sa hauteur en pixels."],
         aide: {
-          "Méthode valable partout": "Glisse l'image dans un onglet vide du navigateur : les dimensions s'affichent dans le titre de l'onglet, par exemple « (24 × 16) ».",
-          "Windows": "Clic droit sur l'image > Propriétés > onglet « Détails » > Dimensions.",
-          "macOS": "Ouvre l'image dans Aperçu > menu Outils > « Afficher l'inspecteur ». Ou, dans le Finder, clic droit > « Lire les informations ».",
-          "ChromeOS": "Ouvre l'image dans la Galerie et clique sur l'icône « i » (infos)."
+          "Partout": "Glisse l'image dans un onglet vide du navigateur : la taille s'affiche dans le titre de l'onglet.",
+          "Windows": "Clic droit sur l'image > Propriétés > Détails > Dimensions.",
+          "macOS": "Aperçu > Outils > Afficher l'inspecteur.",
+          "ChromeOS": "Ouvre l'image dans la Galerie, puis l'icône « i »."
         }
       },
+
       champs: [
-        { id: "larg", label: "Largeur (en pixels)", ok: ["129x3xv"], pieges: { "076w5r2": "Tu as inversé : la largeur se mesure horizontalement (←→) et elle s'écrit en premier." } },
-        { id: "haut", label: "Hauteur (en pixels)", ok: ["076w5r2"], pieges: { "129x3xv": "Tu as inversé : la hauteur se mesure verticalement (↑↓)." } },
-        { id: "total", label: "Nombre total de pixels", ok: ["1m3k2mm"], pieges: { "129bzc9": "Tu as additionné. Pour une grille, on multiplie : largeur × hauteur." } }
+        { id: "larg", label: "Largeur", ok: ["129x3xv"], pieges: { "076w5r2": "Inversé : la largeur se mesure ←→." } },
+        { id: "haut", label: "Hauteur", ok: ["076w5r2"], pieges: { "129x3xv": "Inversé : la hauteur se mesure ↑↓." } },
+        { id: "total", label: "Total de pixels", ok: ["1m3k2mm"], pieges: { "129bzc9": "Tu as additionné. On multiplie." } }
       ],
       indices: [
-        "Les dimensions d'une image sont écrites dans ses propriétés (ou dans le titre de l'onglet si tu l'ouvres dans le navigateur).",
-        "Les dimensions s'écrivent largeur × hauteur. Pour le total, imagine une grille : on multiplie le nombre de colonnes par le nombre de lignes.",
-        "L'image mesure 24 pixels de large et 16 pixels de haut : 24 × 16 = 384 pixels."
+        "La taille est dans les propriétés de l'image.",
+        "Largeur × hauteur : on multiplie.",
+        "24 × 16 = 384 pixels."
       ],
       recompense: ["resolution"],
-      changement: "Le capteur d'étoiles vise la bonne étoile : une étoile jaune brille au-dessus de lui.",
-      succes: "GLADYS : « Avec si peu de pixels, l'étoile ressemble à un biscuit. Mais un biscuit précis. »"
+      changement: "Le capteur vise la bonne étoile.",
     }
   },
 
   /* ------------------------------------------------------------- FINAL */
   final: {
-    titre: "Reconstruire la mémoire de GLADYS",
-    panne: "La mémoire de démarrage de GLADYS est vide : 11 fentes attendent une disquette.",
-    afaire: "Insérer chaque disquette dans la fente dont la phrase lui correspond. Glisse une disquette vers une fente, ou clique sur la disquette puis sur la fente.",
-    valider: "Lancer le démarrage. Ensuite, envoyer le signal grâce au nom de la balise relais.",
-    recit: [
-      { qui: "gladys", txt: "Bon. Mes trois secteurs fonctionnent. Je veux bien me réveiller… si vous reconstruisez ma mémoire de démarrage. Sans faute. J'ai ma fierté." }
+    titre: "Réveille GLADYS",
+    consigne: "Glisse chaque disquette dans la bonne fente.",
+    replique: { qui: "gladys", txt: "Reconstruisez ma mémoire. Sans faute. J'ai ma fierté." },
+    aide: "Glisse une disquette vers une fente, ou clique la disquette puis la fente. Clique une fente pleine pour reprendre sa disquette.",
+    groupes: [
+      { titre: "L'ordinateur démarre", lignes: [0, 1, 2] },
+      { titre: "Sur Internet", lignes: [3, 4, 5, 6] },
+      { titre: "Image et programme", lignes: [7, 8, 9, 10] }
     ],
     lignes: [
-      { avant: "1. Quand on appuie sur le bouton, c'est le", carte: "materiel", apres: "qui se met en marche : écran, processeur, clavier…" },
-      { avant: "2. Puis le", carte: "os", apres: "démarre : il fait le lien entre le matériel et les autres logiciels." },
-      { avant: "3. Il range chaque", carte: "fichier", apres: "(texte, image, son…) dans des dossiers." },
-      { avant: "4. Pour visiter un site, j'ouvre un", carte: "navigateur", apres: "comme Firefox ou Chrome…" },
-      { avant: "5. … et je tape son adresse, l'", carte: "url", apres: ", dans la barre d'adresse." },
-      { avant: "6. Ma demande voyage par", carte: "internet", apres: ", le réseau mondial qui relie les ordinateurs." },
-      { avant: "7. Si je ne connais pas l'adresse, je choisis chaque", carte: "motcle", apres: "avec soin avant de lancer ma recherche." },
-      { avant: "8. La page s'affiche à l'écran : chaque", carte: "pixel", apres: "est un petit carré de couleur." },
-      { avant: "9. Le nombre de pixels en largeur et en hauteur s'appelle la", carte: "resolution", apres: "." },
-      { avant: "10. Pour guider Boulon, j'écris un", carte: "algorithme", apres: ": une suite d'instructions dans un ordre précis." },
-      { avant: "11. Quand des instructions se répètent, je les place dans une", carte: "boucle", apres: "« répéter »." }
+      { avant: "On appuie sur le bouton : le", carte: "materiel", apres: "se met en marche." },
+      { avant: "Le", carte: "os", apres: "démarre et relie matériel et logiciels." },
+      { avant: "Chaque", carte: "fichier", apres: "est rangé dans un dossier." },
+      { avant: "J'ouvre un", carte: "navigateur", apres: "pour visiter un site." },
+      { avant: "Je tape l'", carte: "url", apres: "dans la barre d'adresse." },
+      { avant: "Ma demande voyage par", carte: "internet", apres: "." },
+      { avant: "Sans adresse, je cherche avec un", carte: "motcle", apres: "précis." },
+      { avant: "L'écran affiche chaque", carte: "pixel", apres: "." },
+      { avant: "Largeur × hauteur en pixels : c'est la", carte: "resolution", apres: "." },
+      { avant: "Pour guider BOULON, j'écris un", carte: "algorithme", apres: "." },
+      { avant: "Pour répéter des instructions, j'utilise une", carte: "boucle", apres: "." }
     ],
     signal: {
-      titre: "Dernière étape : le signal d'amarrage",
-      txt: "Pour envoyer le signal, GLADYS a besoin du NOM de la balise relais. Il est écrit sur l'onglet de sa page (le titre de l'onglet), pas sur la page. Le lien a disparu du jeu : retrouvez la balise grâce à vos favoris (ou à l'historique : Ctrl + H, Cmd + Y sur Mac).",
-      label: "Nom de la balise (titre de l'onglet)",
+      titre: "Envoie le signal d'amarrage",
+      txt: "Ouvre la balise depuis tes favoris (ou l'historique). Son nom est sur l'onglet.",
+      label: "Nom de la balise",
       ok: ["15qpvgo", "0zp6ptq", "1tt7um8"],
       indices: [
-        "Ouvrez vos favoris (l'étoile, ou le menu du navigateur) et cliquez sur la balise relais. Regardez le titre de l'onglet tout en haut.",
-        "Pas de favori ? Ouvrez l'historique du navigateur (Ctrl + H, ou Cmd + Y sur Mac) et cherchez « Balise ».",
-        "Dernier recours : dans la barre d'adresse du jeu, remplacez index.html par relais.html (ou ajoutez relais.html à la fin de l'adresse). Le nom commence par ALT…"
+        "Ouvre tes favoris et clique sur la balise. Lis le titre de l'onglet.",
+        "Pas de favori ? Historique : Ctrl + H (Cmd + Y sur Mac).",
+        "Remplace index.html par relais.html dans la barre d'adresse. Le nom commence par ALT…"
       ]
     },
     indices: [
-      "Relisez la définition de chaque disquette dans le carnet de mission.",
-      "Chaque disquette n'est utilisée qu'une seule fois. Commencez par les phrases dont vous êtes sûrs : il restera moins de choix pour les autres.",
-      "Les phrases 1 et 2 parlent du matériel puis du système d'exploitation ; les phrases 4, 5 et 6 suivent le trajet navigateur → URL → Internet."
+      "Les définitions sont dans le carnet.",
+      "Chaque disquette sert une seule fois. Commence par les phrases sûres.",
+      "Ordre du démarrage : matériel, système d'exploitation, fichier."
     ],
     succes: [
-      { qui: "gladys", txt: "BIIIP… Mémoire de démarrage : 100 %. Antenne : OK. Écran : OK. Robot : présent. Hélas." },
-      { qui: "gladys", txt: "Signal envoyé à la balise ALTAÏR. Le vaisseau COMÈTE s'amarre à 16 h 45, heure de bord. Le cactus de bord est sauvé." },
-      { qui: "boulon", txt: "Bravo à moi ! Euh… à nous ! Bon, d'accord : bravo à VOUS." }
+      { qui: "gladys", txt: "Mémoire : 100 %. Signal envoyé à la balise ALTAÏR." },
+      { qui: "boulon", txt: "Bravo à moi ! Euh… bravo à VOUS." }
     ]
   },
 
   /* ------------------------------------------------------------- BILAN */
   bilan: {
-    erreurs: [
-      { titre: "Navigateur ≠ moteur de recherche", txt: "Firefox ou Chrome sont des navigateurs (logiciels). Google ou Qwant sont des moteurs de recherche (sites qui cherchent des pages)." },
-      { titre: "Internet ≠ Web", txt: "Internet est le réseau mondial. Le Web est l'ensemble des pages reliées par des liens, qui utilise Internet." },
-      { titre: "Le nom d'un fichier ne suffit pas", txt: "Deux fichiers peuvent avoir presque le même nom. L'extension (.txt, .png…) indique leur type." },
-      { titre: "Le premier résultat n'est pas toujours le bon", txt: "On vérifie qui a écrit la page, son adresse et ce qu'elle demande." },
-      { titre: "La résolution se multiplie", txt: "24 × 16 pixels = 384 pixels, et non 24 + 16." }
-    ],
     autoeval: [
-      "Je distingue le matériel, le système d'exploitation et les applications.",
-      "Je retrouve un fichier dans des dossiers et je reconnais son extension.",
-      "Je distingue Internet, le Web, un navigateur et un moteur de recherche.",
-      "Je lis une URL dans la barre d'adresse et j'utilise les favoris.",
-      "Je choisis des mots-clés précis et je vérifie la fiabilité d'une page.",
-      "J'explique ce qu'est un pixel et la résolution d'une image.",
-      "Je suis un algorithme et j'utilise une boucle « répéter »."
+      "Matériel, système d'exploitation, applications",
+      "Retrouver un fichier, lire une extension",
+      "Internet, Web, navigateur, moteur de recherche",
+      "Lire une URL, utiliser les favoris",
+      "Mots-clés précis, source fiable",
+      "Pixel et résolution",
+      "Algorithme et boucle"
     ],
-    question: "Expliquez avec vos mots comment vous avez retrouvé la bonne sauvegarde de GLADYS (ou une autre manipulation faite dans vos fichiers ou votre navigateur)."
+    question: "Comment avez-vous retrouvé la sauvegarde de GLADYS ?"
   },
 
   /* ---------------------------------------------- QUESTOR (énigme B3) */

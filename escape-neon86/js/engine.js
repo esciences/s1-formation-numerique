@@ -20,7 +20,7 @@
   const E = D.enigmes, IDS = Object.keys(E);
   function etatNeuf() {
     return { v: 2, membres: [], debut: null, fin: null, resolu: {}, indices: {}, essais: {}, saisies: {}, vu: {},
-      son: false, introVue: false, tuto: false, rotation: {},
+      son: false, introVue: false, tuto: false, rotation: {}, astuces: {},
       a1: { lots: [], place: {}, essaisLot: {} }, b1: null, c3: [], final: { slots: {} },
       finalOk: false, signalOk: false, auto: {}, explication: "", journal: [], migreDe: null };
   }
@@ -97,7 +97,7 @@
   let ecran = { nom: "acces" };
   function aller(nom, param) {
     ecran = { nom, param };
-    $("#toast").hidden = true; fermerModale();
+    $("#toast").hidden = true; fermerModale(); if (typeof fermerAstuce === "function") fermerAstuce();
     if (nom === "enigme") { S.vu[param] = true; sauver(); }
     if (nom === "lieu") { S.lieu = param; sauver(); }
     app().innerHTML = "";
@@ -111,26 +111,27 @@
     $("#entete").hidden = !enJeu; $("#objectif").hidden = !enJeu;
     if (!enJeu) return;
     $("#equipe-aff").innerHTML = S.membres.map((m, i) => badge(m, i, true)).join("");
-    $("#compteur").textContent = `💾 ${cartesGagnees().length}/11 disquettes · ${nbResolus()}/9 systèmes`;
+    $("#compteur").textContent = `💾 ${cartesGagnees().length}/11 · ${nbResolus()}/9`;
+    $("#compteur").setAttribute("aria-label", `${cartesGagnees().length} disquettes sur 11, ${nbResolus()} systèmes réparés sur 9`);
     $("#btn-son").setAttribute("aria-pressed", S.son ? "true" : "false");
-    $("#btn-son").textContent = S.son ? "🔊 Son activé" : "🔇 Son coupé";
-    let lieu, obj;
+    $("#btn-son").textContent = S.son ? "🔊" : "🔇";
+    $("#btn-son").setAttribute("aria-label", S.son ? "Son activé" : "Son coupé");
+    let lieu, obj = "";
     if (ecran.nom === "lieu") { lieu = D.lieux[ecran.param].nom; obj = objectifLieu(ecran.param); }
-    else if (ecran.nom === "enigme") { const e = E[ecran.param]; lieu = D.lieux[e.salle].nom + " › " + e.titre; obj = estResolu(ecran.param) ? "Système réparé. Choisis une autre réparation." : e.afaire; }
-    else if (ecran.nom === "final") { lieu = "Poste de pilotage › Console de GLADYS"; obj = S.finalOk ? "Envoyer le signal d'amarrage avec le nom de la balise." : "Insérer les 11 disquettes dans les bonnes fentes."; }
-    else { lieu = "Poste de pilotage"; obj = termine() ? "Mission accomplie : faites votre bilan." : "Bilan de mission."; }
+    else if (ecran.nom === "enigme") lieu = D.lieux[E[ecran.param].salle].nom;
+    else lieu = "Poste de pilotage";
     $("#obj-lieu").textContent = lieu; $("#obj-txt").textContent = obj;
+    $("#objectif").classList.toggle("sans-obj", !obj);
   }
   function objectifLieu(l) {
     if (l === "hub") {
-      if (termine()) return "Mission accomplie ! Le vaisseau COMÈTE est amarré. Ouvrez le bilan.";
-      if (finalOuvert()) return "Les 9 systèmes fonctionnent : réveillez GLADYS à sa console.";
-      return `${D.lieux.hub.objectif} (${nbResolus()}/9 systèmes réparés)`;
+      if (termine()) return "Mission accomplie !";
+      if (finalOuvert()) return "Tout est réparé : réveille GLADYS à sa console.";
+      return `${D.lieux.hub.objectif} (${nbResolus()}/9 réparés)`;
     }
-    const ids = D.lieux[l].enigmes, faits = ids.filter(estResolu).length;
-    return faits === ids.length ? "Salle entièrement réparée ✔. Retournez au poste de pilotage ou explorez un autre secteur." : `${D.lieux[l].objectif} (${faits}/${ids.length} réparés)`;
+    const ids = D.lieux[l].enigmes, f = ids.filter(estResolu).length;
+    return f === ids.length ? "Salle réparée ✔" : `${D.lieux[l].objectif} (${f}/${ids.length})`;
   }
-
   /* ---------- dialogues ---------- */
   function bulle(l) {
     const noms = { gladys: "GLADYS 3000", boulon: "BOULON", journal: "Journal de bord" };
@@ -149,7 +150,7 @@
       <div class="accueil-panneau">
         <p class="sur-titre">eSCIENCES · Formation numérique S1 · Escape game</p>
         <h1 class="logo">PANNE À BORD<br><span>DU NÉON-86</span></h1>
-        <p>Accès verrouillé. GLADYS n'ouvre la station qu'avec le code donné par votre professeur.</p>
+        <p>Entre le code donné par ton professeur.</p>
         <form id="a-form" class="form-col"><label for="a-code">Code d'accès</label>
           <input id="a-code" type="password" autocomplete="off" autocapitalize="characters" aria-describedby="a-msg">
           <button class="btn btn-grand" type="submit">Déverrouiller</button></form>
@@ -159,7 +160,7 @@
     $("#a-form").onsubmit = (ev) => {
       ev.preventDefault();
       if (H($("#a-code").value) === D.codeAcces) { try { localStorage.setItem(CLE_ACCES, D.codeAcces); } catch (e) {} bip("ok"); demarrage(); }
-      else { $("#a-code").value = ""; $("#a-msg").textContent = "Code incorrect. Attendez que votre professeur vous donne le code."; bip("ko"); }
+      else { $("#a-code").value = ""; $("#a-msg").textContent = "Code incorrect."; bip("ko"); }
     };
   }
   function demarrage() {
@@ -173,12 +174,11 @@
       <div class="accueil-panneau">
         <p class="sur-titre">eSCIENCES · Formation numérique S1 · Escape game · 2056</p>
         <h1 class="logo">PANNE À BORD<br><span>DU NÉON-86</span></h1>
-        <p>GLADYS est en mode de secours, BOULON est en pièces et le vaisseau COMÈTE attend de pouvoir s'amarrer.</p>
-        ${sv && sv.membres.length ? `<div class="reprise"><p><b>Partie enregistrée sur cet ordinateur</b></p><p>${sv.membres.map((m, i) => { m.aff = nomAff(m, sv.membres); return badge(m, i, true); }).join(" ")}</p><p>${Object.keys(sv.resolu).length}/9 systèmes réparés</p>
+        ${sv && sv.membres.length ? `<div class="reprise"><p><b>Partie en cours</b></p><p>${sv.membres.map((m, i) => { m.aff = nomAff(m, sv.membres); return badge(m, i, true); }).join(" ")}</p><p>${Object.keys(sv.resolu).length}/9 réparés</p>
           <button class="btn btn-grand" id="d-reprendre">▶ Reprendre la mission</button></div>` : ""}
-        <button class="btn ${sv ? "btn-sec" : "btn-grand"}" id="d-nouveau">${sv ? "Nouvelle partie (nouvel équipage)" : "▶ Inscrire l'équipage"}</button>
+        <button class="btn ${sv ? "btn-sec" : "btn-grand"}" id="d-nouveau">${sv ? "Nouvelle partie" : "▶ Jouer"}</button>
         ${!stockageOk ? `<p class="msg-erreur">Ce navigateur bloque l'enregistrement : la progression sera perdue si la page est fermée.</p>` : ""}
-        <p class="petit">Environ 50 à 60 minutes · 1 à ${D.equipage.max} élèves par ordinateur · son facultatif</p>
+        <p class="petit">1 à ${D.equipage.max} joueurs · ±50 min</p>
       </div></section>`));
     if ($("#d-reprendre")) $("#d-reprendre").onclick = () => { S = sv; aller("lieu", S.lieu || "hub"); };
     $("#d-nouveau").onclick = () => {
@@ -193,11 +193,8 @@
     const noms = decouperEquipe(v1.equipe);
     const n = Object.keys(v1.resolu || {}).length;
     app().append(html(`<section class="panneau etroit">
-      <h1>Partie de l'ancienne version trouvée</h1>
-      <p>Cette partie a été commencée avec la version précédente du jeu${v1.equipe ? `, par l'équipage « <b>${esc(v1.equipe)}</b> »` : ""}. À l'époque, l'équipage était un seul champ de texte.</p>
-      <ul><li><b>${n}/9</b> systèmes réparés : ils sont conservés, avec les indices et les réponses déjà saisies.</li>
-        <li>Pour continuer, il faut inscrire chaque membre de l'équipage. ${noms.length > 1 ? `Proposition : ${noms.map(esc).join(", ")} (à vérifier).` : ""}</li>
-        <li>L'ancienne sauvegarde n'est pas effacée : elle reste sur cet ordinateur.</li></ul>
+      <h1>Ancienne partie trouvée</h1>
+      <p>${v1.equipe ? `Équipage « <b>${esc(v1.equipe)}</b> » · ` : ""}<b>${n}/9</b> réparés. Tes réparations sont gardées : il suffit d'inscrire les joueurs.</p>
       <div class="actions"><button class="btn btn-grand" id="mg-ok">Continuer cette partie</button><button class="btn btn-sec" id="mg-non">Commencer une nouvelle partie</button></div>
     </section>`));
     const traiter = () => { try { localStorage.setItem("neon86-v1-traitee", "1"); } catch (e) {} };
@@ -218,8 +215,7 @@
     app().append(sec);
     function dessine() {
       if (etape === 1) {
-        sec.innerHTML = `<p class="etape-num">Inscription · étape 1 sur 3</p><h1>Combien êtes-vous devant cet ordinateur ?</h1>
-          <p>Comptez seulement les élèves qui jouent réellement ensemble sur cet ordinateur.</p>
+        sec.innerHTML = `<p class="etape-num">1 / 3</p><h1>Combien jouez-vous ?</h1>
           <div class="choix-nb" role="radiogroup" aria-label="Nombre de membres">${Array.from({ length: D.equipage.max - D.equipage.min + 1 }, (_, i) => i + D.equipage.min).map((k) =>
             `<button type="button" role="radio" aria-checked="${k === nb}" class="nb-btn ${k === nb ? "actif" : ""}" data-nb="${k}"><span class="nb-gros">${k}</span>${k === 1 ? "élève" : "élèves"}</button>`).join("")}</div>
           <div class="actions">${mode === "modifier" ? `<button class="btn btn-sec" id="i-annuler">Annuler</button>` : ""}<button class="btn btn-grand" id="i-suite">Suivant</button></div>`;
@@ -227,20 +223,19 @@
         sec.addEventListener("keydown", flechesNb);
         $("#i-suite", sec).onclick = () => { etape = 2; dessine(); };
       } else if (etape === 2) {
-        sec.innerHTML = `<p class="etape-num">Inscription · étape 2 sur 3</p><h1>Les prénoms de l'équipage</h1>
-          <p>Un prénom par membre. Les accents, espaces, apostrophes et traits d'union sont acceptés.</p>
+        sec.innerHTML = `<p class="etape-num">2 / 3</p><h1>Vos prénoms</h1>
           <form id="i-form" class="form-col" novalidate>${Array.from({ length: nb }, (_, i) => `<div class="champ-nom">
-            <label for="nom-${i}">Prénom du membre ${i + 1}</label>
+            <label for="nom-${i}">Joueur ${i + 1}</label>
             <input id="nom-${i}" data-i="${i}" maxlength="24" autocomplete="off" value="${esc(noms[i] || "")}" aria-describedby="err-${i}">
             <span class="msg-erreur" id="err-${i}"></span></div>`).join("")}
-            <div class="actions"><button type="button" class="btn btn-sec" id="i-retour">← Changer le nombre</button><button class="btn btn-grand" type="submit">Suivant</button></div></form>`;
+            <div class="actions"><button type="button" class="btn btn-sec" id="i-retour" aria-label="Changer le nombre de joueurs">←</button><button class="btn btn-grand" type="submit">Suivant</button></div></form>`;
         $$("input", sec).forEach((inp) => (inp.oninput = () => { noms[+inp.dataset.i] = inp.value; }));
         $("#i-retour", sec).onclick = () => { etape = 1; dessine(); };
         $("#i-form", sec).onsubmit = (ev) => {
           ev.preventDefault(); let premier = null;
           for (let i = 0; i < nb; i++) {
             const v = (noms[i] || "").replace(/\s+/g, " ").trim(), err = $("#err-" + i, sec), inp = $("#nom-" + i, sec);
-            const msg = !v ? "Écris un prénom (pas seulement des espaces)." : !/[\p{L}]/u.test(v) ? "Le prénom doit contenir au moins une lettre." : "";
+            const msg = !v ? "Écris un prénom." : !/[\p{L}]/u.test(v) ? "Il faut au moins une lettre." : "";
             err.textContent = msg; inp.setAttribute("aria-invalid", msg ? "true" : "false");
             if (msg && !premier) premier = inp; else noms[i] = v;
           }
@@ -251,11 +246,10 @@
       } else {
         const fictifs = noms.slice(0, nb).map((n, i) => ({ id: "x" + i, nom: n })); fictifs.forEach((f) => (f.aff = nomAff(f, fictifs)));
         const doublons = new Set(noms.slice(0, nb).filter((n, i, a) => a.findIndex((x) => norm(x) === norm(n)) !== i).map(norm));
-        sec.innerHTML = `<p class="etape-num">Inscription · étape 3 sur 3</p><h1>Votre équipage</h1>
-          <div class="recap">${fictifs.map((m, i) => `<div class="recap-carte">${badge(m, i)}<span class="petit">Membre ${i + 1}${doublons.has(norm(m.nom)) ? " · même prénom qu'un autre membre : le numéro permet de vous distinguer" : ""}</span></div>`).join("")}</div>
+        sec.innerHTML = `<p class="etape-num">3 / 3</p><h1>Votre équipage</h1>
+          <div class="recap">${fictifs.map((m, i) => `<div class="recap-carte">${badge(m, i)}${doublons.has(norm(m.nom)) ? `<span class="petit">Même prénom : le numéro vous distingue.</span>` : ""}</div>`).join("")}</div>
           ${mode === "modifier" ? noteModification(nb) : ""}
-          <p>${nb > 1 ? "Vous partagez un seul ordinateur : chacun prendra la souris à son tour, et les autres aident à réfléchir." : "Tu joues seul(e) : tu réaliseras toutes les manipulations."}</p>
-          <div class="actions"><button class="btn btn-sec" id="i-corriger">✎ Corriger</button><button class="btn btn-grand" id="i-ok">${mode === "modifier" ? "Enregistrer l'équipage" : "Démarrer la mission"}</button></div>`;
+          <div class="actions"><button class="btn btn-sec" id="i-corriger">✎ Corriger</button><button class="btn btn-grand" id="i-ok">${mode === "modifier" ? "Enregistrer" : "▶ C'est parti !"}</button></div>`;
         $("#i-corriger", sec).onclick = () => { etape = 2; dessine(); };
         $("#i-ok", sec).onclick = () => valider();
       }
@@ -266,9 +260,9 @@
     }
     function noteModification(n) {
       const faits = S.a1.lots.filter((l) => l.fait);
-      if (estResolu("A1")) return `<p class="note">L'atelier de Boulon (A1) est déjà terminé : il ne change pas. Les autres réparations restent acquises par toute l'équipe.</p>`;
+      if (estResolu("A1")) return `<p class="note">Les réparations restent acquises.</p>`;
       if (!S.a1.lots.length) return "";
-      return `<p class="note">Atelier de Boulon (A1) : ${faits.length ? `les lots déjà vérifiés restent au nom de ${esc(listeNoms(faits.map((l) => l.nom)))}. ` : ""}Les pièces des lots non vérifiés seront redistribuées entre les ${n} membres.</p>`;
+      return `<p class="note">Atelier de BOULON : ${faits.length ? `les lots vérifiés restent au nom de ${esc(listeNoms(faits.map((l) => l.nom)))}. ` : ""}Les autres éléments seront répartis entre ${n}.</p>`;
     }
     function valider() {
       const anciens = S.membres;
@@ -313,43 +307,38 @@
   function ecIntro(i) {
     const et = D.intro[i], dernier = i === D.intro.length - 1;
     app().append(html(`<section class="intro-ecran">
-      <div class="intro-scene">${SC[et.lieu](etatScene())}</div>
-      <div class="intro-panneau">
-        <p class="etape-num">Introduction · ${i + 1} / ${D.intro.length}</p>
-        <h1>${esc(et.titre)}</h1>
-        ${i === 0 && S.membres.length ? `<p class="equipe-intro">${S.membres.map((m, k) => badge(m, k)).join(" ")}</p>` : ""}
-        <div class="dialogue">${et.lignes.map(bulle).join("")}</div>
-        ${dernier ? `<ul class="regles">${D.regles.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : ""}
-        <div class="actions">
-          ${i > 0 ? `<button class="btn btn-sec" id="in-prec">← Précédent</button>` : ""}
-          <button class="btn btn-grand" id="in-suiv">${dernier ? "Entrer dans le poste de pilotage" : "Suivant →"}</button>
-          ${S.introVue ? `<button class="btn btn-sec" id="in-passer">Passer</button>` : ""}
-        </div>
-        <p class="points" aria-hidden="true">${D.intro.map((_, k) => `<span class="${k === i ? "on" : ""}"></span>`).join("")}</p>
-      </div></section>`));
-    if ($("#in-prec")) $("#in-prec").onclick = () => aller("intro", i - 1);
-    if ($("#in-passer")) $("#in-passer").onclick = () => aller("lieu", S.lieu || "hub");
-    $("#in-suiv").onclick = () => {
-      if (!dernier) return aller("intro", i + 1);
-      const premiere = !S.introVue; S.introVue = true; sauver(); aller("lieu", "hub");
-      if (premiere && !S.tuto) setTimeout(() => tutoriel(0), 300);
-    };
+      <div class="scene intro-scene">${SC[et.lieu](etatScene())}
+        <div class="intro-bulle"><p class="intro-txt">${esc(et.txt)}</p>
+          <div class="actions">
+            <button class="btn btn-grand" id="in-suiv">${dernier ? "▶ Entrer dans la station" : "Suivant →"}</button>
+            ${dernier ? "" : `<button class="btn btn-sec" id="in-go">Commencer</button>`}
+          </div>
+          <p class="points" aria-hidden="true">${D.intro.map((_, k) => `<span class="${k === i ? "on" : ""}"></span>`).join("")}</p>
+        </div></div></section>`));
+    const entrer = () => { const premiere = !S.introVue; S.introVue = true; sauver(); aller("lieu", "hub"); if (premiere) setTimeout(() => astuce("porte", ".hotspot[data-o='porteA']"), 250); };
+    $("#in-suiv").onclick = () => (dernier ? entrer() : aller("intro", i + 1));
+    if ($("#in-go")) $("#in-go").onclick = entrer;
   }
-  function tutoriel(k) {
-    $$(".tuto-cible").forEach((e) => e.classList.remove("tuto-cible"));
-    $("#tuto")?.remove();
-    if (k >= D.tutoriel.length) { S.tuto = true; sauver(); return; }
-    const t = D.tutoriel[k], cible = $(t.cible);
-    if (cible) { cible.classList.add("tuto-cible"); cible.scrollIntoView({ block: "nearest" }); }
-    const b = html(`<div id="tuto" class="tuto" role="dialog" aria-label="Tutoriel"><p class="etape-num">Prise en main · ${k + 1}/${D.tutoriel.length}</p><p>${esc(t.txt)}</p>
-      <div class="actions"><button class="btn btn-mini" id="tu-passer">Passer le tutoriel</button><button class="btn" id="tu-ok">${k === D.tutoriel.length - 1 ? "C'est parti !" : "Suivant"}</button></div></div>`);
+  function tutoriel() { S.astuces = {}; sauver(); if (ecran.nom !== "lieu" || ecran.param !== "hub") aller("lieu", "hub"); setTimeout(() => astuce("porte", ".hotspot[data-o='porteA']"), 200); }
+  /* Astuce montrée une seule fois, au moment utile, à côté de l'élément concerné */
+  function astuce(cle, sel) {
+    S.astuces = S.astuces || {};
+    if (S.astuces[cle]) return;
+    const cible = $(sel); if (!cible) return;
+    fermerAstuce(); astuceCourante = cle;
+    cible.classList.add("tuto-cible");
+    const b = html(`<div id="tuto" class="tuto" role="status"><p>${esc(D.astuces[cle])}</p><button class="btn btn-mini" id="tu-ok">OK</button></div>`);
     document.body.append(b);
-    if (cible) { const r = cible.getBoundingClientRect(); b.style.top = Math.min(window.innerHeight - 220, r.bottom + 12) + "px"; b.style.left = Math.max(10, Math.min(window.innerWidth - 380, r.left)) + "px"; }
-    $("#tu-ok").focus();
-    $("#tu-ok").onclick = () => tutoriel(k + 1);
-    $("#tu-passer").onclick = () => tutoriel(99);
+    const r = cible.getBoundingClientRect();
+    if (r.right + 300 < window.innerWidth && r.height < 80) { b.style.top = Math.max(10, r.top - 6) + "px"; b.style.left = r.right + 12 + "px"; b.classList.add("a-droite"); }
+    else { b.style.top = Math.min(window.innerHeight - 120, r.bottom + 10) + "px"; b.style.left = Math.max(10, Math.min(window.innerWidth - 300, r.left + r.width / 2 - 140)) + "px"; }
+    $("#tu-ok").onclick = fermerAstuce;
   }
-
+  let astuceCourante = null;
+  function fermerAstuce() {
+    if (astuceCourante) { S.astuces = S.astuces || {}; S.astuces[astuceCourante] = true; astuceCourante = null; sauver(); }
+    $$(".tuto-cible").forEach((e) => e.classList.remove("tuto-cible")); $("#tuto")?.remove();
+  }
   /* ======================================================================
      4. LIEUX (scènes avec objets interactifs)
      ====================================================================== */
@@ -369,17 +358,17 @@
     return { sym: "i", mot: "", cls: "info" };
   }
   function ecLieu(l) {
+    if (l !== "hub") setTimeout(() => astuce("pilotage", "#btn-hub"), 400);
     const objets = SC.OBJETS[l];
     const sec = html(`<section class="lieu">
       <div class="scene" id="scene">${SC[l](etatScene())}
-        ${objets.map((o) => { const st = etatObjet(o); return `<button class="hotspot hs-${st.cls}" data-o="${o.id}" style="left:${o.x}%;top:${o.y}%;width:${o.w}%;height:${o.h}%"
-            aria-label="${esc(o.label)}${st.mot ? " — " + st.mot : ""}"><span class="hs-anneau" aria-hidden="true">${st.sym}</span><span class="hs-label">${esc(o.label)}${st.mot ? ` · <b>${esc(st.mot)}</b>` : ""}</span></button>`; }).join("")}
+        ${objets.map((o) => { const st = etatObjet(o); return `<button class="hotspot hs-${st.cls} ${o.x < 12 ? "hs-gauche" : o.x + o.w > 88 ? "hs-droite" : ""}" data-o="${o.id}" style="left:${o.x}%;top:${o.y}%;width:${o.w}%;height:${o.h}%"
+            aria-label="${esc(o.label)}${st.mot ? " — " + st.mot : ""}${st.raison ? ". " + st.raison : ""}"><span class="hs-anneau" aria-hidden="true">${st.sym}</span><span class="hs-label">${esc(o.label)}${st.mot ? ` · <b>${esc(st.mot)}</b>` : ""}</span></button>`; }).join("")}
       </div>
-      <div class="sous-scene">
-        <h2 class="h-lieu">${esc(D.lieux[l].nom)}</h2>
-        <ul class="objets-liste" aria-label="Objets de ce lieu">${objets.map((o) => { const st = etatObjet(o);
+      <details class="sous-scene"><summary>Liste des objets de la salle</summary>
+        <ul class="objets-liste">${objets.map((o) => { const st = etatObjet(o);
           return `<li><button class="obj-btn obj-${st.cls}" data-o="${o.id}"><span class="obj-sym" aria-hidden="true">${st.sym}</span><span><b>${esc(o.label)}</b>${st.mot ? ` — ${esc(st.mot)}` : ""}${st.raison ? `<span class="obj-raison">${esc(st.raison)}</span>` : ""}</span></button></li>`; }).join("")}</ul>
-      </div></section>`);
+      </details></section>`);
     app().append(sec);
     $$("[data-o]", sec).forEach((b) => (b.onclick = () => actionObjet(objets.find((o) => o.id === b.dataset.o))));
   }
@@ -420,96 +409,118 @@
     const j = (i + 1) % n;
     return `<p class="pilotes">Suggestion · aux commandes : ${badge(S.membres[i], i, true)} · copilote : ${badge(S.membres[j], j, true)} <button class="btn btn-mini" id="rot">Changer</button></p>`;
   }
+  function consigneDe(id) {
+    const e = E[id];
+    if (id === "A1") {
+      const restants = S.a1.lots.filter((l) => !l.fait);
+      if (!restants.length) return "";
+      return e.consigne.replace("{nom}", nomLot(restants[0])).replace("{n}", restants[0].items.length);
+    }
+    return e.consigne;
+  }
+  function pilote(id) {
+    const n = S.membres.length; if (n < 2 || id === "A1") return "";
+    const i = (IDS.indexOf(id) + (S.rotation[id] || 0)) % n;
+    return `<span class="pilote">🎮 ${badge(S.membres[i], i, true)}<button class="mini" id="rot" aria-label="Changer qui est aux commandes">↻</button></span>`;
+  }
+  function replique(r) {
+    if (!r) return "";
+    const art = r.qui === "gladys" ? ART.gladys(nbResolus() >= 5 ? "neutre" : "boude") : ART.boulon();
+    return `<p class="replique replique-${r.qui}"><span class="mini-av" aria-hidden="true">${art}</span><span><b>${r.qui === "gladys" ? "GLADYS" : "BOULON"} :</b> ${esc(r.txt)}</span></p>`;
+  }
+  function decouverteHTML(l) {
+    return l ? `<p class="nouveau"><b>🆕 ${esc(l.titre)}</b> ${esc(l.txt)} <span class="exemple">${esc(l.exemple)}</span></p>` : "";
+  }
   function ecEnigme(id) {
     const e = E[id], L = D.lieux[e.salle];
     const sec = html(`<section class="enigme">
-      <div class="e-barre"><button class="btn btn-sec" id="e-ret">← ${esc(L.nom)}</button>${pilotes(id)}</div>
-      <div class="e-tete"><span class="e-id">${id}</span><div><h1>${esc(e.titre)}</h1>
-        <p class="e-meta"><span class="tag">${esc(e.statut)}</span><span class="tag">${icone(e.lieu)} ${esc(e.lieu)}</span><span class="tag">${esc(e.notion)}</span></p></div></div>
-      <div class="trois">
-        <div class="t-bloc t-panne"><h2><span aria-hidden="true">⚠</span> Ce qui ne fonctionne pas</h2><p>${esc(e.panne)}</p></div>
-        <div class="t-bloc t-faire"><h2><span aria-hidden="true">✋</span> Ce que vous devez faire</h2><p>${esc(e.afaire)}</p></div>
-        <div class="t-bloc t-valider"><h2><span aria-hidden="true">✔</span> Ce que vous validez</h2><p>${esc(e.valider)}</p></div>
-      </div>
-      <div class="dialogue">${e.recit.map(bulle).join("")}</div>
-      ${e.learn ? `<aside class="decouverte"><h2>${esc(e.learn.titre)}</h2><p>${esc(e.learn.txt)}</p></aside>` : ""}
+      <div class="e-barre"><button class="btn btn-sec btn-mini" id="e-ret">← ${esc(L.nom)}</button><span class="e-id">${id}</span><h1>${esc(e.titre)}</h1>${pilote(id)}</div>
+      ${estResolu(id) ? "" : `<p class="consigne">${esc(consigneDe(id))}</p>${replique(e.replique)}${decouverteHTML(e.learn)}`}
+      <div class="aide-bar" id="aide-bar"></div>
       <div id="e-zone"></div>
       <div class="retour-zone" id="feedback" role="status" aria-live="polite"></div>
-      <div class="indices" id="indices"></div>
     </section>`);
     app().append(sec);
     $("#e-ret").onclick = () => aller("lieu", e.salle);
     if ($("#rot")) $("#rot").onclick = () => { S.rotation[id] = (S.rotation[id] || 0) + 1; sauver(); aller("enigme", id); };
     const zone = $("#e-zone");
     if (estResolu(id)) {
-      zone.append(html(`<div class="deja"><p><b>✔ Système réparé.</b> ${esc(e.changement)}</p>
-        <p>Disquette${e.recompense.length > 1 ? "s" : ""} obtenue${e.recompense.length > 1 ? "s" : ""} : ${e.recompense.map((c) => `<b>${esc(D.cartes[c].nom)}</b>`).join(", ")}.</p></div>`));
+      zone.append(html(`<div class="deja"><p><b>✔ Réparé.</b> ${esc(e.changement)}</p></div>`));
       if (e.mission) zone.append(blocMission(e, id, true));
-      if (id === "A1") zone.append(html(`<div>${resumeLots()}</div>`));
-    } else {
-      ({ atelier: puzAtelier, branchement: puzBranchement, champs: puzChamps, recherche: puzRecherche, code: puzCode }[e.type])(e, id, zone);
+      return;
     }
-    blocIndices(e.indices, id, $("#indices"));
+    ({ atelier: puzAtelier, branchement: puzBranchement, champs: puzChamps, recherche: puzRecherche, code: puzCode }[e.type])(e, id, zone);
+    barreAide(e.aide, e.indices, id, $("#aide-bar"));
+    if (!S.astuces?.indice) setTimeout(() => astuce("indice", "#btn-indice"), 600);
   }
   function icone(lieu) { return lieu.includes("papier") ? "✎" : lieu.includes("navigateur") ? "🌐" : lieu.includes("ordinateur") ? "🗂" : "🕹"; }
   function retour(type, msg) { const f = $("#feedback"); f.className = "retour-zone " + type; f.innerHTML = msg; if (type === "ko") bip("ko"); }
   function essai(id) { S.essais[id] = (S.essais[id] || 0) + 1; sauver(); return S.essais[id]; }
-  function blocIndices(liste, id, cible) {
+  function barreAide(aide, liste, id, cible) { blocIndices(liste, id, cible, aide); }
+  function blocIndices(liste, id, cible, aide) {
     const n = () => S.indices[id] || 0;
+    let aideOuverte = false;
     function dessine() {
-      cible.innerHTML = `<h2>Indices <span class="petit">(${n()}/3 utilisés)</span></h2>
-        <ol>${liste.slice(0, n()).map((t, i) => `<li tabindex="-1"><b>${["Où regarder", "Comment faire", "Coup de pouce décisif"][i]} :</b> ${esc(t)}</li>`).join("")}</ol>
-        ${n() < 3 ? `<button class="btn btn-sec">Afficher l'indice ${n() + 1} : ${["où regarder ?", "comment faire ?", "coup de pouce décisif"][n()]}</button>` : ""}`;
-      const b = cible.querySelector("button");
-      if (b) b.onclick = () => { S.indices[id] = n() + 1; sauver(); bip("clic"); dessine(); cible.querySelector("li:last-child").focus(); };
+      cible.innerHTML = `<div class="aide-boutons">
+          ${aide ? `<button class="btn btn-sec btn-mini" id="btn-aide" aria-expanded="${aideOuverte}">❔ Comment faire ?</button>` : ""}
+          ${n() < 3 ? `<button class="btn btn-sec btn-mini" id="btn-indice">💡 Indice ${n() + 1}/3</button>` : `<span class="petit">💡 3/3 indices</span>`}
+        </div>
+        ${aide && aideOuverte ? `<p class="aide-txt">${esc(aide)}</p>` : ""}
+        ${n() ? `<ol class="liste-indices">${liste.slice(0, n()).map((t) => `<li tabindex="-1">${esc(t)}</li>`).join("")}</ol>` : ""}`;
+      $("#btn-aide", cible)?.addEventListener("click", () => { aideOuverte = !aideOuverte; dessine(); $("#btn-aide", cible).focus(); });
+      $("#btn-indice", cible)?.addEventListener("click", () => { S.indices[id] = n() + 1; sauver(); bip("clic"); dessine(); cible.querySelector(".liste-indices li:last-child").focus(); });
     }
     dessine();
   }
   function blocMission(e, id, compact) {
     const m = e.mission;
-    return html(`<div class="mission">
-      <h2>✦ ${esc(m.titre)}</h2>
-      ${compact ? `<p>Consigne toujours disponible dans le carnet de mission.</p>` : `
-      <p class="sortie"><b>① Quittez momentanément cet onglet</b> ${e.lieu.includes("papier") ? "(ou posez la souris) " : ""}pour :</p>
-      <ol>${m.etapes.map((t) => `<li>${esc(t)}</li>`).join("")}</ol>
-      <p class="sortie"><b>② Revenez ici avec</b> ${esc(m.rapporter)}</p>`}
-      ${e.telechargement ? `<p><a class="btn" href="${esc(e.telechargement.fichier)}" download id="dl-${id}">⬇ ${esc(e.telechargement.label)}</a></p>` : ""}
-      ${e.relais ? (S.resolu.B2 ? `<p class="petit">La balise s'est cachée : retrouvez-la dans vos favoris ou votre historique.</p>`
-        : `<p><a class="btn" href="${esc(e.relais.fichier)}" target="_blank" rel="noopener" id="relais-lien">🌐 ${esc(e.relais.label)}</a></p>`) : ""}
-      ${!compact && m.aide ? `<div class="aides">${Object.entries(m.aide).map(([k, v]) => `<details><summary>Aide : ${esc(k)}</summary><p>${esc(v)}</p></details>`).join("")}</div>` : ""}
-      ${!compact ? `<p class="petit">Le jeu garde votre progression pendant que vous êtes ailleurs.</p>` : ""}
+    const action = e.telechargement ? `<a class="btn btn-mini" href="${esc(e.telechargement.fichier)}" download id="dl-${id}">⬇ Télécharger</a>`
+      : e.relais ? (S.resolu.B2 ? `<span class="petit">(cachée dans tes favoris)</span>` : `<a class="btn btn-mini" href="${esc(e.relais.fichier)}" target="_blank" rel="noopener" id="relais-lien">🌐 Ouvrir la balise</a>`) : "";
+    if (compact) return html(`<div class="mission"><p class="petit">↗ Mission hors du jeu · ${action || "consignes dans le carnet"}</p></div>`);
+    const os = Object.keys(m.aide || {});
+    const d = html(`<div class="mission">
+      <p class="hors-jeu">↗ Hors du jeu</p>
+      <ol class="etapes">${m.etapes.map((t, i) => `<li>${esc(t)}${i === 0 && action ? " " + action : ""}</li>`).join("")}</ol>
+      ${os.length ? `<div class="aide-os"><span class="petit">Aide :</span> ${os.map((k) => `<button class="btn btn-mini btn-sec" data-os="${esc(k)}" aria-expanded="false">${esc(k)}</button>`).join(" ")}<p class="aide-txt" id="os-txt-${id}" hidden></p></div>` : ""}
+      <p class="retour-ici">↩ Reviens ici avec :</p>
+      <div class="mission-champs" id="mc-${id}"></div>
     </div>`);
+    $$("[data-os]", d).forEach((b) => (b.onclick = () => {
+      const p = $(`#os-txt-${id}`, d), ouvert = b.getAttribute("aria-expanded") === "true";
+      $$("[data-os]", d).forEach((x) => x.setAttribute("aria-expanded", "false"));
+      if (ouvert) { p.hidden = true; return; }
+      b.setAttribute("aria-expanded", "true"); p.textContent = m.aide[b.dataset.os]; p.hidden = false;
+    }));
+    return d;
   }
-
   /* ---------- réussite ---------- */
   function reussite(id) {
     const e = E[id];
     S.resolu[id] = { t: Date.now(), essais: S.essais[id] || 1, indices: S.indices[id] || 0, equipage: prenoms() };
     noter(`${id} réparé (équipage : ${listeNoms(prenoms())})`);
     sauver(); bip("ok"); majEntete();
-    const ouvertes = IDS.filter((i) => !estResolu(i) && estOuvert(i));
-    const debloque = IDS.filter((i) => (E[i].requiert || []).includes(id));
+    const ouvertes = IDS.filter((i) => i !== id && !estResolu(i) && estOuvert(i));
+    const salle = E[id].salle, ici = ouvertes.find((i) => E[i].salle === salle);
     const zone = $("#e-zone");
+    fermerAstuce();
+    $$(".consigne, .replique, .nouveau").forEach((x) => x.remove());
+    $("#aide-bar").innerHTML = "";
     zone.innerHTML = "";
-    zone.append(html(`<div class="succes-box">
+    zone.append(html(`<div class="succes-box" role="status">
       <div class="succes-icone">${ART.disquette()}</div>
-      <div><h2>✔ Système réparé !</h2><p>${esc(e.succes)}</p>
-      <p class="changement"><b>Ce qui a changé dans la station :</b> ${esc(e.changement)}</p>
-      <h3>L'imprimante sort ${e.recompense.length > 1 ? "deux disquettes" : "une disquette"} :</h3>
-      <ul class="cartes-gagnees">${e.recompense.map((c) => `<li>💾 <b>${esc(D.cartes[c].nom)}</b> — ${esc(D.cartes[c].def)}</li>`).join("")}</ul>
-      ${debloque.length ? `<p class="note">🔓 Nouveau : ${debloque.map((i) => esc(E[i].titre)).join(", ")} est maintenant accessible.</p>` : ""}
-      <h3>Et maintenant ?</h3>
+      <div><h2>✔ ${esc(e.changement)}</h2>
+      <p>💾 +${e.recompense.length} disquette${e.recompense.length > 1 ? "s" : ""} : <b>${e.recompense.map((c) => esc(D.cartes[c].nom)).join(", ")}</b></p>
       <div class="actions">
-        <button class="btn" data-suite="lieu:${e.salle}">Voir le changement (${esc(D.lieux[e.salle].nom)})</button>
         ${finalOuvert() ? `<button class="btn btn-grand" data-suite="final">★ Réveiller GLADYS</button>` : ""}
-        ${ouvertes.filter((i) => i !== id).slice(0, 3).map((i) => `<button class="btn btn-sec" data-suite="enigme:${i}">${i} · ${esc(E[i].titre)}</button>`).join("")}
-        <button class="btn btn-sec" data-suite="lieu:hub">Poste de pilotage</button>
+        <button class="btn" data-suite="lieu:${salle}">👀 Voir la salle</button>
+        ${ici ? `<button class="btn btn-sec" data-suite="enigme:${ici}">${esc(E[ici].titre)}</button>` : ""}
+        <button class="btn btn-sec" data-suite="lieu:hub">🛰 Pilotage</button>
       </div></div></div>`));
     $("#feedback").innerHTML = ""; $("#feedback").className = "retour-zone";
     $$("[data-suite]", zone).forEach((b) => (b.onclick = () => { const [n, p] = b.dataset.suite.split(":"); aller(n, p); }));
     zone.querySelector("[data-suite]").focus();
+    setTimeout(() => astuce("carnet", "#btn-carnet"), 500);
   }
-
   /* ======================================================================
      A1 — atelier partagé : lots nominatifs, cartes à déposer dans des bacs
      ====================================================================== */
@@ -522,7 +533,7 @@
     const lotDe = (i) => S.a1.lots.find((l) => l.items.includes(i));
     const wrap = html(`<div class="atelier">
       <div class="atelier-haut"><div class="boulon-etat" id="boulon-etat"></div>
-        <p class="aide-geste"><b>Deux façons de jouer :</b> glisser une pièce vers un bac, ou cliquer sur une pièce puis sur un bac. Une pièce déjà rangée peut être reprise tant que son lot n'est pas vérifié.</p></div>
+</div>
       <div class="lots" id="lots"></div>
       <div class="bacs" id="bacs"></div>
     </div>`);
@@ -530,7 +541,7 @@
     function boulonEtat() {
       const faits = S.a1.lots.filter((l) => l.fait).reduce((s, l) => s + l.items.length, 0), p = Math.floor(faits / 12 * 6);
       $("#boulon-etat").innerHTML = `<svg viewBox="-70 -50 140 160" aria-hidden="true">${SC.DEFS}<g opacity=".18">${SC.boulonSVG(0, 0, 1, 6, "")}</g>${SC.boulonSVG(0, 0, 1, p, p === 6 ? "salut" : "")}</svg>
-        <p><b>Boulon : ${Math.round(faits / 12 * 100)} %</b><br><span class="petit">${faits}/12 pièces vérifiées</span></p>`;
+        <p><b>${Math.round(faits / 12 * 100)} %</b></p>`;
     }
     const carte = (i, dansBac) => {
       const el = e.elements[i], lot = lotDe(i), k = idxMembre(lot.membreId), fait = lot.fait;
@@ -547,15 +558,15 @@
         const ranges = l.items.filter((i) => S.a1.place[i]).length, restants = l.items.filter((i) => !S.a1.place[i]);
         return `<div class="lot ${l.fait ? "lot-fait" : ""}" style="--bc:${COUL[(k < 0 ? 5 : k) % COUL.length]}">
           <div class="lot-tete">${m ? badge(m, k) : `<span class="badge" style="--bc:#999"><span class="b-nom">${esc(l.nom)}</span></span>`}
-            <span class="lot-prog">${l.fait ? "✔ lot vérifié" : `${ranges}/${l.items.length} rangées`}</span></div>
-          <p class="lot-consigne">${l.fait ? `Lot terminé par ${esc(nomLot(l))}${m ? "" : " (ancien membre)"}.` : `<b>${esc(nomLot(l))}</b>, identifie et range les pièces de ton lot.`}</p>
-          <div class="lot-pieces" data-retour="1">${restants.map((i) => carte(i, false)).join("") || (l.fait ? "" : `<span class="petit">Toutes tes pièces sont dans les bacs.</span>`)}</div>
-          ${l.fait ? "" : `<button class="btn ${ranges === l.items.length ? "" : "btn-sec"}" data-verif="${l.id}">Vérifier le lot de ${esc(nomLot(l))}</button>`}
+            <span class="lot-prog">${l.fait ? "✔" : `${ranges}/${l.items.length}`}</span></div>
+          ${l.fait ? `<p class="lot-consigne">✔ Terminé${m ? "" : " (ancien membre)"}</p>` : ""}
+          <div class="lot-pieces" data-retour="1">${restants.map((i) => carte(i, false)).join("") || ""}</div>
+          ${l.fait ? "" : `<button class="btn ${ranges === l.items.length ? "" : "btn-sec"}" data-verif="${l.id}">Vérifier</button>`}
         </div>`; }).join("");
-      const bac = (b) => `<div class="bac" data-bac="${b.id}"><button class="bac-tete" data-bac-btn="${b.id}"><b>${esc(b.nom)}</b><span class="petit">${esc(b.aide)}</span><span class="bac-deposer">${selection ? "⤓ Déposer ici" : ""}</span></button>
+      const bac = (b) => `<div class="bac" data-bac="${b.id}"><button class="bac-tete" data-bac-btn="${b.id}"><b>${esc(b.nom)}</b><span class="bac-deposer">${selection ? "⤓ ici" : ""}</span></button>
         <div class="bac-pieces">${Object.entries(S.a1.place).filter(([, c]) => c === b.id).map(([i]) => carte(+i, true)).join("")}</div></div>`;
       const B = e.bacs;
-      $("#bacs").innerHTML = `${bac(B[0])}<div class="famille"><p class="famille-titre">LOGICIELS <span class="petit">(ce qu'on ne peut pas toucher)</span></p><div class="famille-bacs">${bac(B[1])}${bac(B[2])}</div></div>
+      $("#bacs").innerHTML = `${bac(B[0])}<div class="famille"><p class="famille-titre">LOGICIELS</p><div class="famille-bacs">${bac(B[1])}${bac(B[2])}</div></div>
         ${selection && S.a1.place[selection.val] ? `<button class="btn btn-sec remettre" data-remettre="1">↩ Remettre la pièce sur l'établi</button>` : ""}`;
       brancher();
     }
@@ -585,22 +596,23 @@
     }
     function verifier(lot) {
       const manque = lot.items.filter((i) => !S.a1.place[i]);
-      if (manque.length) { retour("info", `<b>${esc(nomLot(lot))}</b> : il reste ${manque.length} pièce(s) à ranger dans ton lot.`); return; }
+      if (manque.length) { retour("info", `<b>${esc(nomLot(lot))}</b> : encore ${manque.length} élément(s) à ranger.`); return; }
       S.a1.essaisLot[lot.id] = (S.a1.essaisLot[lot.id] || 0) + 1; essai("A1");
       const faux = lot.items.filter((i) => S.a1.place[i] !== e.elements[i].cat);
       if (!faux.length) {
         lot.fait = true; lot.nom = nomLot(lot); noter(`A1 : lot de ${lot.nom} vérifié`); sauver(); bip("ok");
+        const c = $(".consigne"); if (c) c.textContent = consigneDe("A1");
         if (S.a1.lots.every((l) => l.fait)) { dessine(); return reussite("A1"); }
-        retour("ok", `✔ Lot de <b>${esc(lot.nom)}</b> correct ! Boulon récupère des pièces. ${S.a1.lots.filter((l) => !l.fait).map((l) => esc(nomLot(l))).join(", ")} : à vous !`);
+        retour("ok", `✔ Lot de <b>${esc(lot.nom)}</b> juste ! BOULON récupère des pièces.`);
         dessine(); return;
       }
       const msgs = [];
-      if (faux.some((i) => e.elements[i].cat === "mat")) msgs.push("Une pièce que l'on peut <b>toucher</b> a été rangée parmi les logiciels.");
-      if (faux.some((i) => e.elements[i].cat !== "mat" && S.a1.place[i] === "mat")) msgs.push("Un <b>logiciel</b> (qu'on ne peut pas toucher) a été rangé dans le matériel.");
-      if (faux.some((i) => e.elements[i].cat !== "mat" && S.a1.place[i] !== "mat")) msgs.push("Attention à la différence entre <b>système d'exploitation</b> (il démarre l'ordinateur et gère tout) et <b>application</b> (un programme qu'on lance pour une tâche).");
+      if (faux.some((i) => e.elements[i].cat === "mat")) msgs.push("Un objet qu'on peut <b>toucher</b> est dans les logiciels.");
+      if (faux.some((i) => e.elements[i].cat !== "mat" && S.a1.place[i] === "mat")) msgs.push("Un <b>logiciel</b> est dans le matériel.");
+      if (faux.some((i) => e.elements[i].cat !== "mat" && S.a1.place[i] !== "mat")) msgs.push("Système d'exploitation ou application ? Le premier démarre l'ordinateur.");
       const deuxieme = S.a1.essaisLot[lot.id] >= 2;
       S.a1.faux = deuxieme ? faux : []; sauver(); dessine();
-      retour("ko", `<b>${esc(nomLot(lot))}</b> : ${faux.length} pièce(s) mal rangée(s). ${msgs.join(" ")} ${deuxieme ? "Les pièces à revoir sont marquées « ✖ à revoir »." : "Reprends une pièce pour la déplacer, puis vérifie à nouveau."}`);
+      retour("ko", `<b>${esc(nomLot(lot))}</b> : ${faux.length} erreur(s). ${msgs.join(" ")}${deuxieme ? " Elles sont marquées ✖." : ""}`);
     }
     dessine();
     if (S.a1.lots.length && S.a1.lots.every((l) => l.fait)) reussite("A1");
@@ -614,13 +626,12 @@
     let choisi = null;
     const couleurs = ["#e94f37", "#3d7bbf", "#f2b705", "#3f9a5b", "#c45ab3", "#8f8468"];
     const wrap = html(`<div class="branchement">
-      <p class="aide-geste"><b>Pour brancher :</b> clique sur un mot (à gauche), puis sur sa description (à droite). Tu peux aussi glisser un mot vers une description. Une description ne peut recevoir qu'un câble.</p>
       <div class="tableau-b" id="tb">
         <svg class="cables" id="cables" aria-hidden="true"></svg>
-        <div class="col-g">${e.prises.map((p, i) => `<button class="prise" data-prise="${p.id}" draggable="true" style="--pc:${couleurs[i]}"><span class="fiche" aria-hidden="true"></span><span class="p-mot">${esc(p.mot)}</span><span class="p-etat" id="etat-${p.id}"></span></button>`).join("")}</div>
+        <div class="col-g">${e.prises.map((p, i) => `<button class="prise" data-prise="${p.id}" draggable="true" style="--pc:${couleurs[i]}"><span class="fiche" aria-hidden="true"></span><span class="p-mot">${esc(p.mot)}</span><span class="p-etat sr" id="etat-${p.id}"></span></button>`).join("")}</div>
         <div class="col-d">${e.descriptions.map((d) => `<button class="desc" data-desc="${d.id}"><span class="fiche" aria-hidden="true"></span><span>${esc(d.txt)}</span></button>`).join("")}</div>
       </div>
-      <div class="actions"><button class="btn btn-grand" id="b1-test">⚡ Tester le tableau</button><button class="btn btn-sec" id="b1-debr" disabled>Débrancher le mot choisi</button></div>
+      <div class="actions"><button class="btn btn-grand" id="b1-test">⚡ Tester</button><button class="btn btn-sec btn-mini" id="b1-debr" disabled>Débrancher</button></div>
       <div id="b1-expl"></div></div>`);
     zone.append(wrap);
     const tb = $("#tb", wrap);
@@ -661,20 +672,20 @@
       b.ondragstart = (ev) => { ev.dataTransfer.setData("text/plain", "prise:" + b.dataset.prise); choisi = b.dataset.prise; };
     });
     $$(".desc", wrap).forEach((b) => {
-      b.onclick = () => { if (!choisi) { retour("info", "Choisis d'abord un mot à gauche, puis clique sur sa description."); return; } brancher(choisi, b.dataset.desc); };
+      b.onclick = () => { if (!choisi) { retour("info", "Clique d'abord sur un mot à gauche."); return; } brancher(choisi, b.dataset.desc); };
       b.ondragover = (ev) => ev.preventDefault();
       b.ondrop = (ev) => { ev.preventDefault(); const d = ev.dataTransfer.getData("text/plain"); if (d.startsWith("prise:")) brancher(d.slice(6), b.dataset.desc); };
     });
     $("#b1-debr", wrap).onclick = () => { if (choisi) { S.b1[choisi] = null; sauver(); maj(); } };
     $("#b1-test", wrap).onclick = () => {
       const vides = e.prises.filter((p) => !S.b1[p.id]);
-      if (vides.length) { retour("info", `Il reste ${vides.length} câble(s) débranché(s) : ${vides.map((p) => esc(p.mot)).join(", ")}.`); return; }
+      if (vides.length) { retour("info", `Pas encore branché : ${vides.map((p) => esc(p.mot)).join(", ")}.`); return; }
       const n = essai(id);
       const faux = e.prises.filter((p) => e.descriptions.find((d) => d.id === S.b1[p.id]).bonne !== p.id);
       $$(".prise", wrap).forEach((b) => b.classList.toggle("faux", n >= 2 && faux.some((p) => p.id === b.dataset.prise)));
       if (!faux.length) { $("#b1-expl", wrap).innerHTML = ""; return reussite(id); }
       $("#b1-expl", wrap).innerHTML = n >= 2 ? `<ul class="expl">${faux.map((p) => `<li>✖ <b>${esc(p.mot)}</b> : ${esc(e.explications[p.id])}</li>`).join("")}</ul>` : "";
-      retour("ko", `<b>Test du tableau : ${faux.length} câble(s) mal branché(s).</b> ${n >= 2 ? "Les mots concernés sont marqués ✖, avec une explication." : "Pour chaque mot, demande-toi : est-ce un réseau, des pages, un logiciel, un site ou un service ?"}`);
+      retour("ko", `<b>${faux.length} câble(s) faux.</b> ${n >= 2 ? "Voir les ✖ ci-dessous." : "Réseau, pages, logiciel, site ou service ?"}`);
     };
     window.addEventListener("resize", dessineCables);
     maj(); requestAnimationFrame(dessineCables);
@@ -685,25 +696,23 @@
      ====================================================================== */
   function puzChamps(e, id, zone) {
     const sv = S.saisies[id] || {};
-    if (e.mission) zone.append(blocMission(e, id, false));
-    if (e.pixels) zone.append(html(`<div class="codes-pixels"><h2>Ce qu'affiche l'écran en panne</h2>
-      <table class="t-pixels"><caption>10 lignes de 10 pixels · 1 = allumé · 0 = éteint</caption>
-      ${e.pixels.map((l, i) => `<tr><th scope="row">Ligne ${i + 1}</th><td>${l.split("").join(" ")}</td></tr>`).join("")}</table>
-      <p class="petit">Ces codes sont aussi sur la fiche de mission (grille C1). Colorier la grille sur papier est bien plus facile que de compter de tête !</p></div>`));
-    if (e.carte) zone.append(html(`<div class="algo-wrap"><div><h2>Carte de la soute</h2>${carteHTML(e.carte)}</div>
-      <div><h2>Programme de Boulon</h2>${progHTML(e.programme)}<p class="petit">Départ : case ★, Boulon regarde vers le HAUT. Carte et programme identiques sur la fiche (C2).</p></div></div>`));
-    const f = html(`<form class="champs" novalidate>
+    let hote = zone;
+    if (e.mission) { const m = blocMission(e, id, false); zone.append(m); hote = $(`#mc-${id}`, m); }
+    if (e.pixels) zone.insertBefore(html(`<details class="donnees"><summary>Voir les codes à l'écran</summary><table class="t-pixels"><caption>1 = colorié · 0 = blanc</caption>
+      ${e.pixels.map((l, i) => `<tr><th scope="row">${i + 1}</th><td>${l.split("").join(" ")}</td></tr>`).join("")}</table></details>`), zone.firstChild);
+    if (e.carte) zone.insertBefore(html(`<details class="donnees"><summary>Voir la carte et le programme à l'écran</summary><div class="algo-wrap">${carteHTML(e.carte)}${progHTML(e.programme)}</div></details>`), zone.firstChild);
+    const f = html(`<form class="champs champs-ligne" novalidate>
       ${e.champs.map((c) => c.type === "choix"
-        ? `<fieldset class="champ"><legend>${esc(c.label)}</legend>${c.options.map((o, i) => `<label><input type="radio" name="${c.id}" value="${i}" ${sv[c.id] == i ? "checked" : ""}> ${esc(o)}</label>`).join("")}</fieldset>`
+        ? `<fieldset class="champ"><legend>${esc(c.label)}</legend><div class="choix-ligne">${c.options.map((o, i) => `<label><input type="radio" name="${c.id}" value="${i}" ${sv[c.id] == i ? "checked" : ""}> ${esc(o)}</label>`).join("")}</div></fieldset>`
         : `<div class="champ"><label for="ch-${c.id}">${esc(c.label)}</label><input id="ch-${c.id}" name="${c.id}" autocomplete="off" value="${esc(sv[c.id] || "")}"></div>`).join("")}
       <button class="btn btn-grand" type="submit">Valider</button></form>`);
-    zone.append(f);
+    hote.append(f);
     const garde = (ev) => { sv[ev.target.name] = ev.target.value; S.saisies[id] = sv; sauver(); };
     f.addEventListener("input", garde); f.addEventListener("change", garde);
     f.onsubmit = (ev) => {
       ev.preventDefault();
       const vides = e.champs.filter((c) => !String(sv[c.id] ?? "").trim());
-      if (vides.length) { retour("info", "Complète d'abord : " + vides.map((c) => esc(c.label)).join(", ") + "."); return; }
+      if (vides.length) { retour("info", "À compléter : " + vides.map((c) => esc(c.label)).join(", ") + "."); return; }
       essai(id);
       const msgs = []; let tout = true;
       e.champs.forEach((c) => {
@@ -712,10 +721,10 @@
         else { const h = H(sv[c.id]); ok = c.ok.includes(h); piege = c.pieges && c.pieges[h]; }
         const el = f.querySelector(`[name="${c.id}"]`).closest(".champ");
         el.classList.toggle("faux", !ok); el.classList.toggle("bon", ok);
-        if (!ok) { tout = false; msgs.push(`<li><b>${esc(c.label)}</b> : ${piege ? esc(piege) : "ce n'est pas encore ça. Vérifiez votre démarche ou demandez un indice."}</li>`); }
+        if (!ok) { tout = false; msgs.push(`<li><b>${esc(c.label)}</b> : ${piege ? esc(piege) : "pas encore. Revérifie ou prends un indice."}</li>`); }
       });
       if (tout) return reussite(id);
-      retour("ko", `<ul>${msgs.join("")}</ul><p class="petit">Les réponses correctes sont marquées « ✔ correct ». Majuscules, accents et espaces n'ont pas d'importance.</p>`);
+      retour("ko", `<ul>${msgs.join("")}</ul>`);
     };
   }
   function carteHTML(c) {
@@ -744,7 +753,7 @@
     const corps = $("#q-corps"), url = $("#q-url");
     function accueil(q) {
       url.textContent = "https://questor.neon86.space" + (q ? "/recherche?q=" + encodeURIComponent(q).replace(/%20/g, "+") : "");
-      corps.innerHTML = `<div class="questor"><p class="q-logo">QUESTOR<span>moteur de recherche de la station</span></p>
+      corps.innerHTML = `<div class="questor"><p class="q-logo">QUESTOR</p>
         <form id="q-f" class="q-f" role="search"><label for="q-in" class="sr">Mots-clés</label><input id="q-in" placeholder="Tape tes mots-clés…" value="${esc(q || "")}" autocomplete="off"><button class="btn" type="submit">Rechercher</button></form>
         <div id="q-res"></div></div>`;
       $("#q-f").onsubmit = (ev) => { ev.preventDefault(); cherche($("#q-in").value); };
@@ -754,11 +763,11 @@
       sv.derniere = q; S.saisies[id] = sv; sauver();
       url.textContent = "https://questor.neon86.space/recherche?q=" + encodeURIComponent(q).replace(/%20/g, "+");
       const t = tok(q), r = $("#q-res");
-      if (!t.length) { r.innerHTML = `<p class="q-msg">QUESTOR attend des mots-clés. Les petits mots (le, de, à…) ne comptent pas.</p>`; return; }
+      if (!t.length) { r.innerHTML = `<p class="q-msg">Tape des mots-clés.</p>`; return; }
       const res = Q.pages.map((p, i) => ({ p, i, sc: t.filter((x) => p.mots.some((m) => proche(x, m))).length })).filter((x) => x.sc > 0).sort((a, b) => b.sc - a.sc || a.i - b.i).slice(0, 4);
-      let msg = t.length > 6 ? `<p class="q-msg">Beaucoup de mots ! Quelques mots-clés courts et précis suffisent souvent.</p>` : "";
+      let msg = t.length > 6 ? `<p class="q-msg">Trop de mots : garde les plus précis.</p>` : "";
       if (!res.length) { r.innerHTML = msg + `<p class="q-msg">Aucun résultat pour « ${esc(q)} ». Essaie d'autres mots-clés.</p>`; return; }
-      if (res[0].sc === 1 && t.length === 1) msg += `<p class="q-msg">Un seul mot-clé : les résultats sont très variés. Ajoute un mot plus précis ?</p>`;
+      if (res[0].sc === 1 && t.length === 1) msg += `<p class="q-msg">Un seul mot : ajoute un mot plus précis ?</p>`;
       r.innerHTML = msg + `<p class="q-nb">${res.length} premiers résultats</p><ol class="q-liste">${res.map((x) => `<li>
         <a href="#" data-p="${x.i}" class="q-titre">${esc(x.p.titre)}</a>
         <span class="q-url ${x.p.url.startsWith("https") ? "sur" : "pas-sur"}">${x.p.url.startsWith("https") ? "🔒" : "⚠"} ${esc(x.p.url)}</span>
@@ -779,14 +788,14 @@
     f.onsubmit = (ev) => {
       ev.preventDefault();
       const c = e.champs[0];
-      if (!String(sv[c.id] || "").trim()) { retour("info", "Notez d'abord l'heure trouvée."); return; }
+      if (!String(sv[c.id] || "").trim()) { retour("info", "Écris d'abord l'heure."); return; }
       essai(id);
       const coch = sv.cm || [], cmOk = e.choixMultiple.options.every((o, i) => o.ok === coch.includes(i));
       const h = H(sv[c.id]), hOk = c.ok.includes(h), msgs = [];
       $("#q-choix", f).classList.toggle("faux", !cmOk); $("#q-choix", f).classList.toggle("bon", cmOk);
       $("#ch-" + c.id, f).closest(".champ").classList.toggle("faux", !hOk); $("#ch-" + c.id, f).closest(".champ").classList.toggle("bon", hOk);
-      if (!hOk) msgs.push(`<li><b>Heure</b> : ${esc((c.pieges && c.pieges[h]) || "ce n'est pas l'heure donnée par une source fiable. Lisez bien les pages ouvertes.")}</li>`);
-      if (!cmOk) { const pg = e.choixMultiple.options.filter((o, i) => !o.ok && coch.includes(i)); msgs.push(`<li><b>Indices de fiabilité</b> : ${pg.length ? "attention, « " + esc(pg[0].txt) + " » ne prouve rien sur la fiabilité d'un site." : "il manque au moins un indice. Relisez la page « COMÈTE GRATUITE » et son adresse."}</li>`); }
+      if (!hOk) msgs.push(`<li><b>Heure</b> : ${esc((c.pieges && c.pieges[h]) || "pas celle d'une source fiable.")}</li>`);
+      if (!cmOk) { const pg = e.choixMultiple.options.filter((o, i) => !o.ok && coch.includes(i)); msgs.push(`<li><b>Indices de fiabilité</b> : ${pg.length ? "« " + esc(pg[0].txt) + " » ne prouve rien." : "il en manque. Relis la page et son adresse."}</li>`); }
       if (hOk && cmOk) return reussite(id);
       retour("ko", `<ul>${msgs.join("")}</ul>`);
     };
@@ -801,14 +810,12 @@
     let sel = null; // { src: "palette", t } ou { src: "piste", chemin: [i] | [i, j] }
     const wrap = html(`<div class="code-wrap">
       <div><div class="grille-robot" id="gr" style="--l:${G.l}" aria-label="Soute : Boulon doit rejoindre la borne de recharge"></div>
-        <p class="petit legende">🤖 Boulon (flèche = où il regarde) · ⚡ borne · ▦ caisse</p></div>
+        <p class="petit legende">🤖→ BOULON · ⚡ borne · ▦ caisse</p></div>
       <div class="editeur">
-        <h2>Blocs disponibles</h2>
         <div class="palette" id="palette">
           ${[["avancer", "avancer"], ["gauche", "tourner à gauche ↺"], ["droite", "tourner à droite ↻"], ["repeter", "répéter … fois"]].map(([t, n]) => `<button class="bloc b-${t}" data-pal="${t}" draggable="true">${n}</button>`).join("")}
         </div>
-        <p class="aide-geste"><b>Glisse</b> un bloc dans la piste, ou <b>clique</b> sur un bloc puis sur « ＋ insérer ici ». Un bloc de la piste peut être déplacé de la même façon.</p>
-        <h2>Piste du programme <span id="cpt" class="petit"></span></h2>
+        <h2>Programme <span id="cpt" class="petit"></span></h2>
         <div id="piste" class="piste" aria-live="polite"></div>
         <div class="actions"><button class="btn btn-sec" id="vider">Tout effacer</button><button class="btn btn-grand" id="exec">▶ Exécuter</button></div>
       </div></div>`);
@@ -848,7 +855,7 @@
       }
       sel = null; bip("pose"); dessine();
     }
-    function slot(listeCh, idx) { return `<button class="slot ${sel ? "actif" : ""}" data-slot="${listeCh.join(",")}|${idx}" aria-label="Insérer ici${listeCh.length ? " dans la boucle" : ""}, position ${idx + 1}">＋ insérer ici</button>`; }
+    function slot(listeCh, idx) { return `<button class="slot ${sel ? "actif" : ""}" data-slot="${listeCh.join(",")}|${idx}" aria-label="Insérer ici${listeCh.length ? " dans la boucle" : ""}, position ${idx + 1}">＋</button>`; }
     function blocHTML(b, chemin) {
       const c = chemin.join(","), s = sel && sel.src === "piste" && sel.chemin.join(",") === c;
       const outils = `<span class="b-outils"><button class="mini" data-haut="${c}" aria-label="Monter ce bloc">↑</button><button class="mini" data-bas="${c}" aria-label="Descendre ce bloc">↓</button><button class="mini" data-suppr="${c}" aria-label="Supprimer ce bloc">✕</button></span>`;
@@ -858,7 +865,7 @@
       return `<li class="pb b-${b.t} ${s ? "selection" : ""}"><div class="pb-ligne"><button class="pb-nom" data-sel="${c}" draggable="true" aria-pressed="${s}">${NOMB[b.t]}</button>${outils}</div></li>`;
     }
     function dessine() {
-      $("#piste", wrap).innerHTML = `<ol class="piste-liste">${prog.map((b, i) => slot([], i) + blocHTML(b, [i])).join("")}${slot([], prog.length)}</ol>${prog.length ? "" : `<p class="petit">Piste vide : ajoute un premier bloc.</p>`}`;
+      $("#piste", wrap).innerHTML = `<ol class="piste-liste">${prog.map((b, i) => slot([], i) + blocHTML(b, [i])).join("")}${slot([], prog.length)}</ol>`;
       const n = compte(prog);
       $("#cpt", wrap).textContent = `(${n} / ${max} blocs)`; $("#cpt", wrap).className = n > max ? "petit rouge" : "petit";
       $$("[data-pal]", wrap).forEach((b) => b.classList.toggle("selection", !!(sel && sel.src === "palette" && sel.t === b.dataset.pal)));
@@ -894,8 +901,8 @@
       if (enCours) return;
       if (!prog.length) { retour("info", "La piste est vide."); return; }
       const n = compte(prog);
-      if (n > max) { retour("ko", `Le programme utilise ${n} blocs, mais la mémoire de Boulon n'en retient que ${max}. Une boucle « répéter » peut remplacer des blocs qui se répètent.`); return; }
-      if (prog.some((b) => b.t === "repeter" && !b.corps.length)) { retour("info", "Une boucle « répéter » est vide : place des blocs à l'intérieur."); return; }
+      if (n > max) { retour("ko", `${n} blocs : c'est trop (${max} max). Une boucle peut remplacer des blocs répétés.`); return; }
+      if (prog.some((b) => b.t === "repeter" && !b.corps.length)) { retour("info", "Une boucle est vide : mets des blocs dedans."); return; }
       essai(id); enCours = true;
       const plat = []; const deplie = (p) => p.forEach((b) => b.t === "repeter" ? Array.from({ length: b.n }, () => deplie(b.corps)) : plat.push(b.t)); deplie(prog);
       let pos = [...G.depart], dir = G.dir; const trace = [[...pos]];
@@ -908,7 +915,7 @@
           const np = [pos[0] + dirs[dir][0], pos[1] + dirs[dir][1]];
           if (np[0] < 0 || np[1] < 0 || np[0] >= G.l || np[1] >= G.h || caisse(np[0], np[1])) {
             grille(pos, dir, trace, true); enCours = false;
-            retour("ko", `<b>BONK !</b> Boulon a heurté ${caisse(np[0], np[1]) ? "une caisse" : "le mur de la soute"} après ${trace.length - 1} déplacement(s). Regarde où il s'est arrêté (case rouge) et corrige la piste.`); return;
+            retour("ko", `<b>BONK !</b> ${caisse(np[0], np[1]) ? "Une caisse" : "Le mur"} après ${trace.length - 1} case(s). Regarde la case rouge.`); return;
           }
           pos = np; trace.push([...pos]);
         }
@@ -917,7 +924,7 @@
       }
       enCours = false;
       if (pos[0] === G.arrivee[0] && pos[1] === G.arrivee[1]) return reussite(id);
-      retour("ko", "Programme terminé, mais Boulon n'est pas sur la borne ⚡. Compare le chemin parcouru (cases colorées) avec le passage libre.");
+      retour("ko", "BOULON n'est pas sur ⚡. Compare son chemin avec le passage libre.");
     };
     dessine(); grille(G.depart, G.dir);
   }
@@ -927,134 +934,107 @@
      ====================================================================== */
   function ecFinal() {
     if (!finalOuvert()) { aller("lieu", "hub"); return; }
-    const F = D.final, cartes = Object.keys(D.cartes);
+    const F = D.final, cartes = Object.keys(D.cartes).sort((x, y) => D.cartes[x].nom.localeCompare(D.cartes[y].nom, "fr"));
     let sel = null;
     app().append(html(`<section class="enigme final">
-      <div class="e-barre"><button class="btn btn-sec" id="f-ret">← Poste de pilotage</button>
-        <p class="pilotes">Toute l'équipe : ${S.membres.map((m, i) => badge(m, i, true)).join(" ")}</p></div>
-      <div class="e-tete"><span class="e-id">★</span><div><h1>${esc(F.titre)}</h1><p class="e-meta"><span class="tag">Mission finale</span><span class="tag">Synthèse des 9 réparations</span></p></div></div>
-      <div class="trois">
-        <div class="t-bloc t-panne"><h2>⚠ Ce qui ne fonctionne pas</h2><p>${esc(F.panne)}</p></div>
-        <div class="t-bloc t-faire"><h2>✋ Ce que vous devez faire</h2><p>${esc(F.afaire)}</p></div>
-        <div class="t-bloc t-valider"><h2>✔ Ce que vous validez</h2><p>${esc(F.valider)}</p></div></div>
-      <div class="dialogue">${F.recit.map(bulle).join("")}</div>
+      <div class="e-barre"><button class="btn btn-sec btn-mini" id="f-ret">← Poste de pilotage</button><span class="e-id">★</span><h1>${esc(S.finalOk ? F.signal.titre : F.titre)}</h1></div>
+      ${S.finalOk ? "" : `<p class="consigne">${esc(F.consigne)}</p>${replique(F.replique)}`}
+      <div class="aide-bar" id="aide-bar"></div>
       <div id="f-zone"></div>
-      <div class="retour-zone" id="feedback" role="status" aria-live="polite"></div>
-      <div class="indices" id="indices"></div>
-      <div id="f-signal"></div></section>`));
+      <div class="retour-zone" id="feedback" role="status" aria-live="polite"></div></section>`));
     $("#f-ret").onclick = () => aller("lieu", "hub");
     const z = $("#f-zone");
-    if (S.finalOk) z.innerHTML = `<div class="deja"><p><b>✔ Mémoire de démarrage reconstruite.</b> GLADYS est réveillée. Il reste le signal d'amarrage.</p></div>`;
-    else {
+    if (!S.finalOk) {
       const dessine = () => {
-        const places = Object.values(S.final.slots);
+        const places = Object.values(S.final.slots), libres = cartes.filter((c) => !places.includes(c));
         z.innerHTML = `<div class="console-g">
-          <div class="disquettes" data-zone-retour="1"><h2>Vos disquettes <span class="petit">(${cartes.filter((c) => !places.includes(c)).length} à insérer)</span></h2>
-            ${cartes.filter((c) => !places.includes(c)).map((c) => `<button class="disq ${sel === c ? "selection" : ""}" data-disq="${c}" draggable="true" aria-pressed="${sel === c}"><span aria-hidden="true">💾</span> ${esc(D.cartes[c].nom)}</button>`).join("") || `<p class="petit">Toutes les disquettes sont insérées.</p>`}
-          </div>
-          <ol class="fentes">${F.lignes.map((l, i) => { const c = S.final.slots[i];
+          <div class="disquettes"><p class="petit">${libres.length ? "Tes disquettes" : "Toutes insérées"}</p>
+            ${libres.map((c) => `<button class="disq ${sel === c ? "selection" : ""}" data-disq="${c}" draggable="true" aria-pressed="${sel === c}">💾 ${esc(D.cartes[c].nom)}</button>`).join("")}</div>
+          <div class="groupes">${F.groupes.map((g) => `<div class="groupe"><h2>${esc(g.titre)}</h2><ol class="fentes">${g.lignes.map((i) => { const l = F.lignes[i], c = S.final.slots[i];
             return `<li class="fente-ligne" id="ml-${i}"><span>${esc(l.avant)}</span>
-              <button class="fente ${c ? "pleine" : ""}" data-fente="${i}" aria-label="Fente ${i + 1}${c ? " : " + esc(D.cartes[c].nom) + ". Appuie pour la retirer ou la remplacer" : " vide"}">${c ? `💾 ${esc(D.cartes[c].nom)}` : sel ? "⤓ insérer ici" : "fente vide"}</button>
-              <span>${esc(l.apres)}</span></li>`; }).join("")}</ol>
-          <button class="btn btn-grand" id="f-go">Lancer le démarrage</button></div>`;
+              <button class="fente ${c ? "pleine" : ""}" data-fente="${i}" aria-label="Fente ${i + 1}${c ? " : " + esc(D.cartes[c].nom) : " vide"}">${c ? `💾 ${esc(D.cartes[c].nom)}` : sel ? "⤓ ici" : "…"}</button>
+              <span>${esc(l.apres)}</span></li>`; }).join("")}</ol></div>`).join("")}</div>
+          <button class="btn btn-grand" id="f-go">Démarrer GLADYS</button></div>`;
         $$("[data-disq]", z).forEach((b) => {
           b.onclick = () => { sel = sel === b.dataset.disq ? null : b.dataset.disq; dessine(); $(".fente:not(.pleine)", z)?.focus(); };
-          b.ondragstart = (ev) => { ev.dataTransfer.setData("text/plain", "disq:" + b.dataset.disq); };
+          b.ondragstart = (ev) => ev.dataTransfer.setData("text/plain", "disq:" + b.dataset.disq);
         });
         $$("[data-fente]", z).forEach((f) => {
           const i = f.dataset.fente;
           f.onclick = () => {
-            if (sel) { const ancien = S.final.slots[i]; S.final.slots[i] = sel; sel = ancien || null; bip("pose"); if (ancien) retour("info", `La disquette « ${esc(D.cartes[ancien].nom)} » est revenue dans ta main : clique sur une autre fente pour l'insérer.`); }
+            if (sel) { const ancien = S.final.slots[i]; S.final.slots[i] = sel; sel = ancien || null; bip("pose"); }
             else if (S.final.slots[i]) { sel = S.final.slots[i]; delete S.final.slots[i]; }
-            else { retour("info", "Choisis d'abord une disquette, puis clique sur une fente."); return; }
+            else { retour("info", "Choisis d'abord une disquette."); return; }
             sauver(); dessine(); $(`[data-fente="${i}"]`, z).focus();
           };
           f.ondragover = (ev) => ev.preventDefault();
-          f.ondrop = (ev) => { ev.preventDefault(); const d = ev.dataTransfer.getData("text/plain"); if (d.startsWith("disq:")) { S.final.slots[i] = d.slice(5); sauver(); bip("pose"); dessine(); } };
+          f.ondrop = (ev) => { ev.preventDefault(); const d = ev.dataTransfer.getData("text/plain"); if (d.startsWith("disq:")) setTimeout(() => { S.final.slots[i] = d.slice(5); sauver(); bip("pose"); dessine(); }, 0); };
         });
         $("#f-go", z).onclick = () => {
-          if (F.lignes.some((_, i) => !S.final.slots[i])) { retour("info", "Insérez une disquette dans chacune des 11 fentes."); return; }
+          if (F.lignes.some((_, i) => !S.final.slots[i])) { retour("info", "Remplis les 11 fentes."); return; }
           essai("FINAL");
           const faux = F.lignes.map((l, i) => S.final.slots[i] === l.carte ? -1 : i).filter((i) => i >= 0);
           F.lignes.forEach((_, i) => { $("#ml-" + i).classList.toggle("faux", faux.includes(i)); $("#ml-" + i).classList.toggle("bon", !faux.includes(i)); });
-          if (faux.length) { retour("ko", `GLADYS : « ${faux.length} phrase(s) me donnent mal au processeur. » Les phrases à revoir sont marquées « ✖ à revoir ». Cliquez sur une fente pour reprendre sa disquette.`); return; }
+          if (faux.length) { retour("ko", `GLADYS : « ${faux.length} phrase(s) fausse(s). » Clique une fente marquée ✖ pour reprendre sa disquette.`); return; }
           S.finalOk = true; noter("Mémoire de démarrage reconstruite"); sauver(); bip("ok"); aller("final");
         };
       };
       dessine();
-      blocIndices(F.indices, "FINAL", $("#indices"));
-    }
-    if (S.finalOk) {
+      barreAide(F.aide, F.indices, "FINAL", $("#aide-bar"));
+    } else {
       const sg = F.signal;
-      $("#f-signal").append(html(`<div><div class="mission"><h2>✦ ${esc(sg.titre)}</h2>
-        <p class="sortie"><b>① Quittez momentanément cet onglet</b> : ouvrez la balise relais depuis vos favoris (ou l'historique) et lisez le titre de son onglet.</p>
-        <p>${esc(sg.txt)}</p><p class="sortie"><b>② Revenez ici avec</b> le nom de la balise.</p>
-        <form id="sg-form" class="champs" novalidate><div class="champ"><label for="sg-in">${esc(sg.label)}</label><input id="sg-in" autocomplete="off" value="${esc(S.saisies.SIGNAL || "")}"></div>
-        <button class="btn btn-grand" type="submit">Envoyer le signal</button></form></div><div class="indices" id="indices2"></div></div>`));
+      z.append(html(`<div class="mission"><p class="hors-jeu">↗ Hors du jeu</p><p>${esc(sg.txt)}</p>
+        <p class="retour-ici">↩ Reviens ici avec :</p>
+        <form id="sg-form" class="champs champs-ligne" novalidate><div class="champ"><label for="sg-in">${esc(sg.label)}</label><input id="sg-in" autocomplete="off" value="${esc(S.saisies.SIGNAL || "")}"></div>
+        <button class="btn btn-grand" type="submit">Envoyer le signal</button></form></div>`));
       $("#sg-in").oninput = (ev) => { S.saisies.SIGNAL = ev.target.value; sauver(); };
       $("#sg-form").onsubmit = (ev) => {
         ev.preventDefault();
-        const v = $("#sg-in").value; if (!v.trim()) { retour("info", "Écrivez le nom de la balise."); return; }
+        const v = $("#sg-in").value; if (!v.trim()) { retour("info", "Écris le nom de la balise."); return; }
         essai("SIGNAL");
         if (sg.ok.includes(H(v))) { S.signalOk = true; S.fin = Date.now(); noter("Signal d'amarrage envoyé"); sauver(); bip("fin"); aller("fin"); }
-        else retour("ko", "Signal refusé. Ce nom ne correspond pas à la balise. Il est écrit sur l'ONGLET de la page de la balise, pas sur la page elle-même.");
+        else retour("ko", "Signal refusé. Le nom est sur l'ONGLET de la balise, pas sur la page.");
       };
-      blocIndices(sg.indices, "SIGNAL", $("#indices2"));
+      barreAide(null, sg.indices, "SIGNAL", $("#aide-bar"));
     }
   }
-
   /* ---------- conclusion visuelle ---------- */
   function ecFin() {
     app().append(html(`<section class="fin-ecran">
-      <div class="scene fin-scene">${SC.hub(etatScene())}<div class="fin-bandeau">AMARRAGE RÉUSSI · 16 h 45 (heure de bord)</div></div>
-      <div class="panneau">
-        <h1>NÉON-86 est remise en service !</h1>
-        <div class="dialogue">${D.final.succes.map(bulle).join("")}</div>
-        <p class="merci">L'Agence orbitale remercie l'équipe de maintenance : ${S.membres.map((m, i) => badge(m, i)).join(" ")}</p>
-        <div class="actions"><button class="btn btn-grand" id="fin-b">Faire notre bilan</button><button class="btn btn-sec" id="fin-v">Revoir la station</button></div>
-      </div></section>`));
+      <div class="scene fin-scene">${SC.hub(etatScene())}<div class="fin-bandeau">AMARRAGE RÉUSSI</div>
+        <div class="intro-bulle"><div class="dialogue">${D.final.succes.map(bulle).join("")}</div>
+          <p class="merci">Merci à l'équipe : ${S.membres.map((m, i) => badge(m, i, true)).join(" ")}</p>
+          <div class="actions"><button class="btn btn-grand" id="fin-b">Faire notre bilan</button></div></div></div></section>`));
     $("#fin-b").onclick = () => aller("bilan");
-    $("#fin-v").onclick = () => aller("lieu", "hub");
   }
-
   /* ---------- bilan ---------- */
   function ecBilan() {
     const B = D.bilan;
     const tInd = Object.values(S.indices).reduce((a, b) => a + b, 0);
-    const duree = S.fin && S.debut ? Math.round((S.fin - S.debut) / 60000) : null;
     const code = `N86-${nbResolus()}${termine() ? "F" : "x"}-J${S.membres.length}-I${tInd}-${H(prenoms().join("|") + tInd + nbResolus()).slice(0, 3).toUpperCase()}`;
     app().append(html(`<section class="panneau bilan">
-      <button class="btn btn-sec noprint" id="b-ret">← Poste de pilotage</button>
-      <h1>Bilan de mission</h1>
+      <button class="btn btn-sec btn-mini noprint" id="b-ret">← Poste de pilotage</button>
+      <h1>Bilan</h1>
       <p class="equipe-intro">${S.membres.map((m, i) => badge(m, i)).join(" ")}</p>
-      <p>${termine() ? "Mission accomplie : NÉON-86 est rallumée et le vaisseau COMÈTE est amarré." : `Mission en cours : ${nbResolus()}/9 systèmes réparés.`} ${duree ? `Temps de jeu réel : ${duree} min.` : ""} Indices utilisés : ${tInd}.</p>
-      <p><b>Code de fin à montrer au professeur : <span class="code-fin">${code}</span></b></p>
-      <h2>Les notions utilisées</h2>
-      <table class="t-bilan"><thead><tr><th>Système</th><th>Notion</th><th>Essais</th><th>Indices</th></tr></thead><tbody>
-        ${IDS.map((id) => { const r = S.resolu[id] || {}; return `<tr><td>${estResolu(id) ? "✔" : "○"} ${id} · ${esc(E[id].titre)}</td><td>${esc(E[id].notion)}</td><td>${r.essais || "—"}</td><td>${S.indices[id] || 0}</td></tr>`; }).join("")}
-      </tbody></table>
-      ${S.a1.lots.length ? `<h3>Atelier de Boulon : lots vérifiés</h3>${resumeLots()}<p class="petit">Le jeu enregistre quel lot a été vérifié, pas qui tenait la souris.</p>` : ""}
-      <h2>Vos disquettes</h2>
-      <dl class="def-liste">${cartesGagnees().map((c) => `<dt>💾 ${esc(D.cartes[c].nom)}</dt><dd>${esc(D.cartes[c].def)}</dd>`).join("")}</dl>
-      <h2>Erreurs fréquentes à éviter</h2>
-      <ul class="erreurs">${B.erreurs.map((x) => `<li><b>${esc(x.titre)}</b> — ${esc(x.txt)}</li>`).join("")}</ul>
+      <p><b>Code pour ton professeur : <span class="code-fin">${code}</span></b> · ${nbResolus()}/9 réparés · ${tInd} indice(s)</p>
       <h2>Chacun fait le point</h2>
-      <p class="petit">Pour chaque compétence, chaque membre choisit : ✔ je sais faire · ↻ à retravailler.</p>
-      <div class="t-auto-wrap"><table class="t-auto"><thead><tr><th>Compétence</th>${S.membres.map((m, i) => `<th>${badge(m, i, true)}</th>`).join("")}</tr></thead><tbody>
+      <div class="t-auto-wrap"><table class="t-auto"><thead><tr><th>Je sais…</th>${S.membres.map((m, i) => `<th>${badge(m, i, true)}</th>`).join("")}</tr></thead><tbody>
         ${B.autoeval.map((a, k) => `<tr><td>${esc(a)}</td>${S.membres.map((m) => { const v = (S.auto[m.id] || {})[k] || "";
-          return `<td><label class="sr" for="au-${m.id}-${k}">${esc(m.nom)} : ${esc(a)}</label><select id="au-${m.id}-${k}" data-m="${m.id}" data-k="${k}"><option value="">—</option><option value="ok" ${v === "ok" ? "selected" : ""}>✔ je sais</option><option value="re" ${v === "re" ? "selected" : ""}>↻ à retravailler</option></select></td>`; }).join("")}</tr>`).join("")}
+          return `<td><label class="sr" for="au-${m.id}-${k}">${esc(m.nom)} : ${esc(a)}</label><select id="au-${m.id}-${k}" data-m="${m.id}" data-k="${k}"><option value="">—</option><option value="ok" ${v === "ok" ? "selected" : ""}>✔ je sais</option><option value="re" ${v === "re" ? "selected" : ""}>↻ à revoir</option></select></td>`; }).join("")}</tr>`).join("")}
       </tbody></table></div>
-      <h2>Expliquez votre démarche</h2>
-      <label for="b-expl">${esc(B.question)}</label>
-      <textarea id="b-expl" rows="5">${esc(S.explication)}</textarea>
-      <div class="actions noprint"><button class="btn" id="b-print">🖨 Imprimer ou enregistrer en PDF</button></div>
+      <h2><label for="b-expl">${esc(B.question)}</label></h2>
+      <textarea id="b-expl" rows="4">${esc(S.explication)}</textarea>
+      <details class="donnees"><summary>Détail des énigmes</summary>
+        <table class="t-bilan"><thead><tr><th>Énigme</th><th>Essais</th><th>Indices</th></tr></thead><tbody>
+        ${IDS.map((id) => { const r = S.resolu[id] || {}; return `<tr><td>${estResolu(id) ? "✔" : "○"} ${id} · ${esc(E[id].titre)}</td><td>${r.essais || "—"}</td><td>${S.indices[id] || 0}</td></tr>`; }).join("")}
+        </tbody></table>${S.a1.lots.length ? resumeLots() : ""}</details>
+      <div class="actions noprint"><button class="btn" id="b-print">🖨 Imprimer</button></div>
     </section>`));
     $("#b-ret").onclick = () => aller("lieu", "hub");
     $$("[data-m]").forEach((s) => (s.onchange = () => { (S.auto[s.dataset.m] = S.auto[s.dataset.m] || {})[s.dataset.k] = s.value; sauver(); }));
     $("#b-expl").oninput = (ev) => { S.explication = ev.target.value; sauver(); };
     $("#b-print").onclick = () => window.print();
   }
-
   /* ======================================================================
      CARNET, « JE SUIS PERDU », MODALES
      ====================================================================== */
@@ -1091,7 +1071,7 @@
         $$("[data-go]", m).forEach((b) => (b.onclick = () => { const id = b.dataset.go; estOuvert(id) ? aller("enigme", id) : aller("lieu", E[id].salle); }));
         $("#c-equipe", m).onclick = () => { const r = { nom: ecran.nom, param: ecran.param }; aller("inscription", { mode: "modifier" }); ecran.retour = r; };
         $("#c-intro", m).onclick = () => aller("intro", 0);
-        $("#c-tuto", m).onclick = () => { fermerModale(); if (ecran.nom !== "lieu") aller("lieu", "hub"); setTimeout(() => tutoriel(0), 200); };
+        $("#c-tuto", m).onclick = () => { fermerModale(); tutoriel(); };
         $("#c-reset", m).onclick = () => {
           if (confirm("Effacer toute la progression de cet équipage et recommencer ? Le code d'accès reste mémorisé. Cette action ne peut pas être annulée.")) {
             try { localStorage.removeItem(CLE); } catch (e) {}
@@ -1103,20 +1083,16 @@
 
   function perdu() {
     const ouvertes = IDS.filter((i) => !estResolu(i) && estOuvert(i));
-    const verrous = IDS.filter((i) => !estResolu(i) && !estOuvert(i));
     let txt = "";
-    if (termine()) txt = `<p>La mission est terminée ! Vous pouvez ouvrir le bilan.</p><button class="btn" data-va="bilan">Ouvrir le bilan</button>`;
-    else if (finalOuvert()) txt = `<p>Les 9 systèmes fonctionnent. Prochaine action : <b>réveiller GLADYS</b> à sa console, dans le poste de pilotage.</p><button class="btn" data-va="final">Aller à la console de GLADYS</button>`;
+    if (termine()) txt = `<p>Mission terminée !</p><button class="btn" data-va="bilan">Ouvrir le bilan</button>`;
+    else if (finalOuvert()) txt = `<p>Tout est réparé. Va réveiller GLADYS.</p><button class="btn" data-va="final">Console de GLADYS</button>`;
     else {
       if (ecran.nom === "enigme" && !estResolu(ecran.param)) {
-        const id = ecran.param, n = S.indices[id] || 0;
-        txt += `<h3>Dans cette énigme</h3><ol><li>Relisez le bloc « Ce que vous devez faire ».</li>${E[id].mission ? "<li>La mission se fait hors du jeu : suivez les étapes du cadre « Mission », puis revenez noter vos réponses.</li>" : ""}
-          <li>${n < 3 ? `L'indice ${n + 1} est disponible en bas de la page.` : "Les 3 indices sont affichés en bas de la page."}</li><li>Vous pouvez aussi laisser cette énigme de côté et y revenir plus tard.</li></ol>`;
+        const id = ecran.param, e = E[id];
+        txt += `<p><b>Ici :</b> ${esc(consigneDe(id))}</p><p>${e.aide ? "« ❔ Comment faire ? » explique le geste. " : ""}${(S.indices[id] || 0) < 3 ? "Un indice t'attend sous la consigne." : ""}</p>`;
       }
-      const suggestion = ouvertes.filter((i) => i !== ecran.param).sort((a, b) => (S.vu[a] ? 1 : 0) - (S.vu[b] ? 1 : 0))[0];
-      txt += `<h3>Systèmes disponibles maintenant</h3>${suggestion ? `<p>Suggestion de GLADYS (ce n'est pas obligatoire) : <b>${esc(E[suggestion].titre)}</b>, dans ${esc(D.lieux[E[suggestion].salle].nom)}.</p>` : ""}
-        <ul class="perdu-liste">${ouvertes.map((i) => `<li><button class="btn btn-mini" data-va="enigme:${i}">${i} · ${esc(E[i].titre)}</button> <span class="petit">${esc(D.lieux[E[i].salle].nom)} · ${esc(E[i].lieu)}</span></li>`).join("")}</ul>
-        ${verrous.length ? `<h3>Encore verrouillés</h3><ul>${verrous.map((i) => `<li>🔒 ${esc(E[i].titre)} — ${esc(E[i].verrou)}</li>`).join("")}</ul>` : ""}`;
+      const sug = ouvertes.filter((i) => i !== ecran.param).sort((a, b) => (S.vu[a] ? 1 : 0) - (S.vu[b] ? 1 : 0))[0];
+      txt += `<p><b>Ou essaie autre chose :</b></p><ul class="perdu-liste">${ouvertes.filter((i) => i !== ecran.param).slice(0, 4).map((i) => `<li><button class="btn btn-mini ${i === sug ? "" : "btn-sec"}" data-va="enigme:${i}">${esc(E[i].titre)}</button> <span class="petit">${esc(D.lieux[E[i].salle].nom)}</span></li>`).join("")}</ul>`;
     }
     modale("Je suis perdu", txt, (m) => $$("[data-va]", m).forEach((b) => (b.onclick = () => { const [n, p] = b.dataset.va.split(":"); aller(n, p); })));
   }
