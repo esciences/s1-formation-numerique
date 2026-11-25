@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Le nom de la balise (réponse de la mission finale) est volontairement écrit UNIQUEMENT dans le titre de l'onglet. -->
+  <title>Balise ALTAÏR · Néon-86</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="relais-page">
+  <main class="relais">
+    <div class="relais-ecran">
+      <p class="relais-signal" aria-hidden="true">· )) ( ( · )) ( ( ·</p>
+      <h1>BALISE RELAIS</h1>
+      <p><b>Bzzzt.</b> Je suis une balise timide. Je n'écris jamais mon message sur ma page.</p>
+      <p>Mon message est caché <b>dans ma propre adresse</b>. Regarde tout en haut : dans la <b>barre d'adresse</b> de ton navigateur.</p>
+      <p class="petit">Tu ne vois pas toute l'adresse ? Clique une fois dans la barre d'adresse pour l'afficher en entier.</p>
+      <hr>
+      <p><b>Avant de repartir :</b> ajoute-moi à tes <b>favoris</b> (Ctrl + D, ou Cmd + D sur Mac, ou l'étoile ☆). Je vais me cacher, et GLADYS aura besoin de mon nom à la fin de la mission.</p>
+      <p class="petit">Mon nom ? Il n'est pas sur cette page non plus. Il est écrit sur mon onglet.</p>
+      <p id="relais-etat" class="petit"></p>
+      <p><a class="btn" href="index.html">Revenir au jeu</a></p>
+      <p class="petit">Si le jeu est encore ouvert dans un autre onglet, tu peux aussi simplement fermer cet onglet.</p>
+    </div>
+  </main>
+  <script>
+    // Simple aide visuelle : indique si la balise a été ouverte depuis le jeu (paramètres présents dans l'URL).
+    var p = new URLSearchParams(location.search);
+    document.getElementById("relais-etat").textContent = p.has("frequence")
+      ? "Signal reçu. Les informations sont dans l'adresse, après le « ? »."
+      : "Signal faible : cette adresse ne contient pas de fréquence. Pour la mission « La balise relais », ouvre-moi depuis le jeu.";
+  </script>
+</body>
+</html>

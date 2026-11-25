@@ -1,0 +1,6 @@
+﻿JOURNAL DU SYSTEME
+08:02  Demarrage du systeme d'exploitation GLADYS-OS
+08:03  BOULON se branche sur la prise de la cafetiere
+08:04  BOULON debranche GLADYS pour brancher un grille-pain
+08:05  GLADYS : "Tres bien. Puisque c'est comme ca, je boude."
+08:06  Passage en VEILLE BOUDEUSE

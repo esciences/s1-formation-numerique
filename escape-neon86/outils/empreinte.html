@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outil enseignant · empreinte d'une réponse</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<main class="app"><section class="panneau">
+  <h1>Outil enseignant : empreinte d'une réponse</h1>
+  <p>Les réponses du jeu ne sont pas écrites en clair dans <code>js/data.js</code>. Chacune est remplacée par une « empreinte ».
+     Pour changer une réponse, tape-la ci-dessous, puis copie l'empreinte obtenue dans <code>data.js</code>, à la place de l'ancienne (entre guillemets).</p>
+  <p>Majuscules, accents, espaces et ponctuation sont ignorés : « Vacances_Boulon » et « vacances boulon » donnent la même empreinte.</p>
+  <div class="champ"><label for="in">Réponse</label><input id="in" autocomplete="off"></div>
+  <p>Empreinte : <span id="out" class="code-fin">—</span></p>
+  <p><a href="../index.html">← Retour au jeu</a></p>
+</section></main>
+<script>
+function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"");}
+function H(s){let h=0x811c9dc5;const t=norm(s);for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}return h.toString(36).padStart(7,"0");}
+document.getElementById("in").oninput=function(e){document.getElementById("out").textContent=e.target.value?H(e.target.value):"—";};
+</script>
+</body></html>

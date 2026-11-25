@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panne à bord du Néon-86 · Escape game · Formation numérique S1</title>
+  <meta name="description" content="Escape game numérique pour la formation numérique en 1re secondaire (eSCIENCES).">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='2' fill='%23ffb000'/%3E%3Crect x='4' y='0' width='7' height='5' fill='%23c9bfa4'/%3E%3Crect x='3' y='8' width='10' height='7' fill='%23f6f1e3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="evitement" href="#app">Aller au contenu</a>
+  <header id="entete" class="entete" hidden>
+    <div class="ent-logo" aria-hidden="true">NÉON-86</div>
+    <span id="equipe-aff" class="ent-equipe"></span>
+    <span id="compteur" class="ent-compteur"></span>
+    <nav class="ent-nav" aria-label="Menu du jeu">
+      <button class="btn btn-mini" id="btn-hub">Poste de pilotage</button>
+      <button class="btn btn-mini" id="btn-carnet">📒 Carnet de mission</button>
+      <button class="btn btn-mini" id="btn-son" aria-pressed="false">Son : coupé</button>
+      <button class="btn btn-mini" id="btn-bilan">Bilan</button>
+      <button class="btn btn-mini btn-danger" id="btn-reset">Recommencer</button>
+    </nav>
+  </header>
+
+  <main id="app" class="app"></main>
+
+  <div id="carnet" class="carnet" role="dialog" aria-modal="true" aria-labelledby="carnet-titre" hidden>
+    <div class="carnet-boite">
+      <div class="carnet-tete"><h2 id="carnet-titre">📒 Carnet de mission</h2><button class="btn btn-mini" id="carnet-fermer">Fermer ✕</button></div>
+      <div id="carnet-corps"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <footer class="pied">Panne à bord du Néon-86 · Tommy Berben · eSCIENCES.be · Formation numérique S1 · Licence CC BY-NC-SA 4.0</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+﻿=== ARCHIVES DE LA STATION NEON-86 ===
+Rangement effectue par : BOULON (robot de maintenance, modele "jamais tort")
+
+Message de GLADYS 3000 :
+  Mes sauvegardes de memoire s'appellent "memoire_gladys" suivi d'un numero de version.
+  Je ne sais lire ma memoire que dans un fichier TEXTE (extension .txt).
+  Il me faut la version la PLUS RECENTE (v01 < v02 < v03 < ...).
+
+Message de BOULON :
+  J'ai tout range a la perfection. Enfin presque. Certains fichiers ont peut-etre
+  glisse dans d'autres dossiers pendant que je dansais. Bonne chance, humains !

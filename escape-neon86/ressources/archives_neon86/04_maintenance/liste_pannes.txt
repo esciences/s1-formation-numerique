@@ -1,0 +1,5 @@
+﻿LISTE DES PANNES CONNUES
+- Ecran de pilotage : n'affiche plus que des 0 et des 1 (voir Atelier)
+- Antenne : rebranchee a l'envers par Boulon (voir Antenne)
+- Boulon : en pieces detachees (voir Salle des machines)
+- GLADYS : vexee. Tres vexee.

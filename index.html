@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>S1 · Formation numérique</title>
-<meta name="description" content="Les ressources du cours de formation numérique de 1re secondaire, classées par champ : Informations et données, Communication et collaboration, Création de contenus, Sécurité.">
+<meta name="description" content="Les ressources du cours de formation numérique de 1re secondaire, classées par champ : Informations et données, Communication et collaboration, Création de contenus, Sécurité, et des escape games de révision.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Poppins:wght@600;700;800&family=Fira+Code:wght@500&display=swap">
 <style>
@@ -83,6 +83,9 @@ h1 .neon { background: linear-gradient(transparent 58%, var(--neon) 58%, var(--n
 .c-comm { --c: var(--magenta); --ct: var(--magenta-texte); --cs: #FFFFFF; --cc: var(--magenta-clair); --bs: dashed; }
 .c-crea { --c: var(--ambre); --ct: var(--ambre-texte); --cs: #1B1030; --cc: var(--ambre-clair); --bs: dotted; --bw: 3px; }
 .c-secu { --c: var(--vert); --ct: var(--vert-texte); --cs: #1B1030; --cc: var(--vert-clair); --bs: double; --bw: 5px; }
+.c-jeux { --c: #0891B2; --ct: #0E7490; --cs: #FFFFFF; --cc: #DDF4F8; --bs: dashed; --bw: 3px; }
+@media (prefers-color-scheme: dark) { .c-jeux { --ct: #67E8F9; --cc: #0C2F38; } }
+.verrou-code { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--discret); margin-top: 4px; }
 
 /* Séquence et supports */
 .sequence + .sequence { margin-top: 18px; padding-top: 16px; border-top: 1.5px solid var(--filet); }
@@ -298,6 +301,30 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
               <span class="haut"><span class="etiquette entraine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Je m’entraîne</span><span class="format">Jeu de missions</span></span>
               <b>GTA · Gère. Traque. Agis.</b>
               <p>5 missions et un bonus : stockage, faux sites, rumeurs, compte piraté. Ta progression reste sur ton ordinateur.</p>
+              <span class="ouvrir">Jouer →</span>
+            </a>
+          </div>
+        </div>
+        <p class="rien">Aucun support de ce type dans ce champ pour l’instant.</p>
+      </div>
+    </section>
+
+
+    <!-- Escape games -->
+    <section class="champ c-jeux" id="escape-games">
+      <header><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.6" fill="currentColor"/></svg><h2>Escape games</h2><span class="compte"></span></header>
+      <div class="corps">
+        <p class="quoi">Réviser plusieurs notions du cours en jouant : énigmes dans le jeu, sur papier, dans tes fichiers et dans le navigateur. Ils s’ouvrent avec un code donné en classe.</p>
+
+        <div class="sequence">
+          <h3>Panne à bord du Néon-86</h3>
+          <p class="sous">L’ordinatrice de bord boude, le robot Boulon est en pièces détachées et la cargo-comète arrive aujourd’hui. Répare la station ! Révisions : matériel et logiciel, fichiers et dossiers, Internet et navigateur, URL et favoris, mots-clés, pixels, algorithmes.</p>
+          <div class="supports">
+            <a class="support" data-type="entraine" href="escape-neon86/index.html">
+              <span class="haut"><span class="etiquette entraine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Je m’entraîne</span><span class="format">Escape game</span></span>
+              <b>Panne à bord du Néon-86</b>
+              <p>9 énigmes en 3 secteurs, à résoudre dans l’ordre que tu veux, seul ou en binôme (±50 min). Ta progression reste sur ton ordinateur.</p>
+              <span class="verrou-code">🔒 Code donné par ton professeur</span>
               <span class="ouvrir">Jouer →</span>
             </a>
           </div>
