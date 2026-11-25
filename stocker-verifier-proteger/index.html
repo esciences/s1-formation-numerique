@@ -27,7 +27,8 @@
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
-body { background: var(--encre); color: var(--encre); font: 21px/1.45 var(--f-corps); display: flex; flex-direction: column; overflow: hidden;
+html { font-size: 18px; } /* base de lecture agrandie : tous les rem suivent */
+body { background: var(--encre); color: var(--encre); font: 23px/1.45 var(--f-corps); display: flex; flex-direction: column; overflow: hidden;
   padding: 10px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left)); }
 h1, h2, h3 { font-family: var(--f-titre); line-height: 1.15; margin: 0; text-wrap: balance; }
 p { margin: 0 0 10px; }
@@ -58,13 +59,13 @@ code { font-family: var(--f-code); font-size: .9em; }
 .sh { flex: none; display: flex; align-items: center; gap: 14px; height: 58px; padding: 0 28px; background: var(--aplat); color: var(--sur-aplat); }
 .sh-n { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; background: var(--sur-aplat); color: var(--aplat); font: 800 1.2rem var(--f-titre); }
 .ch-s .sh-n { color: var(--s-texte); }
-.sh-t { font: 700 1.02rem var(--f-titre); letter-spacing: .01em; white-space: nowrap; }
-.sh-t small { font: 600 .78rem var(--f-titre); letter-spacing: .1em; text-transform: uppercase; opacity: .85; display: block; line-height: 1; margin-bottom: 3px; }
+.sh-t { font: 700 1.12rem var(--f-titre); letter-spacing: .01em; white-space: nowrap; }
+.sh-t small { font: 600 .9rem var(--f-titre); letter-spacing: .1em; text-transform: uppercase; opacity: .85; display: block; line-height: 1; margin-bottom: 3px; }
 .sh-pas { display: flex; gap: 5px; margin-left: 6px; }
 .sh-pas i { width: 12px; height: 12px; border-radius: 3px; border: 2px solid currentColor; opacity: .9; }
 .sh-pas i.on { background: currentColor; }
 .sh .grow { flex: 1; }
-.kind { display: inline-flex; align-items: center; gap: 8px; font: 700 .95rem var(--f-titre); padding: 6px 14px 6px 10px; border-radius: 999px; background: var(--blanc); color: var(--encre); border: 2px solid var(--encre); }
+.kind { display: inline-flex; align-items: center; gap: 8px; font: 700 1.08rem var(--f-titre); padding: 6px 14px 6px 10px; border-radius: 999px; background: var(--blanc); color: var(--encre); border: 2px solid var(--encre); }
 .kind svg { width: 20px; height: 20px; }
 .kind.atoi { background: var(--neon); }
 .kind.retiens { background: var(--encre); color: var(--neon); }
@@ -72,9 +73,9 @@ code { font-family: var(--f-code); font-size: .9em; }
 .corps { flex: 1; min-height: 0; padding: 22px 44px 26px; display: flex; flex-direction: column; gap: 16px; }
 .slide h2 { font-size: 2.15rem; font-weight: 800; }
 .slide h2 .num { color: var(--texte); margin-right: 8px; }
-.consigne { display: flex; align-items: center; gap: 12px; font: 700 1.08rem var(--f-titre); }
-.consigne .pt { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--neon); border: 2px solid var(--encre); font-size: 1.05rem; }
-.lead { font-size: 1.12rem; max-width: 62ch; margin: 0; }
+.consigne { display: flex; align-items: center; gap: 12px; font: 700 1.18rem var(--f-titre); }
+.consigne .pt { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--neon); border: 2px solid var(--encre); font-size: 1.15rem; }
+.lead { font-size: 1.22rem; max-width: 62ch; margin: 0; }
 .grille { flex: 1; min-height: 0; display: grid; gap: 20px; }
 .g2 { grid-template-columns: 1fr 1fr; }
 .g3 { grid-template-columns: repeat(3, 1fr); }
@@ -85,15 +86,15 @@ code { font-family: var(--f-code); font-size: .9em; }
 .bloc { background: var(--blanc); border-radius: var(--r); border: 2px solid var(--moyen); padding: 18px 22px; }
 .bloc h3 { font-size: 1.22rem; margin-bottom: 10px; }
 .col { display: flex; flex-direction: column; gap: 14px; }
-.attention { background: var(--blanc); border: 2px dashed var(--filet); border-radius: var(--r); padding: 12px 18px; font-size: .95rem; margin: 0; }
+.attention { background: var(--blanc); border: 2px dashed var(--filet); border-radius: var(--r); padding: 12px 18px; font-size: 1.1rem; margin: 0; }
 .attention b:first-child { color: var(--texte); }
 .fb { min-height: 1.4em; margin: 8px 0 0; font-weight: 700; }
 .fb.ok { color: var(--bon); }
 .fb.ko { color: var(--faux); }
 .fb span { font-weight: 400; color: var(--encre); }
-.btn { font: 700 .98rem var(--f-titre); background: var(--aplat); color: var(--sur-aplat); border: 2px solid var(--encre); border-radius: 10px; padding: 8px 16px; }
+.btn { font: 700 1.1rem var(--f-titre); background: var(--aplat); color: var(--sur-aplat); border: 2px solid var(--encre); border-radius: 10px; padding: 8px 16px; }
 .btn.second { background: var(--blanc); color: var(--texte); border-color: var(--texte); }
-.btn.petit { font-size: .85rem; padding: 5px 11px; }
+.btn.petit { font-size: 1.1rem; padding: 5px 11px; }
 .btn[disabled] { opacity: .45; cursor: default; }
 .rangee { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
@@ -102,12 +103,12 @@ code { font-family: var(--f-code); font-size: .9em; }
 .retenir { background: var(--clair); border: 4px var(--bord) var(--texte); border-radius: 18px; padding: 22px 28px; display: flex; flex-direction: column; justify-content: center; }
 .retenir ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 22px; }
 .retenir li { display: grid; grid-template-columns: 38px 1fr; gap: 14px; align-items: start; font-size: 1.32rem; line-height: 1.4; }
-.retenir li::before { content: "✔"; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px; background: var(--aplat); color: var(--sur-aplat); font-weight: 800; font-size: .95rem; margin-top: 1px; }
+.retenir li::before { content: "✔"; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px; background: var(--aplat); color: var(--sur-aplat); font-weight: 800; font-size: 1.1rem; margin-top: 1px; }
 .compris { display: flex; flex-direction: column; gap: 14px; justify-content: center; align-items: stretch; }
-.compris label { display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 16px; background: var(--blanc); border: 3px solid var(--encre); font: 700 1.12rem var(--f-titre); cursor: pointer; line-height: 1.25; }
+.compris label { display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 16px; background: var(--blanc); border: 3px solid var(--encre); font: 700 1.22rem var(--f-titre); cursor: pointer; line-height: 1.25; }
 .compris label:has(input:checked) { background: var(--neon); }
 .compris input { width: 30px; height: 30px; accent-color: var(--encre); flex: none; }
-.compris p { font-size: .92rem; color: var(--discret); margin: 0; }
+.compris p { font-size: 1.1rem; color: var(--discret); margin: 0; }
 .compris .octet-mini { display: flex; gap: 5px; justify-content: center; }
 .compris .octet-mini i { width: 22px; height: 22px; border-radius: 4px; border: 2.5px solid var(--encre); }
 .compris .octet-mini i.on { background: var(--i-aplat); }
@@ -115,7 +116,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 /* ---------- titre, mode d'emploi, parties ---------- */
 .s-titre { background: var(--blanc); }
 .s-titre .corps { padding: 46px 60px; justify-content: center; gap: 26px; }
-.kicker { font: 700 .9rem var(--f-titre); letter-spacing: .14em; text-transform: uppercase; color: var(--i-texte); }
+.kicker { font: 700 1.1rem var(--f-titre); letter-spacing: .14em; text-transform: uppercase; color: var(--i-texte); }
 .s-titre h1 { font-size: 4.3rem; font-weight: 800; line-height: 1.02; }
 .s-titre .lead { font-size: 1.3rem; }
 .octet-deco { display: flex; gap: 8px; }
@@ -126,19 +127,19 @@ code { font-family: var(--f-code); font-size: .9em; }
 .part { display: flex; gap: 14px; align-items: center; padding: 16px 18px; border-radius: 16px; background: var(--pale); border: 3px var(--bord) var(--aplat); text-align: left; color: var(--encre); }
 .part .pic { flex: none; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 13px; background: var(--aplat); color: var(--sur-aplat); font-size: 1.5rem; }
 .part .pic svg { width: 30px; height: 30px; }
-.part b { font: 700 1.1rem var(--f-titre); display: block; }
-.part small { color: var(--discret); font-size: .9rem; line-height: 1.3; display: block; }
+.part b { font: 700 1.2rem var(--f-titre); display: block; }
+.part small { color: var(--discret); font-size: 1.1rem; line-height: 1.3; display: block; }
 .part:hover { transform: translateY(-2px); }
-.depart { font: 700 1.05rem var(--f-titre); color: var(--discret); display: flex; align-items: center; gap: 10px; }
-.depart kbd { font: 700 .95rem var(--f-code); background: var(--encre); color: #fff; border-radius: 6px; padding: 2px 9px; }
+.depart { font: 700 1.15rem var(--f-titre); color: var(--discret); display: flex; align-items: center; gap: 10px; }
+.depart kbd { font: 700 1.1rem var(--f-code); background: var(--encre); color: #fff; border-radius: 6px; padding: 2px 9px; }
 
 .legende { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .legende > div { background: var(--blanc); border: 2px solid var(--filet); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
-.legende .kind { font-size: 1.05rem; }
+.legende .kind { font-size: 1.15rem; }
 .legende p { margin: 0; }
-.legende .ex-mini { margin-top: auto; font-size: .9rem; color: var(--discret); }
+.legende .ex-mini { margin-top: auto; font-size: 1.1rem; color: var(--discret); }
 .reperes { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.reperes > div { display: flex; gap: 14px; align-items: center; background: var(--blanc); border: 2px solid var(--filet); border-radius: 16px; padding: 14px 18px; font-size: 1rem; }
+.reperes > div { display: flex; gap: 14px; align-items: center; background: var(--blanc); border: 2px solid var(--filet); border-radius: 16px; padding: 14px 18px; font-size: 1.12rem; }
 .reperes .ico { flex: none; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 12px; background: var(--encre); color: #fff; font: 700 1.3rem var(--f-titre); }
 
 .s-partie { background: var(--aplat); color: var(--sur-aplat); }
@@ -149,7 +150,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 .chemin { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 12px; margin-top: 12px; }
 .chemin button { text-align: left; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; min-height: 130px; border-radius: 16px; background: var(--blanc); color: var(--encre); border: 3px solid var(--encre); }
 .chemin button b { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 9px; background: var(--aplat); color: var(--sur-aplat); font: 800 1.2rem var(--f-titre); border: 2px solid var(--encre); }
-.chemin button span { font: 700 1.02rem var(--f-titre); line-height: 1.25; }
+.chemin button span { font: 700 1.12rem var(--f-titre); line-height: 1.25; }
 .chemin button.vu { background: var(--neon); }
 .chemin button.vu b::after { content: " ✓"; font-size: .8em; }
 
@@ -157,31 +158,31 @@ code { font-family: var(--f-code); font-size: .9em; }
 .bits { display: flex; gap: 8px; justify-content: center; margin: 6px 0 10px; }
 .bits button { width: 50px; height: 62px; border-radius: 10px; border: 3px solid var(--encre); background: var(--blanc); font: 700 1.7rem var(--f-code); }
 .bits button.on { background: var(--aplat); color: #fff; }
-.bits-out { display: flex; justify-content: center; gap: 14px; align-items: center; font-size: 1.02rem; }
+.bits-out { display: flex; justify-content: center; gap: 14px; align-items: center; font-size: 1.12rem; }
 .bits-out b.lettre { display: grid; place-items: center; min-width: 56px; height: 56px; padding: 0 10px; border-radius: 12px; background: var(--neon); border: 3px solid var(--encre); font: 800 1.8rem var(--f-titre); }
-.accolade { text-align: center; font: 700 1rem var(--f-titre); color: var(--texte); border-top: 3px solid var(--texte); margin: 0 40px 10px; padding-top: 6px; }
+.accolade { text-align: center; font: 700 1.12rem var(--f-titre); color: var(--texte); border-top: 3px solid var(--texte); margin: 0 40px 10px; padding-top: 6px; }
 .escalier { display: flex; align-items: flex-end; gap: 10px; height: 210px; }
 .marche { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; }
 .marche b { width: 100%; display: grid; place-items: center; background: var(--aplat); color: #fff; border-radius: 12px 12px 4px 4px; font: 800 1.4rem var(--f-titre); }
-.marche small { font-size: .85rem; color: var(--discret); text-align: center; line-height: 1.2; }
-.fleches { text-align: center; margin-bottom: 0; font: 700 .95rem var(--f-code); color: var(--texte); margin-top: 10px; }
+.marche small { font-size: 1.1rem; color: var(--discret); text-align: center; line-height: 1.2; }
+.fleches { text-align: center; margin-bottom: 0; font: 700 1.1rem var(--f-code); color: var(--texte); margin-top: 10px; }
 .sens { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.sens div { border-radius: 10px; padding: 8px 12px; background: var(--clair); font-size: .95rem; text-align: center; }
+.sens div { border-radius: 10px; padding: 8px 12px; background: var(--clair); font-size: 1.1rem; text-align: center; }
 .sens b { display: block; font-family: var(--f-titre); }
 .conv { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 12px; }
-.conv input, .conv select { padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; font-size: 1.1rem; }
+.conv input, .conv select { padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; font-size: 1.2rem; }
 .conv-res { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .conv-res div { background: var(--clair); border-radius: 10px; padding: 8px; text-align: center; }
-.conv-res small { display: block; font: 700 .8rem var(--f-titre); color: var(--texte); }
-.conv-res span { font: 600 1rem var(--f-code); word-break: break-all; }
+.conv-res small { display: block; font: 700 1.1rem var(--f-titre); color: var(--texte); }
+.conv-res span { font: 600 1.12rem var(--f-code); word-break: break-all; }
 .conv-res div.src { background: var(--aplat); color: #fff; }
 .conv-res div.src small { color: #fff; }
 .duels { display: flex; flex-direction: column; gap: 10px; }
 .duel { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
-.duel .vs { font: 800 .85rem var(--f-titre); color: var(--discret); }
-.carte { text-align: left; padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; line-height: 1.3; font-size: .95rem; }
+.duel .vs { font: 800 1.1rem var(--f-titre); color: var(--discret); }
+.carte { text-align: left; padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); background: #fff; line-height: 1.3; font-size: 1.1rem; }
 .carte:hover { border-color: var(--texte); }
-.carte b { display: block; font-family: var(--f-code); font-size: 1.05rem; }
+.carte b { display: block; font-family: var(--f-code); font-size: 1.15rem; }
 .carte.ok { border-color: var(--bon); background: var(--bon-fond); }
 .carte.ko { border-color: var(--faux); background: var(--faux-fond); }
 
@@ -190,7 +191,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 .cuisine > div { background: var(--blanc); border: 3px solid var(--aplat); border-radius: 18px; padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; }
 .cuisine .ico { font-size: 3.2rem; line-height: 1; }
 .cuisine h3 { font-size: 1.5rem; }
-.cuisine .egal { font: 700 1.1rem var(--f-titre); color: var(--texte); }
+.cuisine .egal { font: 700 1.2rem var(--f-titre); color: var(--texte); }
 .cuisine ul { margin: 0; padding-left: 1.1em; }
 .cuisine li { margin: 4px 0; }
 .etat { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; font-weight: 700; }
@@ -200,13 +201,13 @@ code { font-family: var(--f-code); font-size: .9em; }
 .tri-l { min-height: 120px; display: flex; flex-direction: column; gap: 8px; justify-content: space-between; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--filet); background: #fff; }
 .tri-l.ok { border-color: var(--bon); background: var(--bon-fond); }
 .tri-l.ko { border-color: var(--faux); background: var(--faux-fond); }
-.tri-l small { display: block; color: var(--discret); font-size: .86rem; margin-top: 4px; }
+.tri-l small { display: block; color: var(--discret); font-size: 1rem; margin-top: 4px; }
 .espaces { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .espace { background: var(--blanc); border: 2px solid var(--moyen); border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
 .espace .ico { font-size: 2.6rem; line-height: 1; }
 .espace h3 { font-size: 1.35rem; }
-.espace .ex2 { font-size: .95rem; background: var(--clair); border-radius: 10px; padding: 8px 12px; }
-.espace .plus { margin-top: auto; font-size: .95rem; }
+.espace .ex2 { font-size: 1.1rem; background: var(--clair); border-radius: 10px; padding: 8px 12px; }
+.espace .plus { margin-top: auto; font-size: 1.1rem; }
 .espace .plus div { display: flex; gap: 8px; }
 
 /* ---------- 3. faire de la place ---------- */
@@ -217,21 +218,21 @@ code { font-family: var(--f-code); font-size: .9em; }
 .flow { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .flow .q { background: var(--aplat); color: #fff; font: 700 1.15rem var(--f-titre); padding: 10px 18px; border-radius: 12px; text-align: center; }
 .flow .yn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-.flow .yn div { background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 12px; text-align: center; font-size: .95rem; }
+.flow .yn div { background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 12px; text-align: center; font-size: 1.1rem; }
 .flow .yn .gros { font-size: 2rem; display: block; }
-.phone { display: grid; grid-template-columns: 360px 1fr; gap: 20px; flex: 1; min-height: 0; }
+.phone { display: grid; grid-template-columns: 420px 1fr; align-items: start; gap: 20px; flex: 1; min-height: 0; }
 .jauge { background: var(--blanc); border: 2px solid var(--moyen); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
-.jauge-h { font: 700 1.05rem var(--f-titre); }
+.jauge-h { font: 700 1.15rem var(--f-titre); }
 .jauge-big { font: 800 2rem var(--f-titre); }
 .jauge-bar { position: relative; height: 26px; border-radius: 99px; background: #fff; border: 2px solid var(--texte); overflow: hidden; }
 .jauge-bar i { position: absolute; inset: 0 auto 0 0; background: var(--aplat); transition: width .35s; }
 .jauge-bar em { position: absolute; top: -2px; bottom: -2px; width: 3px; background: var(--encre); }
-.jauge small { color: var(--discret); font-size: .88rem; }
-.items { display: flex; flex-direction: column; gap: 7px; }
-.item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 6px 12px; border-radius: 10px; background: #fff; border: 2px solid var(--filet); font-size: .95rem; line-height: 1.25; }
-.item .nm small { display: block; color: var(--discret); font-size: .8rem; }
+.jauge small { color: var(--discret); font-size: 1.1rem; }
+.items { display: flex; flex-direction: column; gap: 6px; }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 6px 12px; border-radius: 10px; background: #fff; border: 2px solid var(--filet); font-size: 1.1rem; line-height: 1.25; }
+.item .nm small { display: block; color: var(--discret); font-size: 1rem; }
 .seg { display: inline-flex; border: 2px solid var(--texte); border-radius: 10px; overflow: hidden; }
-.seg button { border: 0; background: #fff; padding: 5px 10px; font-size: .84rem; font-weight: 700; color: var(--texte); }
+.seg button { border: 0; background: #fff; padding: 5px 10px; font-size: 1.02rem; font-weight: 700; color: var(--texte); }
 .seg button + button { border-left: 2px solid var(--texte); }
 .seg button[aria-pressed="true"] { background: var(--aplat); color: var(--sur-aplat); }
 
@@ -245,18 +246,18 @@ code { font-family: var(--f-code); font-size: .9em; }
 .r3 { display: grid; grid-template-columns: auto auto auto; justify-content: center; gap: 6px 18px; font: 600 1.15rem var(--f-code); background: var(--clair); border-radius: 12px; padding: 14px; }
 .r3 .op { color: var(--texte); font-weight: 700; text-align: center; }
 .calc { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-.calc label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; font-size: .95rem; }
+.calc label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; font-size: 1.1rem; }
 .calc .in { display: flex; align-items: center; gap: 8px; }
 .calc input { width: 100%; padding: 9px 12px; border-radius: 10px; border: 2px solid var(--filet); font-size: 1.15rem; }
 .calc em { font-style: normal; font-weight: 700; color: var(--texte); white-space: nowrap; }
 .etapes { margin: 0; padding: 0; list-style: none; counter-reset: e; display: flex; flex-direction: column; gap: 10px; }
-.etapes li { counter-increment: e; display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: center; font-family: var(--f-code); font-size: 1.05rem; background: #fff; border: 2px solid var(--filet); border-radius: 10px; padding: 8px 12px; }
-.etapes li::before { content: counter(e); display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; background: var(--clair); color: var(--texte); font: 700 .9rem var(--f-titre); }
+.etapes li { counter-increment: e; display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: center; font-family: var(--f-code); font-size: 1.15rem; background: #fff; border: 2px solid var(--filet); border-radius: 10px; padding: 8px 12px; }
+.etapes li::before { content: counter(e); display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; background: var(--clair); color: var(--texte); font: 700 1.1rem var(--f-titre); }
 .etapes li.res { border-color: var(--encre); }
 .etapes li.res b { background: var(--neon); padding: 0 6px; border-radius: 4px; }
 .hconv { display: flex; align-items: center; gap: 10px; font-size: 1.4rem; }
 .hconv input { width: 150px; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--filet); font: 600 1.4rem var(--f-code); }
-.hconv-out { margin-top: 14px; font-family: var(--f-code); font-size: 1.12rem; line-height: 1.9; background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 12px 16px; }
+.hconv-out { margin-top: 14px; font-family: var(--f-code); font-size: 1.22rem; line-height: 1.9; background: #fff; border: 2px solid var(--filet); border-radius: 12px; padding: 12px 16px; }
 .hconv-out b { background: var(--neon); padding: 0 5px; border-radius: 4px; }
 .piege { display: flex; align-items: center; gap: 16px; justify-content: center; font: 800 1.6rem var(--f-titre); }
 .piege .non { text-decoration: line-through; color: var(--faux); }
@@ -267,26 +268,26 @@ code { font-family: var(--f-code); font-size: .9em; }
 .q3 div { background: #fff; border-radius: 16px; border: 3px solid var(--texte); padding: 16px; text-align: center; }
 .q3 .ico { font-size: 2.2rem; line-height: 1; }
 .q3 b { display: block; font: 800 1.7rem var(--f-titre); color: var(--texte); margin: 4px 0; }
-.q3 small { color: var(--discret); font-size: .98rem; }
+.q3 small { color: var(--discret); font-size: 1.1rem; }
 .posts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; min-height: 0; }
-.post { min-height: 300px; background: #fff; border-radius: 14px; border: 2px solid var(--filet); padding: 14px 16px; display: flex; flex-direction: column; font-size: .98rem; }
+.post { min-height: 300px; background: #fff; border-radius: 14px; border: 2px solid var(--filet); padding: 14px 16px; display: flex; flex-direction: column; font-size: 1.1rem; }
 .post-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.av { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; font: 700 .9rem var(--f-titre); color: #fff; flex: none; }
-.post-h b { font-size: .95rem; }
-.post-h small { display: block; color: var(--discret); font-size: .8rem; line-height: 1.25; }
+.av { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; font: 700 1.1rem var(--f-titre); color: #fff; flex: none; }
+.post-h b { font-size: 1.1rem; }
+.post-h small { display: block; color: var(--discret); font-size: 1.1rem; line-height: 1.25; }
 .post p { margin: 0 0 10px; }
 .post .rangee { margin-top: auto; }
-.post .fb { font-size: .9rem; }
+.post .fb { font-size: 1.1rem; }
 .post.ok { border-color: var(--bon); }
 .post.ko { border-color: var(--faux); }
-.tag-f { display: inline-block; font: 700 .68rem var(--f-titre); letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: var(--clair); color: var(--texte); }
+.tag-f { display: inline-block; font: 700 .82rem var(--f-titre); letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: var(--clair); color: var(--texte); }
 
 /* ---------- 6. PEGI ---------- */
 .ages { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 8px 0 12px; }
 .age { display: grid; place-items: center; width: 70px; height: 82px; border-radius: 10px; font: 800 1.9rem var(--f-titre); color: #fff; border: 3px solid var(--encre); }
 .a3, .a7 { background: #2E9E3F; } .a12, .a16 { background: #E58A00; color: var(--encre); } .a18 { background: #D9001B; }
 .vs-x { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.vs-x div { border-radius: 12px; padding: 10px 14px; font-size: .98rem; }
+.vs-x div { border-radius: 12px; padding: 10px 14px; font-size: 1.1rem; }
 .vs-x .oui { background: var(--bon-fond); border: 2px solid var(--bon); }
 .vs-x .non { background: var(--faux-fond); border: 2px solid var(--faux); }
 .vs-x b { display: block; font-family: var(--f-titre); }
@@ -295,16 +296,16 @@ code { font-family: var(--f-code); font-size: .9em; }
 .etiq .pics { display: flex; gap: 8px; }
 .mini { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 8px; background: var(--encre); color: #fff; font-size: 1.5rem; }
 .pictos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.picto { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border-radius: 12px; border: 2px solid var(--encre); background: #fff; font-weight: 700; font-size: .95rem; text-align: center; line-height: 1.2; }
+.picto { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border-radius: 12px; border: 2px solid var(--encre); background: #fff; font-weight: 700; font-size: 1.1rem; text-align: center; line-height: 1.2; }
 .picto span { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 9px; background: var(--encre); color: #fff; font-size: 1.5rem; }
 .picto[aria-expanded="true"] { background: var(--neon); }
 .picto.vu:not([aria-expanded="true"]) { background: var(--clair); }
-.picto-def { min-height: 3.4em; padding: 14px 18px; border-radius: 12px; background: var(--blanc); border: 3px solid var(--texte); font-size: 1.08rem; }
+.picto-def { min-height: 3.4em; padding: 14px 18px; border-radius: 12px; background: var(--blanc); border: 3px solid var(--texte); font-size: 1.18rem; }
 .boite { display: flex; gap: 18px; align-items: center; padding: 18px; border-radius: 16px; background: var(--blanc); border: 3px solid var(--encre); }
 .boite .jeu { font: 800 1.3rem var(--f-titre); display: block; margin-bottom: 8px; }
 .boite .lbl { display: flex; gap: 8px; }
 .choix { display: flex; flex-direction: column; gap: 10px; }
-.choix button { text-align: left; padding: 11px 14px; border-radius: 12px; border: 2px solid var(--filet); background: #fff; line-height: 1.35; font-size: 1rem; }
+.choix button { text-align: left; padding: 11px 14px; border-radius: 12px; border: 2px solid var(--filet); background: #fff; line-height: 1.35; font-size: 1.12rem; }
 .choix button:hover { border-color: var(--texte); }
 .choix button.ok { border-color: var(--bon); background: var(--bon-fond); }
 .choix button.ko { border-color: var(--faux); background: var(--faux-fond); }
@@ -317,9 +318,9 @@ code { font-family: var(--f-code); font-size: .9em; }
 .anat button[data-k="dom"] { border-color: var(--neon); background: rgba(212, 255, 61, .35); }
 .anat button[data-k="chemin"] { border-color: #F1B2D8; }
 .anat button[aria-pressed="true"] { background: var(--clair); }
-.anat-leg { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; font-size: .88rem; color: var(--discret); margin-top: 8px; }
+.anat-leg { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; font-size: 1.1rem; color: var(--discret); margin-top: 8px; }
 .anat-leg span::before { content: ""; display: inline-block; width: 18px; height: 6px; border-radius: 3px; margin-right: 6px; vertical-align: middle; background: var(--c); }
-.anat-def { min-height: 3.2em; padding: 12px 18px; border-radius: 12px; background: var(--blanc); border: 3px solid var(--texte); font-size: 1.05rem; }
+.anat-def { min-height: 3.2em; padding: 12px 18px; border-radius: 12px; background: var(--blanc); border: 3px solid var(--texte); font-size: 1.15rem; }
 .cadenas { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
 .cadenas .ico { font-size: 3rem; }
 .urls { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -330,36 +331,36 @@ code { font-family: var(--f-code); font-size: .9em; }
 .url-c button:hover { background: var(--clair); }
 .url-c button.ok { background: var(--neon); }
 .url-c button.ko { background: var(--faux-fond); text-decoration: line-through; }
-.url-l .fb { font-size: .92rem; }
+.url-l .fb { font-size: 1.1rem; }
 
 /* ---------- 8. arnaques ---------- */
 .signaux { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .signal { background: #fff; border: 2px solid var(--moyen); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
 .signal span { font-size: 2.3rem; line-height: 1; }
 .signal b { font: 700 1.25rem var(--f-titre); margin-top: 6px; }
-.signal small { color: var(--discret); font-size: .98rem; }
-.compteur { display: flex; align-items: center; gap: 14px; background: var(--blanc); border: 3px solid var(--encre); border-radius: 14px; padding: 10px 16px; font-size: 1.02rem; }
+.signal small { color: var(--discret); font-size: 1.1rem; }
+.compteur { display: flex; align-items: center; gap: 14px; background: var(--blanc); border: 3px solid var(--encre); border-radius: 14px; padding: 10px 16px; font-size: 1.12rem; }
 .compteur b { font: 800 1.3rem var(--f-titre); white-space: nowrap; }
 .sms { width: 440px; background: #EEF0F4; border-radius: 28px; padding: 18px; border: 4px solid var(--encre); align-self: center; }
-.sms-h { text-align: center; font-size: .88rem; color: var(--discret); margin-bottom: 10px; }
-.sms .bulle { background: #fff; border-radius: 18px 18px 18px 4px; padding: 14px 16px; line-height: 1.75; font-size: 1.05rem; }
+.sms-h { text-align: center; font-size: 1.1rem; color: var(--discret); margin-bottom: 10px; }
+.sms .bulle { background: #fff; border-radius: 18px 18px 18px 4px; padding: 14px 16px; line-height: 1.75; font-size: 1.15rem; }
 .sms .hot { display: inline; -webkit-box-decoration-break: clone; box-decoration-break: clone; cursor: pointer; border: 0; background: transparent; padding: 0 2px; border-radius: 4px; font: inherit; text-align: left; border-bottom: 2px dotted var(--ligne); }
 .sms .hot.found { background: var(--neon); border-bottom-color: transparent; }
 .trouves { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.trouves li { background: #fff; border: 2px solid var(--bon); border-radius: 10px; padding: 8px 12px; font-size: .95rem; }
+.trouves li { background: #fff; border: 2px solid var(--bon); border-radius: 10px; padding: 8px 12px; font-size: 1.1rem; }
 .trouves li.vide { border-style: dashed; border-color: var(--filet); color: var(--discret); }
 .stop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .stop div { background: #fff; border-radius: 16px; border: 3px solid var(--texte); padding: 16px 12px; text-align: center; }
 .stop b { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 10px; border-radius: 12px; background: var(--aplat); color: var(--sur-aplat); font: 800 2.2rem var(--f-titre); border: 3px solid var(--encre); }
-.stop small { font-size: 1.02rem; line-height: 1.3; display: block; }
-.stop small strong { display: block; font: 700 1.1rem var(--f-titre); }
+.stop small { font-size: 1.12rem; line-height: 1.3; display: block; }
+.stop small strong { display: block; font: 700 1.2rem var(--f-titre); }
 
 /* ---------- 9. identité ---------- */
 .share { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.share button { font-size: 1.1rem; padding: 12px; border-radius: 12px; border: 2px solid var(--filet); background: #fff; font-weight: 700; line-height: 1.25; min-height: 92px; }
+.share button { font-size: 1.2rem; padding: 12px; border-radius: 12px; border: 2px solid var(--filet); background: #fff; font-weight: 700; line-height: 1.25; min-height: 92px; }
 .share button.ok { border-color: var(--bon); background: var(--bon-fond); }
 .share button.ko { border-color: var(--faux); background: var(--faux-fond); }
-.share button small { display: block; font-weight: 400; font-size: .82rem; margin-top: 4px; }
+.share button small { display: block; font-weight: 400; font-size: 1.1rem; margin-top: 4px; }
 .mode { display: inline-flex; border: 3px solid var(--encre); border-radius: 12px; overflow: hidden; }
 .mode button { border: 0; background: #fff; padding: 8px 16px; font-weight: 700; }
 .mode button + button { border-left: 3px solid var(--encre); }
@@ -371,9 +372,9 @@ code { font-family: var(--f-code); font-size: .9em; }
 .pw-bar { height: 16px; border-radius: 99px; background: var(--clair); overflow: hidden; margin: 12px 0 6px; border: 2px solid var(--texte); }
 .pw-bar i { display: block; height: 100%; width: 0; background: var(--aplat); transition: width .25s; }
 .pw-lvl { font: 800 1.3rem var(--f-titre); }
-.pw ul { list-style: none; margin: 8px 0 0; padding: 0; font-size: 1rem; display: flex; flex-direction: column; gap: 4px; }
+.pw ul { list-style: none; margin: 8px 0 0; padding: 0; font-size: 1.12rem; display: flex; flex-direction: column; gap: 4px; }
 .pw li.ok { color: var(--bon); font-weight: 700; }
-.recette { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 700 1.05rem var(--f-code); }
+.recette { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 700 1.15rem var(--f-code); }
 .recette span { background: var(--clair); border: 2px solid var(--texte); border-radius: 8px; padding: 6px 10px; }
 .recette .op { background: transparent; border: 0; padding: 0; color: var(--texte); }
 .pas { list-style: none; margin: 0; padding: 0; counter-reset: p; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
@@ -384,7 +385,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 /* ---------- turbo-check ---------- */
 .quiz { flex: 1; min-height: 0; background: var(--blanc); border: 3px solid var(--aplat); border-radius: 18px; padding: 22px 28px; display: flex; flex-direction: column; overflow: auto; }
 .quiz-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
-.quiz-top b { font: 700 1.05rem var(--f-titre); color: var(--texte); }
+.quiz-top b { font: 700 1.15rem var(--f-titre); color: var(--texte); }
 .quiz-dots { display: flex; gap: 6px; }
 .quiz-dots i { width: 20px; height: 20px; border-radius: 4px; border: 2.5px solid var(--encre); }
 .quiz-dots i.ok { background: var(--bon); }
@@ -392,31 +393,31 @@ code { font-family: var(--f-code); font-size: .9em; }
 .quiz-dots i.cur { background: var(--neon); }
 .quiz-q { font: 700 1.5rem var(--f-titre); margin-bottom: 16px; }
 .quiz .choix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.quiz .choix button { font-size: 1.1rem; padding: 14px 16px; }
+.quiz .choix button { font-size: 1.2rem; padding: 14px 16px; }
 .score { text-align: center; }
 .score .big { font: 800 3.6rem var(--f-titre); color: var(--texte); line-height: 1.1; }
-.score ul { text-align: left; max-width: 900px; margin: 10px auto; font-size: .95rem; }
+.score ul { text-align: left; max-width: 900px; margin: 10px auto; font-size: 1.1rem; }
 
 /* ---------- fin ---------- */
 .fin-zone { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .fin-zone a { display: flex; flex-direction: column; gap: 10px; padding: 24px; border-radius: 18px; border: 3px solid var(--encre); background: var(--blanc); color: var(--encre); text-decoration: none; }
 .fin-zone a b { font: 800 1.5rem var(--f-titre); }
-.fin-zone a .go { margin-top: auto; font: 700 1.05rem var(--f-titre); color: var(--texte); }
+.fin-zone a .go { margin-top: auto; font: 700 1.15rem var(--f-titre); color: var(--texte); }
 .fin-zone a.jeu { background: var(--s-clair); border-color: var(--s-texte); }
-.bilan { display: flex; align-items: center; gap: 18px; font-size: 1.1rem; }
+.bilan { display: flex; align-items: center; gap: 18px; font-size: 1.2rem; }
 .bilan .octet-mini { display: flex; gap: 6px; }
 .bilan .octet-mini i { width: 28px; height: 28px; border-radius: 5px; border: 3px solid var(--encre); }
 .bilan .octet-mini i.on { background: var(--i-aplat); }
-.pied { font-size: .85rem; color: var(--discret); }
+.pied { font-size: 1.1rem; color: var(--discret); }
 .pied a { color: var(--i-texte); }
 
 /* ---------- barre de navigation ---------- */
 #bar { flex: none; display: flex; align-items: center; gap: 10px; padding-top: 10px; color: #fff; }
-#bar button { background: #2E2247; border: 2px solid #4A3C6B; border-radius: 10px; padding: 8px 14px; color: #fff; font: 700 .95rem var(--f-titre); white-space: nowrap; }
+#bar button { background: #2E2247; border: 2px solid #4A3C6B; border-radius: 10px; padding: 8px 14px; color: #fff; font: 700 1.08rem var(--f-titre); white-space: nowrap; }
 #bar button:hover { background: #3C2E5C; }
 #bar button.fleche { width: 52px; font-size: 1.15rem; padding: 6px 0; }
-#bar .accueil { color: var(--neon); font: 800 1rem var(--f-titre); letter-spacing: .08em; text-decoration: none; padding: 0 6px; }
-#count { font: 600 .9rem var(--f-code); min-width: 64px; text-align: center; }
+#bar .accueil { color: var(--neon); font: 800 1.12rem var(--f-titre); letter-spacing: .08em; text-decoration: none; padding: 0 6px; }
+#count { font: 600 1.02rem var(--f-code); min-width: 64px; text-align: center; }
 #pistes { flex: 1; display: flex; gap: 3px; min-width: 120px; height: 14px; }
 #pistes button { flex: 1; padding: 0 !important; border: 0 !important; border-radius: 3px !important; background: #3A2E55 !important; min-width: 0; }
 #pistes button.i { background: #4B3577 !important; } #pistes button.s { background: #245A3A !important; } #pistes button.c { background: #6B4A12 !important; }
@@ -425,7 +426,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 #octet { display: flex; gap: 3px; }
 #octet i { width: 13px; height: 13px; border-radius: 3px; border: 2px solid var(--i-moyen); }
 #octet i.on { background: var(--i-moyen); }
-#prog-t { font: 600 .82rem var(--f-code); color: #CFC8E0; white-space: nowrap; }
+#prog-t { font: 600 .95rem var(--f-code); color: #CFC8E0; white-space: nowrap; }
 @media (max-width: 760px) { #prog-t, #bar .accueil, #fs { display: none; } }
 
 /* ---------- sommaire ---------- */
@@ -434,13 +435,13 @@ code { font-family: var(--f-code); font-size: .9em; }
 #som h2 { font-size: 1.6rem; margin-bottom: 4px; }
 #som .som-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 #som .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-#som h3 { font: 700 .82rem var(--f-titre); letter-spacing: .12em; text-transform: uppercase; color: var(--texte); margin: 0 0 8px; }
+#som h3 { font: 700 .95rem var(--f-titre); letter-spacing: .12em; text-transform: uppercase; color: var(--texte); margin: 0 0 8px; }
 #som ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-#som li button { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 9px 12px; border-radius: 12px; border: 2px solid var(--moyen); background: var(--pale); font-size: 1rem; line-height: 1.25; }
+#som li button { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 9px 12px; border-radius: 12px; border: 2px solid var(--moyen); background: var(--pale); font-size: 1.12rem; line-height: 1.25; }
 #som li button:hover { border-color: var(--texte); }
-#som li button .n { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--blanc); border: 2px solid var(--aplat); color: var(--texte); font: 800 .95rem var(--f-titre); }
+#som li button .n { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--blanc); border: 2px solid var(--aplat); color: var(--texte); font: 800 1.08rem var(--f-titre); }
 #som li button.vu .n { background: var(--aplat); color: var(--sur-aplat); }
-#som li button .etat-n { margin-left: auto; font-size: .8rem; color: var(--discret); white-space: nowrap; }
+#som li button .etat-n { margin-left: auto; font-size: 1.1rem; color: var(--discret); white-space: nowrap; }
 #som li button.ici { border-color: var(--encre); box-shadow: 0 0 0 3px var(--neon); }
 #som .bas { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
 
@@ -486,7 +487,7 @@ code { font-family: var(--f-code); font-size: .9em; }
     <div class="legende">
       <div><span class="kind"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13"/></svg>Je découvre</span><p>Je lis et j'observe. C'est la théorie, expliquée avec des exemples.</p><p class="ex-mini">Prends le temps de lire chaque bloc.</p></div>
       <div><span class="kind atoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>À toi !</span><p>Je clique, je trie, je calcule. L'écran me dit tout de suite si c'est juste.</p><p class="ex-mini">Tu te trompes ? Lis l'aide et réessaie.</p></div>
-      <div><span class="kind retiens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8L12 2z"/></svg>À retenir</span><p>Le résumé de la notion. Je coche « J'ai compris » quand c'est clair.</p><p class="ex-mini">Chaque case cochée remplit ton octet.</p></div>
+      <div><span class="kind retiens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8L12 2z"/></svg>À retenir</span><p>Le résumé de la notion. Je coche « J'ai compris » quand c'est clair.</p><p class="ex-mini">Chaque case cochée remplit ton octet.</p></div>
     </div>
     <div class="reperes">
       <div><span class="ico">☰</span><span>Le bouton <b>Sommaire</b> (en bas à gauche) te montre les 9 notions. Tu peux sauter où tu veux.</span></div>
@@ -513,7 +514,7 @@ code { font-family: var(--f-code); font-size: .9em; }
       <div class="bloc">
         <h3>Le bit et l'octet</h3>
         <p>Un ordinateur ne connaît que deux états : <b>0</b> ou <b>1</b>. C'est un <b>bit</b>. On regroupe <b>8 bits</b> pour former <b>1 octet</b>.</p>
-        <p style="font-size:.92rem;color:var(--discret);margin-bottom:4px">Clique sur les bits pour changer l'octet :</p>
+        <p style="font-size:1.1rem;color:var(--discret);margin-bottom:4px">Clique sur les bits pour changer l'octet :</p>
         <div class="bits" id="bits" role="group" aria-label="Les 8 bits d'un octet"></div>
         <p class="accolade">8 bits = 1 octet</p>
         <div class="bits-out" aria-live="polite"><span>Cet octet code la lettre</span><b class="lettre" id="bits-l">A</b></div>
@@ -533,7 +534,7 @@ code { font-family: var(--f-code); font-size: .9em; }
         </div>
       </div>
     </div>
-    <p class="attention"><b>Le savais-tu ?</b> Les ordinateurs comptent souvent par 1 024 au lieu de 1 000. C'est pour ça qu'une clé USB vendue « 64 Go » affiche un peu moins. Rien n'a disparu ! En classe, on compte par 1 000.</p>
+    <p class="attention"><b>Le savais-tu ?</b> Les ordinateurs comptent souvent par 1 024 au lieu de 1 000. C'est pour ça qu'une clé USB vendue « 64 Go » affiche un peu moins. Rien n'a disparu ! En classe, on compte par 1 000.</p>
   </div>
 </section>
 
@@ -628,7 +629,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 <section class="slide ch-i" data-n="3" data-k="decouvre" data-name="Faire de la place">
   <div class="corps">
     <h2><span class="num">3</span>Faire de la <span class="neon">place</span></h2>
-    <p class="lead">« Stockage presque plein » : avant de supprimer au hasard, je calcule ce qui manque, puis je trie.</p>
+    <p class="lead">« Stockage presque plein » : avant de supprimer au hasard, je calcule ce qui manque, puis je trie.</p>
     <div class="grille g2">
       <div class="bloc">
         <h3>Étape 1 · Combien libérer ?</h3>
@@ -653,7 +654,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 <section class="slide ch-i" data-n="3" data-k="atoi" data-name="Le smartphone de Lou">
   <div class="corps">
     <h2><span class="num">3</span>Le smartphone de <span class="neon">Lou</span></h2>
-    <p class="consigne"><span class="pt">1</span>Une mise à jour demande 6 Go. Pour chaque élément : garder, déplacer ou supprimer. Ne perds rien d'important !</p>
+    <p class="consigne"><span class="pt">1</span>Une mise à jour demande 6 Go. Pour chaque élément : garder ou supprimer. Ne perds rien d'important !</p>
     <div class="phone">
       <div class="jauge" aria-live="polite">
         <span class="jauge-h">📱 Stockage utilisé</span>
@@ -662,7 +663,7 @@ code { font-family: var(--f-code); font-size: .9em; }
         <small>Il faut au moins 6 Go de libre : la barre doit passer sous le trait noir.</small>
         <b id="ph-free"></b>
         <div class="rangee" style="margin-top:auto"><button class="btn" id="ph-check">Vérifier</button><button class="btn second" id="ph-reset">Recommencer</button></div>
-        <p class="fb" id="ph-fb" aria-live="polite" style="font-size:.92rem"></p>
+        <p class="fb" id="ph-fb" aria-live="polite" style="font-size:1rem;line-height:1.3;margin-top:8px"></p>
       </div>
       <div class="items" id="ph-items"></div>
     </div>
@@ -692,7 +693,7 @@ code { font-family: var(--f-code); font-size: .9em; }
       <div class="bloc">
         <h3>Des bits aux octets : ÷ 8</h3>
         <div class="paquet" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <p style="text-align:center;font-size:.95rem;color:var(--discret)">8 bits forment 1 octet, donc 8 Mbit = 1 Mo.</p>
+        <p style="text-align:center;font-size:1.1rem;color:var(--discret)">8 bits forment 1 octet, donc 8 Mbit = 1 Mo.</p>
         <div class="debit-visu"><span>80 Mbit/s</span><span class="op">÷ 8</span><span>=</span><span class="r">10 Mo/s</span></div>
         <p class="formule" style="margin:0">Temps (s) = taille (Mo) ÷ vitesse (Mo/s)</p>
       </div>
@@ -720,7 +721,7 @@ code { font-family: var(--f-code); font-size: .9em; }
           <label for="dl-v">Vitesse de la connexion<span class="in"><input id="dl-v" type="text" inputmode="decimal" value="40"><em>Mbit/s</em></span></label>
           <label for="dl-t">Taille du fichier<span class="in"><input id="dl-t" type="text" inputmode="decimal" value="1,2"><em>Go</em></span></label>
         </div>
-        <p style="color:var(--discret);font-size:.92rem;margin:0">Repère : un épisode de série en HD pèse environ 1 à 2 Go.</p>
+        <p style="color:var(--discret);font-size:1.1rem;margin:0">Repère : un épisode de série en HD pèse environ 1 à 2 Go.</p>
       </div>
       <ol class="etapes" id="dl-steps" aria-live="polite"></ol>
     </div>
@@ -774,7 +775,7 @@ code { font-family: var(--f-code); font-size: .9em; }
     </div>
     <div class="grille g2">
       <div class="bloc"><h3>✔ Des sources souvent fiables</h3><p style="margin:0">Le site officiel de l'organisation (école, commune, entreprise), les médias connus, <code>enseignement.be</code> pour l'école en Fédération Wallonie-Bruxelles.</p></div>
-      <div class="bloc"><h3>⚠ Méfiance si…</h3><p style="margin:0">capture d'écran sans source, « partage vite ! », compte créé récemment, message qui joue sur la peur ou la colère.</p></div>
+      <div class="bloc"><h3>⚠ Méfiance si…</h3><p style="margin:0">capture d'écran sans source, « partage vite ! », compte créé récemment, message qui joue sur la peur ou la colère.</p></div>
     </div>
   </div>
 </section>
@@ -794,7 +795,7 @@ code { font-family: var(--f-code); font-size: .9em; }
       <div class="retenir"><ul>
         <li><span>Je me pose les 3 questions : <b>Qui ? Quand ? Comment le sait-il ?</b></span></li>
         <li><span>Je <b>recoupe</b> : je cherche la même info dans au moins <b>deux sources fiables</b>.</span></li>
-        <li><span>Je vérifie l'<b>identifiant exact</b> d'un compte, lettre par lettre (un « 0 » à la place d'un « o », un « _officiel » ajouté…).</span></li>
+        <li><span>Je vérifie l'<b>identifiant exact</b> d'un compte, lettre par lettre (un « 0 » à la place d'un « o », un « _officiel » ajouté…).</span></li>
         <li><span>Un compte officiel ne demande <b>jamais</b> de mot de passe ni d'argent par message.</span></li>
       </ul></div>
       <div class="compris" data-vu="5"></div>
@@ -848,7 +849,7 @@ code { font-family: var(--f-code); font-size: .9em; }
     <p class="consigne"><span class="pt">2</span>Voici l'étiquette d'un jeu inventé. Que t'apprend-elle ?</p>
     <div class="grille g12">
       <div class="col">
-        <div class="boite"><span class="age a12" style="width:76px;height:88px;font-size:2rem">12</span><div><span class="jeu">Galaxy Racers</span><span style="font-size:.85rem;color:var(--discret);display:block;margin-bottom:8px">jeu inventé</span><div class="lbl"><span class="mini" title="Violence">👊</span><span class="mini" title="Achats intégrés">💳</span></div></div></div>
+        <div class="boite"><span class="age a12" style="width:76px;height:88px;font-size:2rem">12</span><div><span class="jeu">Galaxy Racers</span><span style="font-size:1.1rem;color:var(--discret);display:block;margin-bottom:8px">jeu inventé</span><div class="lbl"><span class="mini" title="Violence">👊</span><span class="mini" title="Achats intégrés">💳</span></div></div></div>
         <p class="attention">Aide : regarde <b>le chiffre</b>, puis <b>chaque pictogramme</b>.</p>
       </div>
       <div><div class="choix" id="pegi-q"></div><p class="fb" id="pegi-fb" aria-live="polite"></p></div>
@@ -888,7 +889,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 <section class="slide ch-s" data-n="7" data-k="atoi" data-name="Chez qui j'arrive ?">
   <div class="corps">
     <h2><span class="num">7</span>Chez qui <span class="neon">j'arrive</span> ?</h2>
-    <p class="consigne"><span class="pt">1</span>Dans chaque adresse, clique sur le nom de domaine (juste avant la première « / »).</p>
+    <p class="consigne"><span class="pt">1</span>Dans chaque adresse, clique sur le nom de domaine (juste avant la première « / »).</p>
     <div class="urls" id="urls"></div>
   </div>
 </section>
@@ -898,7 +899,7 @@ code { font-family: var(--f-code); font-size: .9em; }
     <h2><span class="num">7</span>Lire une adresse <span class="neon">web</span></h2>
     <div class="retenir-zone">
       <div class="retenir"><ul>
-        <li><span>Le vrai propriétaire d'un site = le <b>nom de domaine</b>, juste <b>avant la première « / »</b> (avec son extension : .be, .com, .net…).</span></li>
+        <li><span>Le vrai propriétaire d'un site = le <b>nom de domaine</b>, juste <b>avant la première « / »</b> (avec son extension : .be, .com, .net…).</span></li>
         <li><span>Ce qui est à gauche du nom de domaine peut être un <b>déguisement</b> : <code>bpost.be.suivi-colis.info</code> appartient à <code>suivi-colis.info</code>.</span></li>
         <li><span>Le cadenas <b>HTTPS</b> = échanges chiffrés. Il ne prouve <b>pas</b> que le site est honnête.</span></li>
       </ul></div>
@@ -911,13 +912,13 @@ code { font-family: var(--f-code); font-size: .9em; }
 <section class="slide ch-s" data-n="8" data-k="decouvre" data-name="Les 6 signaux">
   <div class="corps">
     <h2><span class="num">8</span>Repérer une <span class="neon">arnaque</span></h2>
-    <p class="lead">Faux SMS, faux concours, « Robux gratuits » : les arnaques changent de forme, mais utilisent toujours les mêmes ficelles.</p>
+    <p class="lead">Faux SMS, faux concours, « Robux gratuits » : les arnaques changent de forme, mais utilisent toujours les mêmes ficelles.</p>
     <div class="signaux">
-      <div class="signal"><span aria-hidden="true">⏰</span><b>Urgence</b><small>« Plus que 24 h ! », « Dernière chance »</small></div>
+      <div class="signal"><span aria-hidden="true">⏰</span><b>Urgence</b><small>« Plus que 24 h ! », « Dernière chance »</small></div>
       <div class="signal"><span aria-hidden="true">🎁</span><b>Trop beau</b><small>Gratuit, cadeau, gain surprise</small></div>
       <div class="signal"><span aria-hidden="true">🔗</span><b>Adresse bizarre</b><small>Nom de domaine inconnu, lettres changées</small></div>
       <div class="signal"><span aria-hidden="true">🔑</span><b>Données demandées</b><small>Mot de passe, carte bancaire, code reçu</small></div>
-      <div class="signal"><span aria-hidden="true">📦</span><b>Fichier suspect</b><small>Pièce jointe .exe, « logiciel de triche »</small></div>
+      <div class="signal"><span aria-hidden="true">📦</span><b>Fichier suspect</b><small>Pièce jointe .exe, « logiciel de triche »</small></div>
       <div class="signal"><span aria-hidden="true">✍️</span><b>Fautes, inconnu</b><small>Fautes, expéditeur inconnu, faux avis</small></div>
     </div>
     <div class="compteur"><b>1 signal</b> = méfiance.<b style="margin-left:18px">Plusieurs signaux</b> = arnaque presque sûre.</div>
@@ -978,7 +979,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 <section class="slide ch-s" data-n="9" data-k="atoi" data-name="Partager ou garder ?">
   <div class="corps">
     <h2><span class="num">9</span>Protéger mes <span class="neon">données</span></h2>
-    <p class="lead" style="font-size:1rem">Ton <b>identité numérique</b>, c'est tout ce qui te représente en ligne : comptes, profil, publications… et les <b>traces</b> que tu laisses. Tes <b>données personnelles</b> permettent de te reconnaître ou de te retrouver.</p>
+    <p class="lead" style="font-size:1.1rem">Ton <b>identité numérique</b>, c'est tout ce qui te représente en ligne : comptes, profil, publications… et les <b>traces</b> que tu laisses. Tes <b>données personnelles</b> permettent de te reconnaître ou de te retrouver.</p>
     <div class="rangee" style="justify-content:space-between">
       <p class="consigne" style="margin:0"><span class="pt">1</span>Sur un profil public : choisis un bouton, puis clique sur les cartes.</p>
       <div class="mode" role="group" aria-label="Ma réponse"><button aria-pressed="true" data-m="ok">✔ Je peux partager</button><button aria-pressed="false" data-m="ko">✘ Je garde pour moi</button></div>
@@ -994,11 +995,11 @@ code { font-family: var(--f-code); font-size: .9em; }
     <div class="grille g2">
       <div class="bloc">
         <h3>💻 Sur un appareil partagé</h3>
-        <p style="font-size:.95rem;color:var(--discret)">Ordinateur de l'école, de la bibliothèque, tablette d'un ami :</p>
+        <p style="font-size:1.1rem;color:var(--discret)">Ordinateur de l'école, de la bibliothèque, tablette d'un ami :</p>
         <ul class="check">
           <li><span aria-hidden="true">🕶️</span><span>J'utilise la <b>navigation privée</b>.</span></li>
           <li><span aria-hidden="true">🚪</span><span>Je me <b>déconnecte</b> avant de partir (fermer l'onglet ne suffit pas).</span></li>
-          <li><span aria-hidden="true">🙅</span><span>Je réponds <b>« Jamais »</b> quand le navigateur propose d'enregistrer mon mot de passe.</span></li>
+          <li><span aria-hidden="true">🙅</span><span>Je réponds <b>« Jamais »</b> quand le navigateur propose d'enregistrer mon mot de passe.</span></li>
           <li><span aria-hidden="true">🧽</span><span>J'efface l'historique et mes fichiers téléchargés.</span></li>
         </ul>
       </div>
@@ -1040,7 +1041,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 <section class="slide ch-s" data-n="9" data-k="decouvre" data-name="Compte piraté">
   <div class="corps">
     <h2><span class="num">9</span>Mon compte est <span class="neon">piraté</span> : que faire ?</h2>
-    <p class="lead">Tes amis reçoivent des messages bizarres « de toi » ? Tu ne peux plus te connecter ? Pas de panique : 4 étapes, dans l'ordre.</p>
+    <p class="lead">Tes amis reçoivent des messages bizarres « de toi » ? Tu ne peux plus te connecter ? Pas de panique : 4 étapes, dans l'ordre.</p>
     <ol class="pas">
       <li><span class="ico" aria-hidden="true">🧑‍🏫</span><span>Je préviens un <b>adulte de confiance</b>.</span></li>
       <li><span class="ico" aria-hidden="true">🔑</span><span>Je change le mot de passe <b>depuis l'appli ou le site officiel</b> (jamais par un lien reçu).</span></li>
@@ -1069,7 +1070,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 <section class="slide ch-c" id="turbo" data-k="turbo" data-name="Turbo-check">
   <div class="corps">
     <h2>⚡ Turbo-<span class="neon">check</span></h2>
-    <p class="lead" style="font-size:1rem">10 questions tirées au hasard parmi les 9 notions. Recommence autant que tu veux : les questions changent.</p>
+    <p class="lead" style="font-size:1.1rem">10 questions tirées au hasard parmi les 9 notions. Recommence autant que tu veux : les questions changent.</p>
     <div class="quiz" id="quiz" aria-live="polite"></div>
   </div>
 </section>
@@ -1105,7 +1106,7 @@ code { font-family: var(--f-code); font-size: .9em; }
 
 <div id="som" role="dialog" aria-modal="true" aria-labelledby="som-t" hidden>
   <div class="boite-som">
-    <div class="som-h"><div><h2 id="som-t">Sommaire</h2><span style="color:var(--discret);font-size:.95rem">Clique sur une notion pour y aller. ✓ = « J'ai compris » coché.</span></div><button class="btn second" id="som-x" style="--texte:var(--encre)">✕ Fermer</button></div>
+    <div class="som-h"><div><h2 id="som-t">Sommaire</h2><span style="color:var(--discret);font-size:1.1rem">Clique sur une notion pour y aller. ✓ = « J'ai compris » coché.</span></div><button class="btn second" id="som-x" style="--texte:var(--encre)">✕ Fermer</button></div>
     <div class="cols">
       <div class="ch-i"><h3>Partie 1 · Informations et données</h3><ol id="som-1"></ol></div>
       <div class="ch-s"><h3>Partie 2 · Sécurité</h3><ol id="som-2"></ol></div>
@@ -1218,7 +1219,7 @@ code { font-family: var(--f-code); font-size: .9em; }
     if (tx === null) return; const t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty; tx = null;
     if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5 && !["INPUT", "SELECT"].includes(e.target.tagName)) go(cur + (dx < 0 ? 1 : -1));
   });
-  /* liens « aller à » (titre, parties, sommaire) */
+  /* liens « aller à » (titre, parties, sommaire) */
   document.addEventListener("click", (e) => { const b = e.target.closest("[data-aller]"); if (!b) return; const i = idx(b.dataset.aller); if (i >= 0) { fermerSom(); go(i); } });
 
   /* ---------- parcours des parties ---------- */
@@ -1239,7 +1240,7 @@ code { font-family: var(--f-code); font-size: .9em; }
   $("#som-x").addEventListener("click", fermerSom);
   som.addEventListener("click", (e) => { if (e.target === som) fermerSom(); });
 
-  /* ---------- progression : « J'ai compris » remplit l'octet ---------- */
+  /* ---------- progression : « J'ai compris » remplit l'octet ---------- */
   const saved = store.get();
   const vu = new Set((saved.vu || []).map(String));
   $$(".compris[data-vu]").forEach((c) => {
@@ -1337,7 +1338,7 @@ code { font-family: var(--f-code); font-size: .9em; }
   function resetPhone() {
     ITEMS.forEach((it) => (choix[it.id] = "keep"));
     $("#ph-items").innerHTML = `<div class="item"><span class="nm">⚙️ Système du smartphone · <b>${PH.sys} Go</b><small>obligatoire, on n'y touche pas</small></span><span></span></div>` + ITEMS.map((it) => `<div class="item" data-id="${it.id}"><span class="nm">${it.n} · <b>${it.s} Go</b><small>${it.d}</small></span>
-      <span class="seg" role="group" aria-label="${it.n}">${[["keep", "Garder"], ["move", "Déplacer"], ["del", "Supprimer"]].map(([k, t]) => `<button data-k="${k}" aria-pressed="${k === "keep"}">${t}</button>`).join("")}</span></div>`).join("");
+      <span class="seg" role="group" aria-label="${it.n}">${[["keep", "Garder"], ["del", "Supprimer"]].map(([k, t]) => `<button data-k="${k}" aria-pressed="${k === "keep"}">${t}</button>`).join("")}</span></div>`).join("");
     $$("#ph-items .item[data-id]").forEach((row) => $$("button", row).forEach((b) => b.addEventListener("click", () => {
       choix[row.dataset.id] = b.dataset.k;
       $$("button", row).forEach((x) => x.setAttribute("aria-pressed", x === b));
@@ -1348,7 +1349,7 @@ code { font-family: var(--f-code); font-size: .9em; }
   $("#ph-reset").addEventListener("click", resetPhone);
   $("#ph-check").addEventListener("click", () => {
     const errs = [];
-    ITEMS.forEach((it) => { if (it.irr && choix[it.id] === "del") errs.push(`Les « ${it.n.slice(3)} » sont irremplaçables : déplace-les plutôt.`); });
+    ITEMS.forEach((it) => { if (it.irr && choix[it.id] === "del") errs.push(`Les « ${it.n.slice(3)} » sont irremplaçables : garde-les.`); });
     if (choix.apps !== "keep") errs.push("Lou utilise ses applis chaque jour : elles restent sur le smartphone.");
     const free = PH.cap - used();
     if (free < PH.need) errs.push(`Il n'y a que ${fmt(free)} Go de libre. Il en faut ${PH.need}.`);
@@ -1391,7 +1392,7 @@ code { font-family: var(--f-code); font-size: .9em; }
   const POSTS = [
     { av: "IE", c: "#9C94AE", who: "@info_ecoles_be", meta: "compte créé il y a 3 jours · 12 abonnés", txt: "🚨 URGENT !!! Toutes les écoles seront fermées demain à cause de la neige. PARTAGE VITE à tout le monde !!!", r: "doute", why: "Compte inconnu et récent, aucune source, urgence et majuscules. Je vérifie sur le site de l'école ou auprès d'un adulte." },
     { av: "FW", c: "#6C2BD9", who: "enseignement.be", meta: "site officiel de la Fédération Wallonie-Bruxelles", txt: "Calendrier scolaire : les dates des prochains congés sont publiées sur cette page.", r: "fiable", why: "Site officiel de l'enseignement : la source la mieux placée pour les dates de congés." },
-    { av: "AP", c: "#D9248F", who: "@App1e_Officiel", meta: "publication sponsorisée", txt: "🎁 Smartphone OFFERT aux 100 premiers ! Envoie ton nom, ton adresse et ton numéro en message privé.", r: "doute", why: "Identifiant copié (un « 1 » à la place du « l »), cadeau trop beau, données demandées : arnaque." },
+    { av: "AP", c: "#D9248F", who: "@App1e_Officiel", meta: "publication sponsorisée", txt: "🎁 Smartphone OFFERT aux 100 premiers ! Envoie ton nom, ton adresse et ton numéro en message privé.", r: "doute", why: "Identifiant copié (un « 1 » à la place du « l »), cadeau trop beau, données demandées : arnaque." },
   ];
   $("#posts").innerHTML = POSTS.map((p, i) => `<article class="post" data-i="${i}"><div class="post-h"><span class="av" style="background:${p.c}">${p.av}</span><div><b>${p.who}</b><small>${p.meta}</small></div></div><span class="tag-f" style="align-self:flex-start;margin-bottom:8px">Exemple inventé</span>
     <p>${p.txt}</p><div class="rangee"><button class="btn second petit" data-r="fiable">✔ Fiable</button><button class="btn second petit" data-r="doute">🔍 À vérifier</button></div><p class="fb" aria-live="polite"></p></article>`).join("");
@@ -1439,17 +1440,17 @@ code { font-family: var(--f-code); font-size: .9em; }
 
   /* ---------- 7. anatomie d'une adresse + exercice ---------- */
   const ANAT = {
-    proto: "<b>https://</b> : le protocole. Le « s » veut dire que les échanges sont chiffrés. Ça ne dit pas si le site est honnête.",
+    proto: "<b>https://</b> : le protocole. Le « s » veut dire que les échanges sont chiffrés. Ça ne dit pas si le site est honnête.",
     sous: "<b>monecole.</b> : un sous-domaine. Le propriétaire du domaine le choisit librement : ici, l'espace de ton école.",
-    dom: "<b>smartschool.be</b> : le nom de domaine. C'est lui qui dit chez qui tu arrives vraiment. Il se lit juste avant la première « / ».",
+    dom: "<b>smartschool.be</b> : le nom de domaine. C'est lui qui dit chez qui tu arrives vraiment. Il se lit juste avant la première « / ».",
     chemin: "<b>/login</b> : le chemin, la page précise à l'intérieur du site.",
   };
   $$("#anat button").forEach((b) => b.addEventListener("click", () => { $$("#anat button").forEach((x) => x.setAttribute("aria-pressed", x === b)); $("#anat-def").innerHTML = ANAT[b.dataset.k]; }));
   const URLS = [
     { parts: ["https://", "monecole.", "smartschool.be", "/login"], dom: 2, why: "Le domaine est smartschool.be : c'est bien la plateforme de l'école." },
-    { parts: ["https://", "bpost.be.", "suivi-colis.info", "/payer"], dom: 2, why: "Piège : le domaine est suivi-colis.info. « bpost.be » n'est qu'un déguisement placé devant." },
+    { parts: ["https://", "bpost.be.", "suivi-colis.info", "/payer"], dom: 2, why: "Piège : le domaine est suivi-colis.info. « bpost.be » n'est qu'un déguisement placé devant." },
     { parts: ["https://", "www.roblox.com.", "robux-gratuits.net", "/free"], dom: 2, why: "Le domaine est robux-gratuits.net : ce n'est pas Roblox. Et des Robux gratuits, c'est trop beau." },
-    { parts: ["https://", "fr.", "wikipedia.org", "/wiki/Octet"], dom: 2, why: "Le domaine est wikipedia.org : « fr. » est un sous-domaine pour la version française." },
+    { parts: ["https://", "fr.", "wikipedia.org", "/wiki/Octet"], dom: 2, why: "Le domaine est wikipedia.org : « fr. » est un sous-domaine pour la version française." },
   ];
   $("#urls").innerHTML = URLS.map((u, i) => `<div class="url-l" data-i="${i}"><div class="url-c">${u.parts.map((p, k) => `<button data-k="${k}">${p}</button>`).join("")}</div><p class="fb" aria-live="polite"></p></div>`).join("");
   $$(".url-l").forEach((row) => $$("button", row).forEach((b) => b.addEventListener("click", () => {
@@ -1457,13 +1458,13 @@ code { font-family: var(--f-code); font-size: .9em; }
     const u = URLS[+row.dataset.i], ok = +b.dataset.k === u.dom;
     const fb = $(".fb", row);
     if (ok) { b.classList.add("ok"); row.classList.add("ok"); fb.className = "fb ok"; fb.innerHTML = `✔ <span>${u.why}</span>`; }
-    else { b.classList.add("ko"); setTimeout(() => b.classList.remove("ko"), 900); fb.className = "fb ko"; fb.innerHTML = `✘ <span>Ce n'est pas le nom de domaine. Cherche le morceau juste avant la première « / », avec son extension.</span>`; }
+    else { b.classList.add("ko"); setTimeout(() => b.classList.remove("ko"), 900); fb.className = "fb ko"; fb.innerHTML = `✘ <span>Ce n'est pas le nom de domaine. Cherche le morceau juste avant la première « / », avec son extension.</span>`; }
   })));
 
   /* ---------- 8. SMS ---------- */
   const SMS = {
     exp: "👤 Expéditeur : un numéro de portable inconnu, pas le vrai service.",
-    urg: "⏰ Urgence : « bloqué », « avant 24 h » pour te pousser à agir vite.",
+    urg: "⏰ Urgence : « bloqué », « avant 24 h » pour te pousser à agir vite.",
     arg: "🔑 Données demandées : de l'argent et ta carte bancaire, même pour une petite somme.",
     lien: "🔗 Adresse bizarre : le domaine est bpost-livraison.info, pas bpost.be.",
   };
@@ -1513,7 +1514,7 @@ code { font-family: var(--f-code); font-size: .9em; }
       [words.length >= 4, `Au moins 4 mots (${words.length})`],
       [/\d/.test(v), "Au moins un chiffre"],
       [/[^\p{L}\p{N}\s]/u.test(v), "Au moins un symbole (! ? # - …)"],
-      [v.length > 0 && !bad, bad ? `Rien de facile à deviner (« ${bad} »)` : "Rien de facile à deviner (123, azerty…)"],
+      [v.length > 0 && !bad, bad ? `Rien de facile à deviner (« ${bad} »)` : "Rien de facile à deviner (123, azerty…)"],
     ];
     const n = c.filter((x) => x[0]).length;
     $("#pw-bar").style.width = (n / c.length) * 100 + "%";
@@ -1534,12 +1535,12 @@ code { font-family: var(--f-code); font-size: .9em; }
     { q: "Une connexion de 80 Mbit/s, c'est combien de Mo/s ?", o: ["10 Mo/s", "80 Mo/s", "640 Mo/s", "8 Mo/s"], why: "Mbit/s ÷ 8 = Mo/s.", n: 4 },
     { q: "3,5 h, c'est…", o: ["3 h 30 min", "3 h 50 min", "3 h 05 min", "35 min"], why: "0,5 × 60 = 30 min.", n: 4 },
     { q: "Avant de partager une info, je me demande…", o: ["Qui ? Quand ? Comment le sait-il ?", "Est-ce que c'est drôle ?", "Combien de likes ?", "Est-ce que c'est long ?"], why: "Puis je recoupe avec deux sources fiables.", n: 5 },
-    { q: "Un compte « officiel » te demande ton mot de passe par message. C'est…", o: ["une arnaque", "normal", "obligatoire", "un cadeau"], why: "Un compte officiel ne le demande jamais.", n: 5 },
+    { q: "Un compte « officiel » te demande ton mot de passe par message. C'est…", o: ["une arnaque", "normal", "obligatoire", "un cadeau"], why: "Un compte officiel ne le demande jamais.", n: 5 },
     { q: "Sur une boîte de jeu, le chiffre PEGI indique…", o: ["l'âge conseillé", "la note du jeu", "le prix", "la difficulté"], why: "C'est un âge conseillé, pas une note.", n: 6 },
     { q: "Le pictogramme PEGI 💳 veut dire…", o: ["achats intégrés avec de l'argent réel", "jeu gratuit", "jeu de cartes", "jeu en ligne"], why: "On peut payer dans le jeu.", n: 6 },
-    { q: "Dans https://bpost.be.suivi-colis.info/payer, le nom de domaine est…", o: ["suivi-colis.info", "bpost.be", "payer", "https"], why: "Juste avant la première « / ».", n: 7 },
+    { q: "Dans https://bpost.be.suivi-colis.info/payer, le nom de domaine est…", o: ["suivi-colis.info", "bpost.be", "payer", "https"], why: "Juste avant la première « / ».", n: 7 },
     { q: "Le cadenas HTTPS prouve que…", o: ["les échanges sont chiffrés", "le site est honnête", "le site est belge", "le site est gratuit"], why: "Chiffré ne veut pas dire honnête.", n: 7 },
-    { q: "« Votre colis est bloqué, payez 1,99 € avant 24 h » : quel signal ?", o: ["l'urgence", "une adresse officielle", "aucun", "un fichier trop léger"], why: "L'urgence pousse à agir sans réfléchir.", n: 8 },
+    { q: "« Votre colis est bloqué, payez 1,99 € avant 24 h » : quel signal ?", o: ["l'urgence", "une adresse officielle", "aucun", "un fichier trop léger"], why: "L'urgence pousse à agir sans réfléchir.", n: 8 },
     { q: "Que veut dire le P de STOP ?", o: ["Je préviens un adulte", "Je paie", "Je partage", "Je publie"], why: "Stop, Teste, Observe, Préviens.", n: 8 },
     { q: "Sur l'ordinateur de la bibliothèque, le navigateur propose d'enregistrer ton mot de passe :", o: ["Jamais", "Oui", "Plus tard", "Oui, juste aujourd'hui"], why: "Sur un appareil partagé, jamais.", n: 9 },
     { q: "La double authentification sert à…", o: ["bloquer un pirate qui connaît ton mot de passe", "jouer à deux", "aller plus vite", "ne plus avoir de mot de passe"], why: "Un code arrive sur un autre appareil.", n: 9 },
