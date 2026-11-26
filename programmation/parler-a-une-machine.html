@@ -445,7 +445,7 @@ svg text{font-family:var(--f-body)}
       <div class="robot-says" id="r2" hidden><span class="k">robot&gt;</span> tartine prête !<br><span class="k">✓</span> Chaque étape est claire et dans le bon ordre.</div>
     </div>
   </div>
-  <p class="lead"><b>Programmer</b>, c'est donner à une machine des instructions <b>précises</b>, dans le <b>bon ordre</b>.</p>
+  <p class="lead" style="max-width:none;font-size:25px"><b>Programmer</b>, c'est donner à une machine des instructions <b>précises</b>, dans le <b>bon ordre</b>.</p>
 </section>
 
 <!-- 4 · ALGORITHME -->
@@ -903,7 +903,7 @@ svg text{font-family:var(--f-body)}
   $('#count').textContent=(cur+1)+' / '+slides.length;
 
   /* révélations */
-  $$('[data-reveal]').forEach(b=>b.onclick=()=>{ $('#'+b.dataset.reveal).hidden=false; b.disabled=true; });
+  $$('[data-reveal]').forEach(b=>b.onclick=()=>{ $('#'+b.dataset.reveal).hidden=false; b.hidden=true; });
 
   /* ---- 4. ordre ---- */
   const steps=['Prendre sa brosse à dents','Mettre du dentifrice sur la brosse','Brosser ses dents pendant 2 minutes','Rincer sa bouche','Ranger la brosse dans le gobelet'];
