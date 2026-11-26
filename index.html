@@ -114,7 +114,13 @@ h1 .neon { background: linear-gradient(transparent 58%, var(--neon) 58%, var(--n
 .consignes > header h2 { margin: 0; font: 800 22px var(--f-titre); }
 .consignes > header .date { font: 600 16px var(--f-titre); }
 .consignes ol { list-style: none; margin: 0; padding: 16px 20px 20px; display: grid; gap: 14px; counter-reset: c; }
-.consignes li { display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; font: 700 clamp(19px, 2.4vw, 24px)/1.4 var(--f-corps); }
+.consignes li { display: grid; grid-template-columns: 42px 1fr; gap: 14px; align-items: start; font: 400 clamp(19px, 2.4vw, 24px)/1.4 var(--f-corps); }
+.consignes li b { font-weight: 800; }
+.consignes li .txt p { margin: 0; }
+.consignes li .txt p + p, .consignes li .txt ul + p, .consignes li .txt p + ul { margin-top: 6px; }
+.consignes li .txt ul { margin: 0; padding-left: 1.2em; list-style: disc; display: block; }
+.consignes li .txt ul li { display: list-item; font: inherit; }
+.consignes li .txt ul li::before { content: none; }
 .consignes li::before { counter-increment: c; content: counter(c); width: 42px; height: 42px; display: grid; place-items: center; background: var(--violet); color: #FFFFFF; border-radius: 6px; font: 800 22px var(--f-titre); }
 .brouillon { font: 700 12px var(--f-code); background: #1B1030; color: var(--neon); padding: 3px 10px; border-radius: 999px; }
 
@@ -127,7 +133,11 @@ h1 .neon { background: linear-gradient(transparent 58%, var(--neon) 58%, var(--n
 .prof .edit { display: grid; gap: 8px; margin: 10px 0; }
 .prof .edit-ligne { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: start; }
 .prof .edit-ligne span { width: 34px; height: 34px; display: grid; place-items: center; background: var(--violet); color: #fff; border-radius: 6px; font: 800 16px var(--f-titre); }
-.prof textarea { width: 100%; min-height: 42px; resize: vertical; }
+.prof textarea { width: 100%; min-height: 42px; resize: vertical; overflow: hidden; }
+.prof .outils { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 10px 0 0; }
+.prof .outils button.gras { font-weight: 900; min-width: 40px; }
+.prof .aide { font-size: 14px; color: var(--discret); }
+.prof .aide code { font: 13px var(--f-code); background: var(--surface); padding: 1px 5px; border-radius: 4px; }
 .prof button { font: 700 14px var(--f-titre); border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 2px solid var(--violet-texte); background: transparent; color: var(--violet-texte); }
 .prof button.plein { background: var(--violet); border-color: var(--violet); color: #fff; }
 .prof button.suppr { padding: 6px 10px; border-color: var(--filet); color: var(--discret); }
@@ -181,7 +191,8 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
   <section class="prof" id="prof" hidden aria-label="Espace enseignant">
     <h2>Espace prof · consignes du jour</h2>
     <p class="msg" style="margin:0">Écris tes consignes : elles s’affichent en grand en haut de la page, <b>sur cet ordinateur uniquement</b> (l’écran de la classe). Elles restent affichées quand tu quittes le mode prof, même après avoir fermé la page.</p>
-    <div class="ligne"><label for="c-date">Date</label><input type="date" id="c-date"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="c-visible" checked> Afficher à l’écran</label></div>
+    <div class="ligne"><span class="aide">La date affichée suit automatiquement la date du jour.</span><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="c-visible" checked> Afficher à l’écran</label></div>
+    <div class="outils"><button type="button" class="gras" id="c-gras" title="Mettre en gras (Ctrl+B)" aria-label="Mettre en gras la sélection">B</button><button type="button" id="c-puce" title="Ajouter une puce à la ligne">• Puce</button><span class="aide">Sélectionne un mot puis clique sur <b>B</b> (ou Ctrl+B) → <code>**mot**</code>. Une ligne qui commence par <code>- </code> devient une puce. Entrée pour aller à la ligne.</span></div>
     <div class="edit" id="c-edit"></div>
     <div class="ligne"><button type="button" id="c-ajout">+ Ajouter une consigne</button><button type="button" id="c-vider">Tout effacer</button><button type="button" class="plein" id="c-quitter">Terminer et quitter le mode prof</button></div>
   </section>
@@ -397,42 +408,80 @@ footer .logo { font: 700 14px var(--f-titre); letter-spacing: .06em; color: var(
   var JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'], MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
   function dateFr(iso) { if (!iso) return ''; var d = new Date(iso + 'T12:00:00'); if (isNaN(d)) return ''; return JOURS[d.getDay()] + ' ' + d.getDate() + ' ' + MOIS[d.getMonth()]; }
   function aujourdhui() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function echapper(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function gras(t) { return echapper(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+  function miseEnForme(t) {
+    var html = '', puces = [];
+    function fermer() { if (puces.length) { html += '<ul>' + puces.map(function (p) { return '<li>' + gras(p) + '</li>'; }).join('') + '</ul>'; puces = []; } }
+    t.split(/\r?\n/).forEach(function (l) {
+      var m = l.match(/^\s*[-–•*]\s+(.*)$/);
+      if (m) { puces.push(m[1]); return; }
+      fermer(); if (l.trim()) html += '<p>' + gras(l) + '</p>';
+    });
+    fermer(); return html;
+  }
   function afficher() {
     var bloc = document.getElementById('consignes');
     var liste = consignes ? (consignes.consignes || []).map(function (t) { return String(t).trim(); }).filter(Boolean) : [];
     if (!consignes || consignes.visible === false || !liste.length) { bloc.hidden = true; return; }
     var ol = document.getElementById('consignes-liste'); ol.innerHTML = '';
-    liste.forEach(function (t) { var li = document.createElement('li'); var sp = document.createElement('span'); sp.textContent = t; li.appendChild(sp); ol.appendChild(li); });
-    document.getElementById('consignes-date').textContent = dateFr(consignes.date);
+    liste.forEach(function (t) { var li = document.createElement('li'); var sp = document.createElement('div'); sp.className = 'txt'; sp.innerHTML = miseEnForme(t); li.appendChild(sp); ol.appendChild(li); });
+    document.getElementById('consignes-date').textContent = dateFr(aujourdhui());
     bloc.hidden = false;
   }
   var edit = document.getElementById('c-edit');
   function enregistrer() {
-    consignes = { date: document.getElementById('c-date').value, visible: document.getElementById('c-visible').checked, consignes: Array.prototype.map.call(edit.querySelectorAll('textarea'), function (t) { return t.value; }) };
+    consignes = { visible: document.getElementById('c-visible').checked, consignes: Array.prototype.map.call(edit.querySelectorAll('textarea'), function (t) { return t.value; }) };
     try { localStorage.setItem('s1-consignes', JSON.stringify(consignes)); } catch (e) {}
     afficher();
   }
   function ligne(texte) {
     var d = document.createElement('div'); d.className = 'edit-ligne';
     d.innerHTML = '<span></span><textarea rows="1" aria-label="Consigne"></textarea><button type="button" class="suppr" aria-label="Supprimer cette consigne">✕</button>';
-    d.querySelector('textarea').value = texte || '';
-    d.querySelector('textarea').addEventListener('input', enregistrer);
+    var ta = d.querySelector('textarea');
+    ta.value = texte || '';
+    ta.addEventListener('input', function () { ajuster(ta); enregistrer(); });
+    ta.addEventListener('focus', function () { dernier = ta; });
+    ta.addEventListener('keydown', function (e) { if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B')) { e.preventDefault(); dernier = ta; mettreEnGras(); } });
+    setTimeout(function () { ajuster(ta); }, 0);
     d.querySelector('button').addEventListener('click', function () { d.remove(); numeroter(); enregistrer(); });
     edit.appendChild(d); numeroter(); return d;
   }
+  var dernier = null;
+  function ajuster(ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 4 + 'px'; }
+  function mettreEnGras() {
+    var ta = dernier || edit.querySelector('textarea'); if (!ta) return;
+    var a = ta.selectionStart, b = ta.selectionEnd, v = ta.value, sel = v.slice(a, b);
+    if (sel && /^\*\*[\s\S]*\*\*$/.test(sel)) { ta.value = v.slice(0, a) + sel.slice(2, -2) + v.slice(b); ta.setSelectionRange(a, b - 4); }
+    else if (v.slice(a - 2, a) === '**' && v.slice(b, b + 2) === '**') { ta.value = v.slice(0, a - 2) + sel + v.slice(b + 2); ta.setSelectionRange(a - 2, b - 2); }
+    else { ta.value = v.slice(0, a) + '**' + sel + '**' + v.slice(b); ta.setSelectionRange(a + 2, b + 2); }
+    ta.focus(); ajuster(ta); enregistrer();
+  }
+  function ajouterPuce() {
+    var ta = dernier || edit.querySelector('textarea'); if (!ta) return;
+    var v = ta.value, a = ta.selectionStart, debut = v.lastIndexOf('\n', a - 1) + 1;
+    if (/^\s*[-–•*]\s/.test(v.slice(debut))) { ta.focus(); return; }
+    ta.value = v.slice(0, debut) + '- ' + v.slice(debut); ta.setSelectionRange(a + 2, a + 2);
+    ta.focus(); ajuster(ta); enregistrer();
+  }
   function numeroter() { Array.prototype.forEach.call(edit.querySelectorAll('.edit-ligne span'), function (s, i) { s.textContent = i + 1; }); }
   function remplirEditeur() {
-    var c = consignes || { date: aujourdhui(), visible: true, consignes: [] };
-    document.getElementById('c-date').value = c.date || aujourdhui();
+    var c = consignes || { visible: true, consignes: [] };
     document.getElementById('c-visible').checked = c.visible !== false;
     edit.innerHTML = '';
     var l = (c.consignes || []).slice(); while (l.length < 3) l.push('');
     l.forEach(function (t) { ligne(t); });
   }
-  document.getElementById('c-date').addEventListener('change', enregistrer);
+  ['c-gras', 'c-puce'].forEach(function (id) { document.getElementById(id).addEventListener('mousedown', function (e) { e.preventDefault(); }); });
+  document.getElementById('c-gras').addEventListener('click', mettreEnGras);
+  document.getElementById('c-puce').addEventListener('click', ajouterPuce);
+  /* la date suit le jour, même si la page reste ouverte */
+  var jourAffiche = aujourdhui();
+  setInterval(function () { if (aujourdhui() !== jourAffiche) { jourAffiche = aujourdhui(); afficher(); } }, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) afficher(); });
   document.getElementById('c-visible').addEventListener('change', enregistrer);
   document.getElementById('c-ajout').addEventListener('click', function () { ligne('').querySelector('textarea').focus(); });
-  document.getElementById('c-vider').addEventListener('click', function () { edit.innerHTML = ''; ligne(''); ligne(''); ligne(''); document.getElementById('c-date').value = aujourdhui(); enregistrer(); });
+  document.getElementById('c-vider').addEventListener('click', function () { edit.innerHTML = ''; ligne(''); ligne(''); ligne(''); enregistrer(); });
   /* mode prof : roue dentée + code */
   function majProf() {
     document.getElementById('prof').hidden = !prof;
