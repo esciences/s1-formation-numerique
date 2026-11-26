@@ -51,10 +51,15 @@ body { margin: 0; background: var(--fond); color: var(--encre); font-family: var
 .etat6 span.ok { background: var(--bon-fond); color: var(--bon); }
 .mix .curseurs label { grid-template-columns: 24px 1fr 76px !important; }
 .mix .curseurs input[type=number] { width: 76px; padding: 4px 6px; font-size: 16px; text-align: center; }
-.p2-verrou { position: relative; }
-.p2-verrou > *:not(.cadenas6) { opacity: .35; pointer-events: none; filter: grayscale(.6); }
-.cadenas6 { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; font: 700 18px var(--f-titre); color: var(--encre); }
-.cadenas6 span { background: var(--surface); border: 2px solid var(--violet-texte); border-radius: 12px; padding: 14px 18px; box-shadow: 0 6px 20px rgba(27,16,48,.15); }
+.question6 { border: 2px solid var(--violet-texte); }
+.labo6 { background: var(--fond); border-style: dashed; }
+.labo6 .mix { grid-template-columns: 1fr 90px; }
+.p2-zone { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.p2-cible { width: 130px; height: 130px; border-radius: 14px; border: 3px solid var(--encre); flex: none; }
+.p2-saisie { display: grid; gap: 8px; }
+.p2-saisie label { display: grid; grid-template-columns: 26px 100px; align-items: center; font: 700 20px var(--f-code); }
+.p2-saisie label.r { color: #D62828; } .p2-saisie label.v { color: #15803D; } .p2-saisie label.b { color: #2E6FD8; }
+.p2-saisie input { width: 100px; text-align: center; font-size: 19px; }
 .p2-ouvert { animation: ouvre .6s ease; }
 @keyframes ouvre { 0% { box-shadow: 0 0 0 0 var(--neon); } 50% { box-shadow: 0 0 0 8px var(--neon); } 100% { box-shadow: 0 0 0 0 var(--neon); } }
 @media (prefers-reduced-motion: reduce) { .p2-ouvert { animation: none; } }
@@ -164,6 +169,16 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
 .defi { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 10px 14px; }
 .defi.ok { border-color: var(--bon); }
 .defi input { width: 90px; }
+.defi.bin { grid-template-columns: 1fr; gap: 6px; }
+.defi.ko { border-color: var(--faux); }
+.interr.petit { margin: 2px 0 4px; gap: 4px; }
+.interr.petit button { width: 36px; height: 42px; font-size: 18px; }
+.interr-poids.petit { gap: 4px; }
+.interr-poids.petit span { width: 36px; }
+.bin-total { font: 500 14px var(--f-code); color: var(--discret); margin: 0; max-width: none; }
+.bin-total b { color: var(--violet-texte); font-size: 17px; }
+.bin-total .ok { color: var(--bon); font-weight: 700; }
+@media (max-width: 480px) { .interr.petit button, .interr-poids.petit span { width: 32px; } }
 
 /* Niveau 6 */
 .nuanciers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -204,6 +219,49 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
 .stat { display: grid; grid-template-columns: 1fr auto; gap: 10px; background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 8px 14px; font-size: 15px; }
 .stat b { font: 700 18px var(--f-code); color: var(--violet-texte); }
 .apercu-png { image-rendering: pixelated; width: 96px; height: 96px; border: 2px solid var(--filet); border-radius: 6px; background: #fff; }
+
+/* Fenêtre d'explication (niveau 8) */
+.consigne-aide { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.consigne-aide .bouton { background: var(--surface); }
+.explic { width: min(920px, 95vw); max-height: 92vh; overflow: auto; border: 0; border-radius: 16px; padding: 20px 24px; background: var(--surface); color: var(--encre); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+.explic::backdrop { background: rgba(20,12,36,.6); }
+.ex-haut { display: flex; justify-content: space-between; align-items: center; }
+.ex-fermer { border: 0; background: var(--violet-clair); color: var(--violet-texte); width: 38px; height: 38px; border-radius: 50%; font-size: 18px; cursor: pointer; }
+.explic h2 { font-size: clamp(24px, 3.4vw, 32px); }
+.ex-bpp { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 4px 0 14px; font: 600 14px var(--f-titre); color: var(--discret); }
+.ex-bpp[hidden] { display: none; }
+.ex-bpp button { border: 2px solid var(--violet-texte); background: var(--surface); color: var(--violet-texte); border-radius: 10px; padding: 6px 14px; font: 700 15px var(--f-titre); cursor: pointer; line-height: 1.15; }
+.ex-bpp button small { display: block; font: 400 11px var(--f-corps); }
+.ex-bpp button.actif { background: var(--violet); color: var(--sur-violet); border-color: var(--violet); }
+.ex-scene { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: start; }
+@media (max-width: 640px) { .ex-scene { grid-template-columns: 1fr; } }
+.ex-image button { width: 46px; height: 46px; font: 700 12px var(--f-code); position: relative; }
+.ex-image button.vise { outline: 4px solid var(--neon); outline-offset: -4px; z-index: 1; }
+.ex-astuce { font-size: 13px; max-width: 200px; margin-top: 6px; }
+.ex-bits { display: flex; flex-wrap: wrap; gap: 8px 10px; align-content: flex-start; min-width: 0; }
+.ex-groupe { border: 1.5px solid var(--filet); border-radius: 8px; padding: 4px 6px 6px; background: var(--fond); }
+.ex-groupe.octet:nth-child(odd) { background: var(--violet-clair); border-color: var(--violet-texte); }
+.ex-groupe .tag { display: flex; align-items: center; gap: 5px; font: 700 11px var(--f-code); color: var(--discret); margin-bottom: 3px; white-space: nowrap; }
+.ex-groupe .tag i { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--encre); display: inline-block; }
+.ex-ligne { display: flex; gap: 2px; }
+.bit { width: 22px; height: 26px; display: grid; place-items: center; font: 700 13px var(--f-code); border-radius: 3px; background: var(--surface); color: var(--encre); border: 1px solid var(--grille); border-bottom: 5px solid var(--pc, #fff); box-sizing: border-box; cursor: pointer; }
+.bit.un { background: var(--violet); color: var(--sur-violet); border-color: var(--violet); border-bottom-color: var(--pc, #fff); }
+.ex-bits.petit .bit { width: 11px; height: 17px; font-size: 9px; border-bottom-width: 4px; border-radius: 2px; }
+.ex-bits.petit { gap: 6px; }
+.ex-bits.petit .ex-ligne { gap: 1px; }
+.ex-bits .bit.sep { margin-left: 5px; }
+.ex-bits.petit .ex-groupe { padding: 3px 5px 4px; }
+.bit.vise { outline: 3px solid var(--neon); outline-offset: 0; }
+.ex-calcul { margin-top: 16px; padding: 12px 16px; border-radius: 10px; background: var(--violet-clair); font: 500 18px var(--f-code); }
+.ex-calcul b { color: var(--violet-texte); }
+.ex-formule { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: 700 20px var(--f-code); }
+.ex-formule .boite { background: var(--surface); border: 2px solid var(--violet-texte); border-radius: 10px; padding: 4px 12px; text-align: center; }
+.ex-formule .boite small { display: block; font: 500 11px var(--f-corps); color: var(--discret); }
+.ex-formule .boite.res { background: var(--neon); color: #1B1030; border-color: #1B1030; }
+.ex-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 16px -24px -20px; padding: 12px 24px 16px; position: sticky; bottom: -20px; background: var(--surface); border-top: 1.5px solid var(--filet); }
+.ex-points { display: flex; gap: 6px; }
+.ex-points i { width: 12px; height: 12px; border-radius: 3px; border: 2px solid var(--violet-texte); }
+.ex-points i.ok { background: var(--violet); border-color: var(--violet); }
 
 /* Fin */
 .fin { text-align: center; padding: 20px 0; }
@@ -319,7 +377,8 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   <section class="niveau" data-nom="Octet" hidden>
     <p class="eyebrow">Niveau 5 · bit 5</p>
     <h2>Lis et écris un octet</h2>
-    <div class="consigne"><p>Chaque bit a un poids : 128, 64, 32, 16, 8, 4, 2, 1. On additionne les poids des bits à <b>1</b>. Résous les 4 défis.</p></div>
+    <div class="consigne"><p>Chaque bit a un poids : 128, 64, 32, 16, 8, 4, 2, 1. On additionne les poids des bits à <b>1</b>. Résous les 4 défis.</p>
+      <p style="margin-top:6px"><b>Pour écrire un nombre :</b> allume d’abord le plus grand poids qui rentre, puis complète avec les plus petits.</p></div>
     <div class="duo">
       <div class="panneau"><h3>Ton laboratoire</h3><p class="discret">Clique sur les interrupteurs pour tester.</p>
         <div class="interr-poids"><span>128</span><span>64</span><span>32</span><span>16</span><span>8</span><span>4</span><span>2</span><span>1</span></div>
@@ -335,25 +394,38 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   <section class="niveau" data-nom="RVB" hidden>
     <p class="eyebrow">Niveau 6 · bit 6</p>
     <h2>Les couleurs RVB</h2>
-    <div class="consigne"><p>Un pixel en couleurs = 3 octets : <b>R</b>ouge, <b>V</b>ert, <b>B</b>leu, chacun de 0 (éteint) à 255 (à fond). Réussis d’abord la <b>partie 1</b> (deviner 4 couleurs), puis la <b>partie 2</b> (fabriquer 2 couleurs). Le bit 6 s’allume quand les deux sont réussies.</p></div>
+    <div class="consigne"><p>Un pixel en couleurs = 3 octets : <b>R</b>ouge, <b>V</b>ert, <b>B</b>leu, chacun de 0 (éteint) à 255 (à fond). <b>Partie 1</b> : devine 4 couleurs. <b>Partie 2</b> : trouve le code de 2 couleurs. Le laboratoire, à droite, sert à tester.</p></div>
     <div class="etat6"><span id="n6-etat1">Partie 1 : 0 / 4</span><span id="n6-etat2">Partie 2 : 0 / 2</span></div>
     <div class="duo">
-      <div class="panneau"><h3>Partie 1 · Devine la couleur</h3>
-        <div id="n6-jeu"><div class="serie" id="n6-serie"></div>
+      <div class="panneau question6">
+        <div id="n6-p1"><h3>Partie 1 · Devine la couleur</h3>
+          <div class="serie" id="n6-serie"></div>
           <p class="cible-q">Quelle couleur correspond à ce code&nbsp;?</p>
           <p class="rvb-code" id="n6-cible"></p>
-          <div class="nuanciers" id="n6-nuanciers"></div></div>
-        <div class="retour info" id="n6-retour">255 = lumière à fond, 0 = éteinte.</div></div>
-      <div class="panneau" id="n6-p2"><h3 id="n6-mix-titre">Simulateur RVB · Partie 2</h3>
-        <p class="cible-q" id="n6-mix-cible"></p>
+          <div class="nuanciers" id="n6-nuanciers"></div>
+          <div class="retour info" id="n6-retour">255 = lumière à fond, 0 = éteinte.</div></div>
+        <div id="n6-p2" hidden><h3>Partie 2 · Trouve le code</h3>
+          <div class="serie" id="n6-p2-serie"></div>
+          <p class="cible-q">Écris les valeurs R, V et B de ce <b id="n6-p2-nom"></b>.</p>
+          <div class="p2-zone">
+            <div class="p2-cible" id="n6-p2-cible" role="img"></div>
+            <div class="p2-saisie">
+              <label class="r">R<input type="number" id="p2-r" min="0" max="255" inputmode="numeric" aria-label="Valeur du rouge"></label>
+              <label class="v">V<input type="number" id="p2-v" min="0" max="255" inputmode="numeric" aria-label="Valeur du vert"></label>
+              <label class="b">B<input type="number" id="p2-b" min="0" max="255" inputmode="numeric" aria-label="Valeur du bleu"></label>
+            </div>
+          </div>
+          <div class="rangee" style="margin-top:12px"><button class="bouton" id="n6-p2-verif">Vérifier</button></div>
+          <div class="retour info" id="n6-p2-retour">Chaque valeur vaut 0 ou 255.</div></div>
+      </div>
+      <div class="panneau labo6"><h3>Laboratoire RVB</h3>
+        <p class="discret" style="margin-bottom:10px">Un outil pour tester tes idées. Il ne donne pas de points.</p>
         <div class="mix"><div class="curseurs">
           <label for="m-r">R<input type="range" id="m-r" min="0" max="255" value="0"><input type="number" id="m-rn" min="0" max="255" value="0" aria-label="Valeur du rouge"></label>
           <label for="m-v">V<input type="range" id="m-v" min="0" max="255" value="0"><input type="number" id="m-vn" min="0" max="255" value="0" aria-label="Valeur du vert"></label>
           <label for="m-b">B<input type="range" id="m-b" min="0" max="255" value="0"><input type="number" id="m-bn" min="0" max="255" value="0" aria-label="Valeur du bleu"></label>
         </div><div class="apercu" id="m-apercu"></div></div>
-        <p class="discret" style="margin:8px 0 0">Glisse le curseur ou tape directement le nombre.</p>
-        <div class="rangee" style="margin-top:12px"><button class="bouton" id="n6-mix-verif">Vérifier ma couleur</button></div>
-        <div class="retour info" id="n6-mix-retour">Le simulateur est libre : teste les codes de la partie 1 pour t’aider&nbsp;!</div></div>
+        <p class="discret" style="margin:8px 0 0">Glisse le curseur ou tape directement le nombre.</p></div>
     </div>
   </section>
 
@@ -377,7 +449,8 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   <section class="niveau" data-nom="Poids" hidden>
     <p class="eyebrow">Niveau 8 · bit 8</p>
     <h2>Combien pèse l’image&nbsp;?</h2>
-    <div class="consigne"><p>Poids = largeur × hauteur × bits par pixel, puis ÷ 8 pour avoir des octets. 1 ko ≈ 1 000 octets, 1 Mo ≈ 1 000 ko. La calculatrice est permise&nbsp;!</p></div>
+    <div class="consigne consigne-aide"><p>Poids = largeur × hauteur × bits par pixel, puis ÷ 8 pour avoir des octets. 1 ko ≈ 1 000 octets, 1 Mo ≈ 1 000 ko. La calculatrice est permise&nbsp;!</p>
+      <button type="button" class="bouton second btn-explic">Comprendre en image</button></div>
     <div id="n7-problemes"></div>
     <div class="rangee"><button class="bouton" id="n7-verif">Vérifier</button></div>
     <div class="retour info" id="n7-retour">Attention au dernier problème : <b>b</b> minuscule = bit, <b>o</b> = octet.</div>
@@ -424,6 +497,25 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   </section>
 
   </main>
+
+  <!-- Fenêtre d'explication du niveau 8 -->
+  <dialog class="explic" id="explic" aria-labelledby="ex-titre">
+    <div class="ex-haut"><p class="eyebrow" id="ex-etape"></p><button type="button" class="ex-fermer" id="ex-fermer" aria-label="Fermer l’explication">✕</button></div>
+    <h2 id="ex-titre"></h2>
+    <p id="ex-texte"></p>
+    <div class="ex-bpp" id="ex-bpp" role="group" aria-label="Bits par pixel">
+      <span>Bits par pixel :</span>
+      <button type="button" data-b="1">1 bit<small>2 couleurs</small></button>
+      <button type="button" data-b="2">2 bits<small>4 couleurs</small></button>
+      <button type="button" data-b="24">24 bits<small>16 millions</small></button>
+    </div>
+    <div class="ex-scene">
+      <div><div class="grille ex-image" id="ex-image" aria-label="Image de 4 × 4 pixels"></div><p class="discret ex-astuce" id="ex-astuce"></p></div>
+      <div class="ex-bits" id="ex-bits"></div>
+    </div>
+    <div class="ex-calcul" id="ex-calcul"></div>
+    <div class="ex-nav"><button type="button" class="bouton second" id="ex-prec">← Retour</button><span class="ex-points" id="ex-points"></span><button type="button" class="bouton" id="ex-suiv">Suivant →</button></div>
+  </dialog>
 
   <footer class="bas">
     <button class="bouton second" id="prec">← Précédent</button>
@@ -518,6 +610,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   document.getElementById('btn-recommencer').addEventListener('click', function () { bits = [0, 0, 0, 0, 0, 0, 0, 0]; boss = false; sauver(); try { history.replaceState(null, '', location.pathname); } catch (e) {} location.reload(); });
   document.addEventListener('keydown', function (e) {
     var t = e.target.tagName; if (t === 'INPUT' || t === 'SELECT') return;
+    var dl = document.getElementById('explic'); if (dl && dl.open) return;
     if (e.key === 'ArrowRight') aller(cur + 1); if (e.key === 'ArrowLeft') aller(cur - 1);
   });
 
@@ -608,11 +701,35 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     { q: 'Que vaut <code>00000101</code> ?', r: 5 }, { q: 'Que vaut <code>10000001</code> ?', r: 129 },
     { q: 'Écris 10 en binaire (8 bits).', r: '00001010' }, { q: 'Écris 255 en binaire (8 bits).', r: '11111111' }
   ];
-  var d5 = document.getElementById('n5-defis');
-  defis5.forEach(function (d, i) { d5.innerHTML += '<div class="defi" id="n5-d' + i + '"><span>' + d.q + '</span><input type="text" id="n5-i' + i + '" autocomplete="off" inputmode="numeric" maxlength="8"' + (typeof d.r === 'string' ? ' style="width:130px;letter-spacing:.15em"' : '') + '></div>'; });
+  var d5 = document.getElementById('n5-defis'), POIDS = [128, 64, 32, 16, 8, 4, 2, 1], n5bin = {};
+  defis5.forEach(function (d, i) {
+    if (typeof d.r === 'string') {
+      /* Écrire en binaire : l'élève allume les bits, le total s'affiche en direct */
+      n5bin[i] = [0, 0, 0, 0, 0, 0, 0, 0];
+      d5.innerHTML += '<div class="defi bin" id="n5-d' + i + '"><span>' + d.q.replace('(8 bits).', ': allume les bons bits.') + '</span>' +
+        '<div><div class="interr-poids petit">' + POIDS.map(function (p) { return '<span>' + p + '</span>'; }).join('') + '</div>' +
+        '<div class="interr petit" id="n5-b' + i + '">' + POIDS.map(function (p, k) { return '<button type="button" data-k="' + k + '" aria-pressed="false" aria-label="bit de poids ' + p + '">0</button>'; }).join('') + '</div>' +
+        '<p class="bin-total" id="n5-t' + i + '"></p></div></div>';
+    } else d5.innerHTML += '<div class="defi" id="n5-d' + i + '"><span>' + d.q + '</span><input type="text" id="n5-i' + i + '" autocomplete="off" inputmode="numeric" maxlength="8"></div>';
+  });
+  function n5Total(i) {
+    var bt = n5bin[i], v = bt.reduce(function (a, b) { return a * 2 + b; }, 0), cible = parseInt(defis5[i].r, 2), t = document.getElementById('n5-t' + i);
+    var calc = POIDS.filter(function (_, k) { return bt[k]; }).join(' + ') || '0';
+    t.innerHTML = calc + ' = <b>' + v + '</b> &nbsp;' + (v === cible ? '<span class="ok">= ' + cible + ' ✓</span>' : (v < cible ? '→ il manque ' + (cible - v) : '→ ' + (v - cible) + ' de trop'));
+    Array.prototype.forEach.call(document.getElementById('n5-b' + i).children, function (b, k) { b.textContent = bt[k]; b.classList.toggle('un', bt[k] === 1); b.setAttribute('aria-pressed', bt[k] ? 'true' : 'false'); });
+  }
+  Object.keys(n5bin).forEach(function (i) {
+    document.getElementById('n5-b' + i).addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; var k = +b.dataset.k; n5bin[i][k] = 1 - n5bin[i][k]; document.getElementById('n5-d' + i).classList.remove('ok', 'ko'); n5Total(i); });
+    n5Total(i);
+  });
   document.getElementById('n5-verif').addEventListener('click', function () {
     var err = 0;
-    defis5.forEach(function (d, i) { var inp = document.getElementById('n5-i' + i); var ok = inp.value.trim() === String(d.r); inp.className = ok ? 'bon' : 'faux'; document.getElementById('n5-d' + i).classList.toggle('ok', ok); if (!ok) err++; });
+    defis5.forEach(function (d, i) {
+      var ok;
+      if (n5bin[i]) { ok = n5bin[i].join('') === d.r; document.getElementById('n5-d' + i).classList.toggle('ko', !ok); }
+      else { var inp = document.getElementById('n5-i' + i); ok = inp.value.trim() === String(d.r); inp.className = ok ? 'bon' : 'faux'; }
+      document.getElementById('n5-d' + i).classList.toggle('ok', ok); if (!ok) err++;
+    });
     if (err === 0) reussi(4, document.getElementById('n5-retour'), 'Tu lis le binaire comme un ordinateur.');
     else rate(document.getElementById('n5-retour'), err + ' défi' + (err > 1 ? 's' : '') + ' à revoir. Reproduis le code sur les interrupteurs du laboratoire.');
   });
@@ -639,23 +756,27 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
         var r = document.getElementById('n6-retour');
         if (c === n6.cible) {
           b.classList.add('bon'); n6.ok++; r.className = 'retour ok'; r.textContent = 'Oui, c’est du ' + c[3] + ' !';
-          if (n6.ok >= 4) { n6.part1 = true; n6Etat(); document.getElementById('n6-jeu').innerHTML = '<div class="fini6">Partie 1 réussie : 4 couleurs sur 4 ✓</div>'; ouvrirP2(); n6Fini(); }
+          if (n6.ok >= 4) { n6.part1 = true; n6Etat(); ouvrirP2(); }
           else { n6Etat(); n6.attente = true; setTimeout(function () { n6.attente = false; n6Nouveau(); }, 800); }
         } else { b.classList.add('faux'); rate(r, 'Non, ça c’est du ' + c[3] + '. Regarde quelles lumières sont à 255, à 128 ou à 0.'); }
       });
       z.appendChild(b);
     });
   }
-  var MIX = [[255, 255, 0, 'jaune'], [255, 0, 255, 'magenta'], [0, 255, 255, 'cyan'], [128, 128, 128, 'gris'], [255, 128, 0, 'orange'], [128, 0, 128, 'violet']];
-  n6.mix = [melange(MIX.slice(0, 3))[0], melange(MIX.slice(3))[0]];
+  /* Partie 2 : on montre la couleur, l'élève tape R, V, B. Jaune, puis magenta ou cyan. */
+  var MIX = [[255, 255, 0, 'jaune', 'Le jaune, c’est la lumière rouge + la lumière verte.'], [255, 0, 255, 'magenta', 'Le magenta, c’est la lumière rouge + la lumière bleue.'], [0, 255, 255, 'cyan', 'Le cyan, c’est la lumière verte + la lumière bleue.']];
+  n6.mix = [MIX[0], hasard6([MIX[1], MIX[2]])];
+  function hasard6(t) { return t[Math.floor(Math.random() * t.length)]; }
+  var P2IN = ['p2-r', 'p2-v', 'p2-b'].map(function (id) { return document.getElementById(id); });
   function n6MixTitre() {
-    var t = document.getElementById('n6-mix-cible');
-    document.getElementById('n6-mix-verif').disabled = !n6.part1 || n6.part2;
-    if (!n6.part1) { t.innerHTML = '🔒 Le défi de fabrication s’ouvre après la partie 1. En attendant, <b>teste les codes</b> avec les curseurs ou en tapant les nombres.'; return; }
-    if (n6.part2) { t.innerHTML = ''; document.getElementById('n6-mix-titre').textContent = 'Partie 2 · Réussie ✓'; return; }
-    var c = n6.mix[n6.mixTour];
-    t.innerHTML = 'Fabrique du <b>' + c[3] + '</b> (' + (n6.mixTour + 1) + ' / 2) : <span class="rvb-code" style="display:inline-flex;font-size:18px;margin:0 0 0 6px">' + codeRVB(c) + '</span>';
+    var c = n6.mix[Math.min(n6.mixTour, 1)];
+    document.getElementById('n6-p2-serie').innerHTML = 'Couleur ' + Math.min(n6.mixTour + 1, 2) + ' / 2 &nbsp; <span class="points">' + [0, 1].map(function (i) { return '<i class="' + (i < n6.mixTour ? 'ok' : '') + '"></i>'; }).join('') + '</span>';
+    document.getElementById('n6-p2-nom').textContent = c[3];
+    var z = document.getElementById('n6-p2-cible'); z.style.background = rgb(c); z.setAttribute('aria-label', 'Couleur à coder : ' + c[3]);
+    P2IN.forEach(function (inp) { inp.value = ''; inp.className = ''; inp.disabled = n6.part2; });
+    document.getElementById('n6-p2-verif').disabled = n6.part2;
   }
+  P2IN.forEach(function (inp) { inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('n6-p2-verif').click(); }); });
   ['r', 'v', 'b'].forEach(function (k) {
     var rg = document.getElementById('m-' + k), nb = document.getElementById('m-' + k + 'n');
     rg.addEventListener('input', function () { nb.value = rg.value; majMix(); });
@@ -664,32 +785,28 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
   });
   function majMix() { document.getElementById('m-apercu').style.background = 'rgb(' + document.getElementById('m-r').value + ',' + document.getElementById('m-v').value + ',' + document.getElementById('m-b').value + ')'; }
   majMix(); n6MixTitre(); n6Etat();
-  document.getElementById('n6-mix-verif').addEventListener('click', function () {
+  document.getElementById('n6-p2-verif').addEventListener('click', function () {
     if (n6.part2 || !n6.part1) return;
-    var c = n6.mix[n6.mixTour], r = document.getElementById('n6-mix-retour');
-    var vals = ['r', 'v', 'b'].map(function (k) { return +document.getElementById('m-' + k).value; });
-    var ok = vals.every(function (x, i) { return Math.abs(x - c[i]) <= 10; });
-    if (ok) {
-      n6.mixTour++; r.className = 'retour ok'; r.textContent = 'Du ' + c[3] + ' : R ' + c[0] + ' V ' + c[1] + ' B ' + c[2] + '. Bravo !';
-      if (n6.mixTour >= 2) n6.part2 = true;
-      n6MixTitre(); n6Etat(); n6Fini();
+    var c = n6.mix[n6.mixTour], r = document.getElementById('n6-p2-retour');
+    if (P2IN.some(function (inp) { return inp.value.trim() === ''; })) { rate(r, 'Remplis les trois cases : R, V et B.'); return; }
+    var vals = P2IN.map(function (inp) { return +inp.value; });
+    var oks = vals.map(function (x, i) { return x === c[i]; });
+    P2IN.forEach(function (inp, i) { inp.className = oks[i] ? 'bon' : 'faux'; });
+    if (oks.every(Boolean)) {
+      n6.mixTour++;
+      if (n6.mixTour >= 2) { n6.part2 = true; n6Etat(); P2IN.forEach(function (inp) { inp.disabled = true; }); document.getElementById('n6-p2-verif').disabled = true; document.getElementById('n6-p2-serie').innerHTML = 'Couleur 2 / 2 &nbsp; <span class="points"><i class="ok"></i><i class="ok"></i></span>'; reussi(5, r, 'R ' + c[0] + ' V ' + c[1] + ' B ' + c[2] + ' : c’est bien du ' + c[3] + '. Tu maîtrises le RVB.'); }
+      else { n6Etat(); r.className = 'retour ok'; r.textContent = 'Exact : R ' + c[0] + ' V ' + c[1] + ' B ' + c[2] + ' = ' + c[3] + ' ! Couleur suivante…'; setTimeout(function () { n6MixTitre(); r.className = 'retour info'; r.textContent = 'Chaque valeur vaut 0 ou 255.'; P2IN[0].focus(); }, 1100); }
     } else {
-      var faux = ['R', 'V', 'B'].filter(function (_, i) { return Math.abs(vals[i] - c[i]) > 10; });
-      rate(r, 'Pas encore. Vérifie ' + (faux.length > 1 ? 'les valeurs ' : 'la valeur ') + faux.join(', ') + '.');
+      var faux = ['R', 'V', 'B'].filter(function (_, i) { return !oks[i]; });
+      rate(r, 'Pas encore : ' + (faux.length > 1 ? 'les valeurs ' : 'la valeur ') + faux.join(', ') + (faux.length > 1 ? ' sont fausses. ' : ' est fausse. ') + c[4] + ' Teste ton code dans le laboratoire.');
     }
   });
   function ouvrirP2() {
-    var p = document.getElementById('n6-p2'); p.classList.add('p2-ouvert');
+    document.getElementById('n6-p1').hidden = true;
+    var p = document.getElementById('n6-p2'); p.hidden = false; p.classList.add('p2-ouvert');
     n6MixTitre();
-    var mr = document.getElementById('n6-mix-retour'); mr.className = 'retour info'; mr.textContent = 'Lis bien le code demandé : chaque valeur compte.';
     p.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(function () { document.getElementById('m-rn').focus({ preventScroll: true }); }, 400);
-  }
-  function n6Fini() {
-    if (n6.part1 && n6.part2) {
-      reussi(5, document.getElementById('n6-mix-retour'), 'Tu maîtrises le RVB.');
-      var r = document.getElementById('n6-retour'); r.className = 'retour ok'; r.textContent = 'Niveau 6 réussi : les deux parties sont terminées.';
-    } else if (n6.part1) { var r1 = document.getElementById('n6-retour'); r1.className = 'retour info'; r1.innerHTML = 'Bravo ! Le niveau n’est pas fini : <b>passe à la partie 2</b>, à droite.'; }
+    setTimeout(function () { P2IN[0].focus({ preventScroll: true }); }, 400);
   }
   n6Nouveau();
 
@@ -751,7 +868,7 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     var err = 0;
     PB.forEach(function (p, i) { var inp = document.getElementById('n7-i' + i); var v = parseFloat(String(inp.value).replace(',', '.')); var ok = !isNaN(v) && Math.abs(v - p.r) <= (p.tol || 0); inp.className = ok ? 'bon' : 'faux'; document.getElementById('n7-p' + i).classList.toggle('ok', ok); if (!ok) err++; });
     if (err === 0) reussi(7, document.getElementById('n7-retour'), 'Tu sais peser une image, en octets, en ko et en Mo.');
-    else rate(document.getElementById('n7-retour'), err + ' réponse' + (err > 1 ? 's' : '') + ' à revoir. Étapes : pixels, puis × bits, puis ÷ 8, puis ÷ 1 000 pour les ko.');
+    else rate(document.getElementById('n7-retour'), err + ' réponse' + (err > 1 ? 's' : '') + ' à revoir. Étapes : pixels, puis × bits, puis ÷ 8, puis ÷ 1 000 pour les ko. <button type="button" class="bouton second btn-explic" style="margin-left:8px;padding:6px 12px">Comprendre en image</button>');
   });
 
   /* ---------- Défi final (planète) ---------- */
@@ -791,6 +908,65 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     else rate(document.getElementById('n8-retour'), err + ' case' + (err > 1 ? 's' : '') + ' à corriger (entourée' + (err > 1 ? 's' : '') + ' en rouge).');
   });
   n8Stats();
+
+  /* ---------- Fenêtre « Comprendre en image » (niveau 8) ---------- */
+  var EX = { etape: 0, bpp: 2, vise: -1 };
+  var EX_IDX = '0031' + '0220' + '2212' + '0220'; // petite pomme, 4 couleurs
+  var EX_PAL2 = ['#FFFFFF', '#FFD23F', '#E5383B', '#1B1030'];
+  var EX_24 = ['#FFFFFF', '#FFFFFF', '#5C3A1E', '#4CAF50', '#FFFFFF', '#E5383B', '#C81D25', '#FFFFFF', '#F25C54', '#FFD6D6', '#E5383B', '#B3161E', '#FFFFFF', '#C81D25', '#9E1A1A', '#FFFFFF'];
+  var EX_ETAPES = [
+    { t: 'Une image, c’est des pixels', x: 'Cette petite pomme fait <b>4 pixels de large</b> et <b>4 pixels de haut</b>. Chaque case est un pixel : il y en a 16.' },
+    { t: 'Chaque pixel est écrit en bits', x: 'L’ordinateur écrit la couleur de chaque pixel avec des 0 et des 1. Plus il y a de couleurs, plus il faut de <b>bits par pixel</b>. Change le nombre de bits et regarde la liste grandir.' },
+    { t: '8 bits = 1 octet', x: 'L’ordinateur range ensuite tous ces bits <b>par paquets de 8</b>. Chaque paquet s’appelle un <b>octet</b>. Le petit trait de couleur sous chaque bit montre de quel pixel il vient.' },
+    { t: 'La formule', x: 'Tu as tout vu : on compte les pixels, on multiplie par les bits de chaque pixel, puis on divise par 8 pour avoir des octets.' }
+  ];
+  function exCouleur(p) { return EX.bpp === 1 ? (EX_IDX[p] >= '2' ? '#1B1030' : '#FFFFFF') : (EX.bpp === 2 ? EX_PAL2[+EX_IDX[p]] : EX_24[p]); }
+  function exBits(p) {
+    if (EX.bpp === 1) return EX_IDX[p] >= '2' ? '1' : '0';
+    if (EX.bpp === 2) return ('0' + (+EX_IDX[p]).toString(2)).slice(-2);
+    return ('00000000000000000000000' + parseInt(EX_24[p].slice(1), 16).toString(2)).slice(-24);
+  }
+  function exClair(hex) { var n = parseInt(hex.slice(1), 16); return ((n >> 16) * .3 + ((n >> 8) & 255) * .59 + (n & 255) * .11) > 140; }
+  var exCases = grille(document.getElementById('ex-image'), 4, 4, 46, function (b, x, y) { var p = y * 4 + x; EX.vise = EX.vise === p ? -1 : p; exDessine(); });
+  function exBit(v, p, sep) { return '<span class="bit' + (v === '1' ? ' un' : '') + (EX.vise === p ? ' vise' : '') + (sep ? ' sep' : '') + '" data-p="' + p + '" style="--pc:' + exCouleur(p) + '">' + v + '</span>'; }
+  function exDessine() {
+    var e = EX.etape, nbBits = 16 * EX.bpp, nbOct = nbBits / 8;
+    document.getElementById('ex-etape').textContent = 'Étape ' + (e + 1) + ' / ' + EX_ETAPES.length;
+    document.getElementById('ex-titre').textContent = EX_ETAPES[e].t;
+    document.getElementById('ex-texte').innerHTML = EX_ETAPES[e].x;
+    document.getElementById('ex-bpp').hidden = e === 0;
+    Array.prototype.forEach.call(document.querySelectorAll('#ex-bpp button'), function (b) { b.classList.toggle('actif', +b.dataset.b === EX.bpp); });
+    exCases.forEach(function (b, p) { var c = exCouleur(p); b.style.background = c; b.style.color = exClair(c) ? '#1B1030' : '#FFFFFF'; b.textContent = e === 0 ? (p + 1) : ''; b.classList.toggle('vise', EX.vise === p); b.setAttribute('aria-label', 'pixel ' + (p + 1)); });
+    document.getElementById('ex-astuce').textContent = e === 0 ? '' : 'Clique sur un pixel pour voir ses bits.';
+    var z = document.getElementById('ex-bits'), h = '';
+    z.classList.toggle('petit', EX.bpp === 24);
+    if (e === 1) {
+      for (var p = 0; p < 16; p++) h += '<div class="ex-groupe"><div class="tag"><i style="background:' + exCouleur(p) + '"></i>pixel ' + (p + 1) + (EX.bpp === 24 ? ' <span style="font-weight:400">R · V · B</span>' : '') + '</div><div class="ex-ligne">' + exBits(p).split('').map(function (v, k) { return exBit(v, p, EX.bpp === 24 && (k === 8 || k === 16)); }).join('') + '</div></div>';
+    } else if (e >= 2) {
+      var tous = []; for (var q = 0; q < 16; q++) exBits(q).split('').forEach(function (v) { tous.push([v, q]); });
+      for (var o = 0; o < nbOct; o++) h += '<div class="ex-groupe octet"><div class="tag">octet ' + (o + 1) + '</div><div class="ex-ligne">' + tous.slice(o * 8, o * 8 + 8).map(function (t) { return exBit(t[0], t[1]); }).join('') + '</div></div>';
+    }
+    z.innerHTML = h;
+    var calc = document.getElementById('ex-calcul');
+    if (e === 0) calc.innerHTML = '4 × 4 = <b>16 pixels</b>';
+    else if (e === 1) calc.innerHTML = '16 pixels × ' + EX.bpp + ' bit' + (EX.bpp > 1 ? 's' : '') + ' = <b>' + nbBits + ' bits</b>' + (EX.bpp === 24 ? '<br><span class="discret">24 bits = 8 pour le rouge + 8 pour le vert + 8 pour le bleu.</span>' : '');
+    else if (e === 2) calc.innerHTML = nbBits + ' bits ÷ 8 = <b>' + nbOct + ' octet' + (nbOct > 1 ? 's' : '') + '</b>' + (EX.bpp === 1 ? '<br><span class="discret">Avec 1 bit, un octet contient 8 pixels.</span>' : (EX.bpp === 2 ? '<br><span class="discret">Avec 2 bits, un octet contient 4 pixels.</span>' : '<br><span class="discret">Avec 24 bits, chaque pixel prend 3 octets.</span>'));
+    else calc.innerHTML = '<div class="ex-formule"><span class="boite">4<small>largeur</small></span>×<span class="boite">4<small>hauteur</small></span>×<span class="boite">' + EX.bpp + '<small>bits par pixel</small></span>÷ 8 =<span class="boite res">' + nbOct + '<small>octets</small></span></div>' +
+      '<p style="margin:12px 0 0;font:400 16px var(--f-corps);max-width:none">Pour une grande image, le nombre devient énorme : continue l’escalier. <b>÷ 1 000</b> → ko, encore <b>÷ 1 000</b> → Mo.<br>Attention : <b>b</b> = bit et <b>o</b> = octet. Comme 1 octet = 8 bits, on passe des bits aux octets en divisant par 8.</p>';
+    document.getElementById('ex-prec').disabled = e === 0;
+    document.getElementById('ex-suiv').textContent = e === EX_ETAPES.length - 1 ? 'À moi de jouer !' : 'Suivant →';
+    document.getElementById('ex-points').innerHTML = EX_ETAPES.map(function (_, k) { return '<i class="' + (k <= e ? 'ok' : '') + '"></i>'; }).join('');
+  }
+  var dlg = document.getElementById('explic');
+  function exOuvrir() { EX.etape = 0; EX.vise = -1; exDessine(); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); }
+  function exFermer() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.btn-explic')) exOuvrir(); });
+  document.getElementById('ex-fermer').addEventListener('click', exFermer);
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) exFermer(); });
+  document.getElementById('ex-bits').addEventListener('click', function (e) { var b = e.target.closest('.bit'); if (!b) return; var p = +b.dataset.p; EX.vise = EX.vise === p ? -1 : p; exDessine(); });
+  document.getElementById('ex-bpp').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; EX.bpp = +b.dataset.b; exDessine(); });
+  document.getElementById('ex-prec').addEventListener('click', function () { if (EX.etape > 0) { EX.etape--; exDessine(); } });
+  document.getElementById('ex-suiv').addEventListener('click', function () { if (EX.etape < EX_ETAPES.length - 1) { EX.etape++; exDessine(); } else exFermer(); });
 
   aller(0);
 })();
