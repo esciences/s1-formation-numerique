@@ -252,6 +252,17 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
 .ex-bits .bit.sep { margin-left: 5px; }
 .ex-bits.petit .ex-groupe { padding: 3px 5px 4px; }
 .bit.vise { outline: 3px solid var(--neon); outline-offset: 0; }
+/* 24 bits : vue d'un seul pixel, en grand */
+.ex-bits.focus { flex-direction: column; flex-wrap: nowrap; gap: 10px; }
+.ex-focus-tete { display: flex; align-items: center; gap: 12px; font: 800 22px var(--f-titre); }
+.ex-focus-tete i { width: 54px; height: 54px; border-radius: 10px; border: 3px solid var(--encre); flex: none; }
+.ex-focus-tete small { display: block; font: 400 14px var(--f-corps); color: var(--discret); }
+.ex-bits.focus .ex-canal { display: block; padding: 6px 10px 8px; width: max-content; max-width: 100%; }
+.ex-bits.focus .ex-canal.octet { background: var(--fond); border-color: var(--violet-texte); }
+.ex-bits.focus .ex-canal .tag { font-size: 15px; }
+.ex-bits.focus .ex-ligne { gap: 4px; }
+.ex-bits.focus .bit { width: 34px; height: 40px; font-size: 19px; border-bottom-width: 6px; cursor: default; }
+@media (max-width: 480px) { .ex-bits.focus .bit { width: 28px; height: 34px; font-size: 16px; } }
 .ex-calcul { margin-top: 16px; padding: 12px 16px; border-radius: 10px; background: var(--violet-clair); font: 500 18px var(--f-code); }
 .ex-calcul b { color: var(--violet-texte); }
 .ex-formule { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: 700 20px var(--f-code); }
@@ -927,20 +938,31 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     return ('00000000000000000000000' + parseInt(EX_24[p].slice(1), 16).toString(2)).slice(-24);
   }
   function exClair(hex) { var n = parseInt(hex.slice(1), 16); return ((n >> 16) * .3 + ((n >> 8) & 255) * .59 + (n & 255) * .11) > 140; }
-  var exCases = grille(document.getElementById('ex-image'), 4, 4, 46, function (b, x, y) { var p = y * 4 + x; EX.vise = EX.vise === p ? -1 : p; exDessine(); });
+  var exCases = grille(document.getElementById('ex-image'), 4, 4, 46, function (b, x, y) { var p = y * 4 + x; EX.vise = (EX.vise === p && EX.bpp !== 24) ? -1 : p; exDessine(); });
   function exBit(v, p, sep) { return '<span class="bit' + (v === '1' ? ' un' : '') + (EX.vise === p ? ' vise' : '') + (sep ? ' sep' : '') + '" data-p="' + p + '" style="--pc:' + exCouleur(p) + '">' + v + '</span>'; }
   function exDessine() {
     var e = EX.etape, nbBits = 16 * EX.bpp, nbOct = nbBits / 8;
+    if (EX.bpp === 24 && e >= 1 && EX.vise < 0) EX.vise = 5;
     document.getElementById('ex-etape').textContent = 'Étape ' + (e + 1) + ' / ' + EX_ETAPES.length;
     document.getElementById('ex-titre').textContent = EX_ETAPES[e].t;
     document.getElementById('ex-texte').innerHTML = EX_ETAPES[e].x;
     document.getElementById('ex-bpp').hidden = e === 0;
     Array.prototype.forEach.call(document.querySelectorAll('#ex-bpp button'), function (b) { b.classList.toggle('actif', +b.dataset.b === EX.bpp); });
     exCases.forEach(function (b, p) { var c = exCouleur(p); b.style.background = c; b.style.color = exClair(c) ? '#1B1030' : '#FFFFFF'; b.textContent = e === 0 ? (p + 1) : ''; b.classList.toggle('vise', EX.vise === p); b.setAttribute('aria-label', 'pixel ' + (p + 1)); });
-    document.getElementById('ex-astuce').textContent = e === 0 ? '' : 'Clique sur un pixel pour voir ses bits.';
+    var focus = EX.bpp === 24 && e >= 1;
+    if (focus && e === 2) document.getElementById('ex-texte').innerHTML = 'L’ordinateur range les bits <b>par paquets de 8</b> : chaque paquet est un <b>octet</b>. En 24 bits, un pixel remplit exactement <b>3 octets</b> : un pour le rouge, un pour le vert, un pour le bleu.';
+    document.getElementById('ex-astuce').textContent = e === 0 ? '' : (focus ? 'Clique sur un autre pixel pour voir ses bits.' : 'Clique sur un pixel pour voir ses bits.');
     var z = document.getElementById('ex-bits'), h = '';
-    z.classList.toggle('petit', EX.bpp === 24);
-    if (e === 1) {
+    z.classList.toggle('focus', focus);
+    if (focus) {
+      /* 24 bits : un seul pixel à la fois, en grand */
+      var fp = EX.vise, fb = exBits(fp), fc = exCouleur(fp), NOMS_C = ['rouge', 'vert', 'bleu'], CL = ['#D62828', '#15803D', '#2E6FD8'];
+      h = '<div class="ex-focus-tete"><i style="background:' + fc + '"></i><span>Pixel ' + (fp + 1) + '<small>' + (e === 1 ? '24 bits pour 1 seul pixel' : '24 bits = 3 octets') + '</small></span></div>';
+      [0, 1, 2].forEach(function (k) {
+        var morceau = fb.slice(k * 8, k * 8 + 8);
+        h += '<div class="ex-groupe ex-canal' + (e >= 2 ? ' octet' : '') + '"><div class="tag" style="color:' + CL[k] + '">' + (e >= 2 ? 'octet ' + (k + 1) + ' · ' : '') + NOMS_C[k] + ' = ' + parseInt(morceau, 2) + '</div><div class="ex-ligne">' + morceau.split('').map(function (v) { return '<span class="bit' + (v === '1' ? ' un' : '') + '" style="--pc:' + CL[k] + '">' + v + '</span>'; }).join('') + '</div></div>';
+      });
+    } else if (e === 1) {
       for (var p = 0; p < 16; p++) h += '<div class="ex-groupe"><div class="tag"><i style="background:' + exCouleur(p) + '"></i>pixel ' + (p + 1) + (EX.bpp === 24 ? ' <span style="font-weight:400">R · V · B</span>' : '') + '</div><div class="ex-ligne">' + exBits(p).split('').map(function (v, k) { return exBit(v, p, EX.bpp === 24 && (k === 8 || k === 16)); }).join('') + '</div></div>';
     } else if (e >= 2) {
       var tous = []; for (var q = 0; q < 16; q++) exBits(q).split('').forEach(function (v) { tous.push([v, q]); });
@@ -949,8 +971,8 @@ input.faux { border-color: var(--faux); background: var(--faux-fond); }
     z.innerHTML = h;
     var calc = document.getElementById('ex-calcul');
     if (e === 0) calc.innerHTML = '4 × 4 = <b>16 pixels</b>';
-    else if (e === 1) calc.innerHTML = '16 pixels × ' + EX.bpp + ' bit' + (EX.bpp > 1 ? 's' : '') + ' = <b>' + nbBits + ' bits</b>' + (EX.bpp === 24 ? '<br><span class="discret">24 bits = 8 pour le rouge + 8 pour le vert + 8 pour le bleu.</span>' : '');
-    else if (e === 2) calc.innerHTML = nbBits + ' bits ÷ 8 = <b>' + nbOct + ' octet' + (nbOct > 1 ? 's' : '') + '</b>' + (EX.bpp === 1 ? '<br><span class="discret">Avec 1 bit, un octet contient 8 pixels.</span>' : (EX.bpp === 2 ? '<br><span class="discret">Avec 2 bits, un octet contient 4 pixels.</span>' : '<br><span class="discret">Avec 24 bits, chaque pixel prend 3 octets.</span>'));
+    else if (e === 1) calc.innerHTML = '16 pixels × ' + EX.bpp + ' bit' + (EX.bpp > 1 ? 's' : '') + ' = <b>' + nbBits + ' bits</b>' + (EX.bpp === 24 ? '<br><span class="discret">1 pixel = 8 bits pour le rouge + 8 pour le vert + 8 pour le bleu = 24 bits.</span>' : '');
+    else if (e === 2) calc.innerHTML = nbBits + ' bits ÷ 8 = <b>' + nbOct + ' octet' + (nbOct > 1 ? 's' : '') + '</b>' + (EX.bpp === 1 ? '<br><span class="discret">Avec 1 bit, un octet contient 8 pixels.</span>' : (EX.bpp === 2 ? '<br><span class="discret">Avec 2 bits, un octet contient 4 pixels.</span>' : '<br><span class="discret">Avec 24 bits, chaque pixel prend 3 octets : 16 pixels × 3 = 48 octets.</span>'));
     else calc.innerHTML = '<div class="ex-formule"><span class="boite">4<small>largeur</small></span>×<span class="boite">4<small>hauteur</small></span>×<span class="boite">' + EX.bpp + '<small>bits par pixel</small></span>÷ 8 =<span class="boite res">' + nbOct + '<small>octets</small></span></div>' +
       '<p style="margin:12px 0 0;font:400 16px var(--f-corps);max-width:none">Pour une grande image, le nombre devient énorme : continue l’escalier. <b>÷ 1 000</b> → ko, encore <b>÷ 1 000</b> → Mo.<br>Attention : <b>b</b> = bit et <b>o</b> = octet. Comme 1 octet = 8 bits, on passe des bits aux octets en divisant par 8.</p>';
     document.getElementById('ex-prec').disabled = e === 0;
