@@ -407,6 +407,7 @@ canvas.spectre { width: 100%; height: 200px; display: block; border-radius: 8px;
     document.getElementById('num').textContent = (cur + 1) + ' / ' + slides.length;
     document.getElementById('prec').disabled = cur === 0;
     document.getElementById('suiv').disabled = cur === slides.length - 1;
+    document.getElementById('suiv').style.visibility = cur === slides.length - 1 ? 'hidden' : '';
     try { history.replaceState(null, '', '#s' + (cur + 1)); } catch (e) {}
   }
   document.getElementById('prec').addEventListener('click', function () { show(cur - 1); });
