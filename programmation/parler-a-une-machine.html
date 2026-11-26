@@ -474,9 +474,9 @@ pre.code{background:#FBFAFE;color:var(--ink);border:1.5px solid var(--filet);bor
 .sbc > .sb{--b:inherit}
 .sbc > .arm-top{--bx:calc(var(--bar) + 14px);--rb:0px}
 .sbc > .arm-mid{--tx:calc(var(--bar) + 14px);--bx:calc(var(--bar) + 14px);--rt:0px;--rb:0px;margin-top:calc(-1 * var(--n))}
-.sbc > .arm-end{--tx:calc(var(--bar) + 14px);--rt:0px;min-height:calc(26px + var(--nb));min-width:150px;padding-block:4px calc(4px + var(--nb));margin-top:calc(-1 * var(--n))}
+.sbc > .arm-end{--tx:calc(var(--bar) + 14px);--bx:14px;--rt:0px;min-height:calc(26px + var(--nb));min-width:150px;padding-block:4px calc(4px + var(--nb));margin-top:calc(-1 * var(--n))}
 .sbc > .mouth{display:flex;align-items:stretch;margin-top:calc(-1 * var(--n))}
-.sbc > .mouth > .bar{width:var(--bar);flex:none;background:var(--b)}
+.sbc > .mouth > .bar{width:var(--bar);flex:none;background:var(--b);box-shadow:inset 1.5px 0 0 var(--bd,rgba(0,0,0,.25)),inset -1.5px 0 0 var(--bd,rgba(0,0,0,.25))}
 .sbc > .mouth > .inner{display:flex;flex-direction:column;align-items:flex-start;min-height:calc(26px + var(--n));padding-top:0}
 .sbc .arm-end.infini{--nb:0px;--bx:-100px}
 /* valeurs dans les blocs */
@@ -487,7 +487,7 @@ pre.code{background:#FBFAFE;color:var(--ink);border:1.5px solid var(--filet);bor
 .sb-bool{background:var(--s-sensing);color:#fff;padding:2px 20px;clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,12px 100%,0 50%)}
 .sb-bool.vide{background:rgba(0,0,0,.18);min-width:70px;min-height:1.4em}
 /* bloc qui s'exécute : surligneur néon OCTET */
-.sb.ln.on{background:var(--neon)!important;color:var(--ink)}
+.sb.ln.on{color:var(--ink)}
 .sb.ln.on .sb-bool{color:#fff}
 /* blocs-boutons (cliquables) */
 button.sb{cursor:pointer;transition:transform .08s}
@@ -1375,5 +1375,75 @@ button.sb:focus-visible{outline:none;filter:drop-shadow(0 0 0 #000) drop-shadow(
 })();
 </script>
 
+
+<script>
+/* Dessin des blocs façon Scratch : chaque bloc reçoit un fond SVG (forme avec encoche
+   et tenon, contour fin plus foncé), recalculé quand il apparaît ou change. */
+(function(){
+  const NEON='#D4FF3D',NEON_D='#8FB000';
+  function hex(c){c=(c||'').trim();if(c.startsWith('rgb')){const m=c.match(/\d+/g);return m.slice(0,3).map(Number)}
+    if(c[0]!=='#')return [76,151,255];if(c.length===4)c='#'+c[1]+c[1]+c[2]+c[2]+c[3]+c[3];return [1,3,5].map(i=>parseInt(c.substr(i,2),16))}
+  function dark(c){return 'rgb('+hex(c).map(v=>Math.round(v*.74)).join(',')+')'}
+  function num(el,prop,def){const v=parseFloat(getComputedStyle(el).getPropertyValue(prop));return isNaN(v)?def:v}
+  function paint(el){
+    const w=el.offsetWidth,h=el.offsetHeight;if(!w||!h)return;
+    const cs=getComputedStyle(el);
+    const on=el.classList.contains('ln')&&el.classList.contains('on');
+    const fill=on?NEON:(cs.getPropertyValue('--b').trim()||'#4C97FF');
+    const stroke=on?NEON_D:dark(fill);
+    const sbc=el.parentElement&&el.parentElement.classList.contains('sbc')?el.parentElement:null;
+    const bar=sbc?num(sbc,'--bar',18):0;
+    const title=el.classList.contains('sb-title');
+    const n=title?14:num(el,'--n',8), nw=title?56:30;
+    const hat=el.classList.contains('hat'), top=el.classList.contains('arm-top'), mid=el.classList.contains('arm-mid'), end=el.classList.contains('arm-end'), inf=el.classList.contains('infini');
+    let tx=title?30:14, bx=14, nt=n, nb=n, rt=5, rb=5;
+    if(hat){nt=0}
+    if(top){bx=bar+14;rb=0}
+    if(mid){tx=bar+14;bx=bar+14;rt=0;rb=0}
+    if(end){tx=bar+14;bx=14;rt=0;if(inf)nb=0}
+    const s=.75, W=w-s, B=h-nb-s, H=h-s;
+    let d;
+    if(hat){d=`M${s} 20 C 18 -4, 62 -4, 82 18 L${W-5} 18 Q${W} 18 ${W} 23`}
+    else{
+      d=rt?`M${s} ${rt} Q${s} ${s} ${rt} ${s}`:`M${s} ${s}`;
+      if(nt>0)d+=` L${tx} ${s} L${tx+nw*.22} ${nt} L${tx+nw*.78} ${nt} L${tx+nw} ${s}`;
+      d+=` L${W-5} ${s} Q${W} ${s} ${W} 5`;
+    }
+    d+=` L${W} ${B-5} Q${W} ${B} ${W-5} ${B}`;
+    if(nb>0)d+=` L${bx+nw} ${B} L${bx+nw*.78} ${H} L${bx+nw*.22} ${H} L${bx} ${B}`;
+    d+=rb?` L${rb} ${B} Q${s} ${B} ${s} ${B-rb} Z`:` L${s} ${B} Z`;
+    /* là où le bloc rejoint la barre du C, on efface le trait pour que la forme reste d'un seul tenant */
+    let joins='';
+    const cover=(y)=>`<rect x="1.5" y="${y-1.2}" width="${bar-1.5}" height="2.4" fill="${fill}"/>`;
+    if(top)joins+=cover(B);
+    if(mid){joins+=cover(s);joins+=cover(B)}
+    if(end)joins+=cover(s);
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="1.5" stroke-linejoin="round"/>${joins}</svg>`;
+    el.style.clipPath='none';
+    el.style.background='url("data:image/svg+xml,'+encodeURIComponent(svg)+'") no-repeat 0 0 / 100% 100%';
+    if(sbc){sbc.style.setProperty('--bd',dark(cs.getPropertyValue('--b').trim()||fill))}
+  }
+  function paintIn(root){(root.querySelectorAll?root:document).querySelectorAll('.sb').forEach(paint)}
+  const stage=document.getElementById('stage')||document.body;
+  const mo=new MutationObserver(list=>{
+    const todo=new Set();
+    list.forEach(m=>{
+      if(m.type==='attributes'){
+        if(m.attributeName==='hidden'&&!m.target.hidden){m.target.querySelectorAll('.sb').forEach(e=>todo.add(e))}
+        else if(m.target.classList&&m.target.classList.contains('sb'))todo.add(m.target);
+      }else{
+        const t=m.target.nodeType===1?m.target:m.target.parentElement;
+        const c=t&&t.closest?t.closest('.sb'):null;if(c)todo.add(c);
+        m.addedNodes.forEach(nd=>{if(nd.nodeType!==1)return;if(nd.classList.contains('sb'))todo.add(nd);nd.querySelectorAll('.sb').forEach(e=>todo.add(e))});
+      }
+    });
+    requestAnimationFrame(()=>todo.forEach(paint));
+  });
+  mo.observe(stage,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','hidden']});
+  const all=()=>paintIn(document);
+  all();addEventListener('load',all);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(all);
+})();
+</script>
 </body>
 </html>
