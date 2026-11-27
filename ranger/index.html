@@ -54,6 +54,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
         </div>
         <p class="discret">Ces deux étiquettes te disent où agir : ici, dans l’application, ou dans les vraies fenêtres de ton ordinateur.</p>
         <div class="rangee"><button type="button" class="bouton neon" id="btn-commencer">Commencer la mission 1 →</button></div>
+        <p style="margin-top:.9rem"><a class="revoir" href="comprendre.html">📘 J’apprends d’abord : comment mes fichiers sont rangés (± 20 min)</a></p>
       </div>
       <div class="accueil-carte">
         <h3>Ta mission · ± 45 minutes</h3>
@@ -67,6 +68,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m1-tri" data-m="1" data-titre="Trier fichiers et dossiers" data-requis="tri" hidden>
     <p class="eyebrow">Mission 1 · Fichier ou dossier ?</p>
     <h2 tabindex="-1">Range chaque élément dans la bonne boîte</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#fichier">↩ Revoir la notion : fichier ou dossier</a></p>
     <span class="lieu appli" data-lieu="appli"></span>
     <div class="consigne"><p>Clique sur un élément, puis sur <b>Fichier</b> ou <b>Dossier</b>. Tu peux aussi le glisser.</p></div>
     <div class="tri">
@@ -93,6 +95,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m1-sous" data-m="1" data-titre="Le sous-dossier" data-requis="qcm:sous1,qcm:sous2,qcm:sous3" hidden>
     <p class="eyebrow">Mission 1 · Fichier ou dossier ?</p>
     <h2 tabindex="-1">Un dossier dans un dossier</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#sous-dossier">↩ Revoir la notion : le sous-dossier</a></p>
     <span class="lieu appli" data-lieu="appli"></span>
     <div class="duo">
       <div>
@@ -111,6 +114,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m2-explo" data-m="2" data-titre="L’explorateur de fichiers" data-requis="zones" hidden>
     <p class="eyebrow">Mission 2 · Où sont mes documents ?</p>
     <h2 tabindex="-1">L’explorateur de fichiers</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#explorateur">↩ Revoir la notion : l’explorateur</a></p>
     <span class="lieu appli" data-lieu="appli"></span>
     <div class="consigne"><p>C’est l’outil de Windows qui montre tes dossiers et tes fichiers. Repère ses parties.</p></div>
     <p class="cherche-zone" id="zone-question" aria-live="polite"></p>
@@ -145,6 +149,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m2-ou" data-m="2" data-titre="Sur l’ordinateur ou en ligne ?" data-requis="qcm:local" hidden>
     <p class="eyebrow">Mission 2 · Où sont mes documents ?</p>
     <h2 tabindex="-1">Sur l’ordinateur ou en ligne ?</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#local">↩ Revoir la notion : local ou en ligne</a></p>
     <span class="lieu appli" data-lieu="appli"></span>
     <p class="illus">Schéma</p>
     <svg class="schema" viewBox="0 0 760 300" role="img" aria-labelledby="schema-t schema-d">
@@ -191,6 +196,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m2-cas" data-m="2" data-titre="Cinq situations" data-requis="qcm:cas1,qcm:cas2,qcm:cas3,qcm:cas4,qcm:cas5" hidden>
     <p class="eyebrow">Mission 2 · Où sont mes documents ?</p>
     <h2 tabindex="-1">Que se passe-t-il ?</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#synchro">↩ Revoir la notion : la synchronisation</a></p>
     <span class="lieu appli" data-lieu="appli"></span>
     <div class="consigne"><p>Cinq situations. Choisis la bonne réponse. Tu peux réessayer.</p></div>
     <div class="duo">
@@ -392,6 +398,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m4-matieres" data-m="4" data-titre="Créer les 8 autres matières" data-requis="v:matieres" hidden>
     <p class="eyebrow">Mission 4 · Construis ton espace de cours</p>
     <h2 tabindex="-1">Crée les 8 autres matières</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#arborescence">↩ Revoir la notion : l’arborescence</a></p>
     <span class="lieu reel" data-lieu="reel"></span>
     <div class="consigne"><p><b>Reste dans COURS S1.</b> Crée ces dossiers à côté de Sciences. Coche chaque dossier créé.</p></div>
     <div class="niveaux">
@@ -450,6 +457,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m4-verif" data-m="4" data-titre="Remonter et vérifier" data-requis="qcm:parent,saisie:compte,v:arbo" hidden>
     <p class="eyebrow">Mission 4 · Construis ton espace de cours</p>
     <h2 tabindex="-1">Remonte et vérifie ton travail</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#arborescence">↩ Revoir la notion : l’arborescence</a></p>
     <span class="lieu reel" data-lieu="reel"></span>
     <div class="duo">
       <div>
@@ -481,6 +489,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m5-essai" data-m="5" data-titre="Entraînement : déplacer un fichier" data-requis="sim:deplacer" hidden>
     <p class="eyebrow">Mission 5 · Un fichier à ranger</p>
     <h2 tabindex="-1">Entraîne-toi à déplacer un fichier</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#copier">↩ Revoir la notion : copier ou déplacer</a></p>
     <span class="lieu appli" data-lieu="appli"></span>
     <div class="consigne"><p><b>Déplacer :</b> clic droit sur le fichier → <b>Couper</b>. Va dans le bon dossier. Clic droit dans une zone vide → <b>Coller</b>.</p></div>
     <div class="encart"><p><b class="titre">Couper ou Copier ?</b> <b>Couper</b> déplace : le fichier quitte son dossier. <b>Copier</b> fait un double : tu aurais deux fiches, et bientôt tu ne saurais plus laquelle est la bonne.</p></div>
@@ -588,6 +597,7 @@ try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}')
   <section class="ecran" data-id="m6-defi" data-m="6" data-titre="Retrouver la fiche sans guide" data-requis="chemin:fiche,saisie:fusion,v:sansguide" hidden>
     <p class="eyebrow">Mission 6 · Retrouve-la sans le guide</p>
     <h2 tabindex="-1">Défi : retrouve ta fiche tout seul</h2>
+    <p class="lien-revoir"><a class="revoir" href="comprendre.html#chemin">↩ Revoir la notion : le chemin</a></p>
     <span class="lieu reel" data-lieu="reel"></span>
     <ol class="etapes">
       <li><b>Ferme</b> la fiche et l’explorateur.</li>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Note enseignant · Comment mes fichiers sont rangés · OCTET</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Poppins:wght@600;700;800&family=Fira+Code:wght@500&display=swap">
+<style>
+:root { --fond: #F8F6FC; --surface: #fff; --encre: #1B1030; --discret: #5E5670; --filet: #DCD4EA; --violet: #6C2BD9; --violet-clair: #EAE1FA; --neon: #D4FF3D; --ambre-clair: #FEEFD6; --ambre-texte: #A65F00;
+  --f-titre: "Poppins", Arial, sans-serif; --f-corps: "Atkinson Hyperlegible", Verdana, sans-serif; --f-code: "Fira Code", Consolas, monospace; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); color: var(--encre); font: 16px/1.5 var(--f-corps); }
+.page { max-width: 900px; margin: 0 auto; padding: 24px 20px 40px; }
+.bandeau { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 12px; background: var(--violet); color: #fff; font: 600 13px var(--f-titre); letter-spacing: .08em; text-transform: uppercase; }
+.bandeau i { width: 12px; height: 12px; border: 2px solid var(--neon); border-radius: 3px; display: inline-block; } .bandeau i.on { background: var(--neon); }
+.bandeau .octet { margin-left: auto; display: flex; gap: 4px; }
+h1 { font: 800 36px/1.1 var(--f-titre); margin: 22px 0 4px; }
+h1 span { background: var(--neon); padding: 0 6px; border-radius: 4px; }
+h2 { font: 700 19px var(--f-titre); margin: 26px 0 8px; padding-left: 12px; border-left: 5px solid var(--violet); }
+.sous { color: var(--discret); margin: 0 0 14px; }
+.grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.carte { background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 10px 14px; }
+.carte b { display: block; font: 700 13px var(--f-titre); text-transform: uppercase; letter-spacing: .05em; color: var(--violet); }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 10px; overflow: hidden; font-size: 14.5px; }
+th { background: var(--violet); color: #fff; font: 700 13px var(--f-titre); text-align: left; padding: 8px 10px; }
+td { padding: 8px 10px; border-top: 1px solid var(--filet); vertical-align: top; }
+tr:nth-child(even) td { background: #FBFAFE; }
+.tag { display: inline-block; font: 700 11px var(--f-titre); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.tag.s1 { background: var(--neon); } .tag.prim { background: var(--violet-clair); color: var(--violet); }
+ul, ol { padding-left: 1.3em; margin: 6px 0; } li + li { margin-top: 3px; }
+.encadre { background: var(--ambre-clair); border-left: 5px solid #F5A623; padding: 10px 14px; border-radius: 0 10px 10px 0; margin: 12px 0; }
+.encadre b.t { color: var(--ambre-texte); font-family: var(--f-titre); }
+.coche { list-style: none; padding: 0; } .coche li::before { content: "☐  "; font-size: 18px; }
+code { font: 13.5px var(--f-code); background: var(--violet-clair); padding: 1px 5px; border-radius: 4px; }
+footer { margin-top: 30px; padding-top: 12px; border-top: 1.5px solid var(--filet); font-size: 13px; color: var(--discret); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.imprimer { font: 700 14px var(--f-titre); padding: 8px 14px; border-radius: 8px; border: 2px solid var(--violet); background: transparent; color: var(--violet); cursor: pointer; }
+@media print { body { background: #fff; font-size: 12.5px; } .page { padding: 0; } .imprimer { display: none; } h2 { break-after: avoid; } table, .carte, .encadre { break-inside: avoid; } @page { size: A4; margin: 15mm; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bandeau"><span>Note enseignant</span><span>·</span><span>Formation numérique S1 · J’apprends</span><span class="octet" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></span></div>
+  <h1>Comment mes fichiers <span>sont rangés</span></h1>
+  <p class="sous">Volet « J’apprends » de la séquence. Il prépare la mission pratique « Mes cours bien rangés » (volet « Je pratique »).</p>
+  <button class="imprimer" onclick="window.print()">Imprimer la note</button>
+
+  <h2>En bref</h2>
+  <div class="grille">
+    <div class="carte"><b>Durée</b>15 à 20 min (modules A à H + défis)</div>
+    <div class="carte"><b>Modalité</b>Autonomie, 1 élève par ordinateur, sans compte ni connexion</div>
+    <div class="carte"><b>Place</b>Juste avant le parcours pratique, ou en début de séance suivante</div>
+    <div class="carte"><b>Après</b>Aide-mémoire : chaque module s’ouvre directement (<code>comprendre.html#chemin</code>…)</div>
+  </div>
+
+  <h2>Choix pédagogiques</h2>
+  <ul>
+    <li><b>Je manipule → j’observe → je comprends → je vérifie.</b> Chaque module affiche une frise de ces 4 étapes. La synthèse « Je comprends » n’apparaît qu’après la manipulation, puis une question vérifie la compréhension.</li>
+    <li><b>Peu de lecture</b> : une question centrale, un visuel actif, une action, une synthèse de deux phrases maximum.</li>
+    <li><b>Pas de verrou</b> : modules en accès libre, progression et préférences gardées dans le navigateur (<code>localStorage</code>, clé <code>octet-comprendre-v1</code>). Aucune donnée envoyée.</li>
+    <li><b>Simulations explicites</b> : tous les explorateurs portent la mention « Simulation · ce ne sont pas tes vrais fichiers ».</li>
+    <li><b>Erreurs utiles</b> : chaque mauvaise réponse montre ce qui se passe, explique en une ou deux phrases, permet de recommencer et propose « Revoir : [notion] ».</li>
+    <li><b>Transfert</b> : les défis posent des situations nouvelles (clé USB, fichier .zip, schéma A/B, Internet coupé), pas des phrases déjà lues.</li>
+  </ul>
+
+  <h2>Notions et activités</h2>
+  <table>
+    <thead><tr><th style="width:22%">Module</th><th>L’élève manipule…</th><th style="width:32%">… et doit comprendre</th></tr></thead>
+    <tbody>
+      <tr><td>A · Fichier ou dossier ?</td><td>Il ouvre une photo, un PDF, un son (muet) et un dossier. Piège : un .zip à icône de dossier, un Word sans extension visible, un dossier à aperçu photo, un fichier de type inconnu.</td><td>Un fichier contient de l’information ; un dossier range. L’icône seule ne suffit pas toujours.</td></tr>
+      <tr><td>B · Le sous-dossier</td><td>Boîtes emboîtées et vue en dossiers synchronisées ; un clic sur un nom affiche son rôle.</td><td>Un sous-dossier est un dossier dans un dossier ; un même dossier est à la fois sous-dossier et parent.</td></tr>
+      <tr><td>C · L’arborescence</td><td>Arbre et contenu liés (étiquettes « tu es ici », « parent », « même niveau », « contenu ») ; il range 3 fiches avec « Ranger ici ».</td><td>Même niveau = même parent ; un dossier ne montre que ce qu’il contient.</td></tr>
+      <tr><td>D · Le chemin</td><td>Fil d’Ariane cliquable : chaque niveau montre son contenu ; fichier d’arrivée distingué ; reconstitution d’un chemin.</td><td>Le chemin part du plus grand emplacement ; le dernier dossier contient le fichier.</td></tr>
+      <tr><td>E · L’explorateur</td><td>Explorateur simulé : 5 découvertes (emplacements, ouvrir, ↑, clic dans le chemin, recherche).</td><td>Rôle de chaque zone ; la recherche fouille le dossier ouvert et ses sous-dossiers.</td></tr>
+      <tr><td>F · Local ou en ligne</td><td>Ordinateur — Internet — serveur : pour 3 fichiers, il voit où est le contenu et ce qu’affiche l’explorateur.</td><td>Le cloud, ce sont des serveurs ; voir un fichier ≠ l’avoir sur le disque.</td></tr>
+      <tr><td>G · Synchronisation</td><td>Expérience avec versions (v1, v2) des deux côtés : ajouter, modifier, couper/rétablir Internet, ouvrir hors ligne, libérer de l’espace, supprimer.</td><td>Changements en attente puis envoyés ; disponibilité locale ; une suppression est synchronisée.</td></tr>
+      <tr><td>H · Copier ou déplacer</td><td>Deux dossiers du même ordinateur, compteur d’exemplaires, écriture dans une copie (boutons, clavier ou glisser).</td><td>Copier = deux exemplaires indépendants ; déplacer = changer d’endroit.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Défis de fin (6)</h2>
+  <ol>
+    <li>Ouvrir un fichier à partir de son chemin (explorateur simulé, sans recherche).</li>
+    <li>Schéma A ou B : même niveau ou sous-dossier ?</li>
+    <li>Copier ou déplacer selon un objectif (clé USB / rangement).</li>
+    <li>Internet coupé : quels fichiers s’ouvrent ? (icônes OneDrive + Bureau)</li>
+    <li>Pourquoi un document rangé dans Français n’apparaît pas dans Sciences ?</li>
+    <li>Supprimer « pour faire de la place » dans OneDrive : que devient le fichier en ligne ?</li>
+  </ol>
+
+  <h2>Justesse des représentations : choix assumés</h2>
+  <ul>
+    <li>Les états OneDrive représentés suivent les icônes de Windows : nuage = disponible en ligne, coche verte = disponible sur cet appareil, pastille verte pleine = toujours disponible, flèches = synchronisation en cours.</li>
+    <li>La suppression synchronisée envoie le fichier dans la corbeille en ligne : il est récupérable pendant un temps, mais ce n’est pas une sauvegarde.</li>
+    <li>Le module H se limite volontairement à deux dossiers d’un même disque. Le parcours pratique signale que glisser entre deux emplacements différents peut copier au lieu de déplacer.</li>
+    <li>La synchronisation est simplifiée (pas de conflits de versions ni de partage) pour rester sur les idées essentielles.</li>
+  </ul>
+
+  <h2>Lien avec le référentiel FMTTN</h2>
+  <p>Mêmes attendus que la fiche du parcours pratique : la compétence S1 « Organiser des données numériques, afin de faciliter leur gestion dans un espace de stockage adapté à la situation » (p. 63) et les acquis de P4 (fichier/dossier, disque dur/cloud, créer, renommer, déplacer, p. 43). Ce volet installe le vocabulaire et les représentations ; le parcours pratique les mobilise dans le vrai OneDrive.</p>
+
+  <footer><span><b style="font-family:var(--f-titre);color:var(--violet)">OCTET</b> · Ressource créée par Tommy Berben · eSCIENCES.be · réalisée avec l’aide de l’IA Claude (Anthropic)</span><span>CC BY-NC-SA 4.0</span></footer>
+</div>
+</body>
+</html>

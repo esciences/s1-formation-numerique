@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comment mes fichiers sont rangés · OCTET</title>
+<meta name="description" content="J’apprends : fichier, dossier, sous-dossier, arborescence, chemin, explorateur, stockage local et en ligne, OneDrive, copier ou déplacer. Pour les S1.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Poppins:wght@600;700;800&family=Fira+Code:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/ranger.css">
+<link rel="stylesheet" href="css/comprendre.css">
+<script>
+try { var r = (JSON.parse(localStorage.getItem('octet-comprendre-v1') || '{}').reglages) || {};
+  if (r.texte && r.texte !== 'normal') document.documentElement.dataset.texte = r.texte;
+  if (r.theme && r.theme !== 'auto') document.documentElement.dataset.theme = r.theme;
+  if (r.anim === 'non') document.documentElement.dataset.anim = 'non'; } catch (e) {}
+</script>
+</head>
+<body>
+<div class="app">
+
+  <header class="haut">
+    <a class="marque" href="../index.html#informations-donnees" title="Retour à l’accueil Formation numérique"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>OCTET · Comment mes fichiers sont rangés</a>
+    <nav class="progression" id="progression" aria-label="Modules"></nav>
+    <div class="outils-haut">
+      <a class="btn-outil" href="index.html" title="Le parcours pratique"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span class="lbl">Je pratique</span></a>
+      <button type="button" class="btn-outil" id="btn-reglages" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="lbl">Réglages</span></button>
+    </div>
+  </header>
+
+  <div class="zone"><main id="scene">
+
+  <!-- ============ ACCUEIL ============ -->
+  <section class="ecran" data-id="accueil" data-m="0" data-titre="Accueil">
+    <p class="eyebrow">Formation numérique · 1re secondaire · J’apprends</p>
+    <h1 tabindex="-1">Comment mes fichiers <span class="neon">sont rangés</span></h1>
+    <p class="grand"><b>Je manipule, j’observe, je comprends, je vérifie.</b> Ensuite, je saurai ce que je fais dans mon vrai explorateur.</p>
+    <div class="entrees">
+      <a class="entree ici" href="#fichier" data-aller="fichier"><span class="etiquette apprends" style="align-self:flex-start;font:700 .8rem var(--f-titre);padding:.2rem .6rem;border-radius:999px;background:var(--violet-clair);color:var(--violet-texte)">J’apprends · ici</span><b>Je comprends comment mes fichiers sont organisés.</b><span>8 modules courts + des défis · ± 20 minutes</span></a>
+      <a class="entree" href="index.html"><span style="align-self:flex-start;font:700 .8rem var(--f-titre);padding:.2rem .6rem;border-radius:999px;background:var(--neon);color:var(--sur-neon)">Je pratique</span><b>J’organise mes vrais cours sur mon ordinateur.</b><span>Mission « Mes cours bien rangés » · ± 45 minutes</span></a>
+    </div>
+    <h3 style="margin-top:1.4rem">Les modules</h3>
+    <ul class="modules" id="liste-modules"></ul>
+    <p class="discret" style="margin-top:.8rem">Tu peux ouvrir les modules dans l’ordre que tu veux. Ta progression reste sur cet ordinateur.</p>
+    <div class="rangee" style="margin-top:.6rem"><button type="button" class="bouton neon" id="btn-commencer">Commencer par le module A →</button></div>
+  </section>
+
+  <!-- ============ A · FICHIER ============ -->
+  <section class="ecran" data-id="fichier" data-m="1" data-lettre="A" data-titre="Fichier ou dossier ?" hidden>
+    <p class="eyebrow">J’apprends · A</p>
+    <h2 tabindex="-1">Fichier ou dossier ?</h2>
+    <ol class="demarche" data-demarche="fichier"></ol>
+    <p class="question-centrale">Que contient mon ordinateur ? Ouvre chaque élément pour voir ce qu’il y a dedans.</p>
+    <div class="duo">
+      <div class="elements" id="a-elements" role="group" aria-label="Éléments à ouvrir"></div>
+      <div class="apercu" id="a-apercu" aria-live="polite"><p class="discret">Choisis un élément.</p></div>
+    </div>
+    <div class="idee" data-idee="fichier" hidden><span class="ampoule">Je comprends</span><div><p>Un <b>fichier</b> contient des informations : un texte, une image, un son…</p><p>Un <b>dossier</b> ne contient pas d’information lui-même : il <b>range</b> des fichiers et d’autres dossiers.</p></div></div>
+    <div class="bloc" id="a-piege-bloc" hidden>
+      <h3><span class="n">?</span>Je vérifie : l’icône suffit-elle ?</h3>
+      <p>Windows cache parfois la fin du nom (l’extension). Pour chaque élément : fichier ou dossier ? Si tu hésites, <b>ouvre-le</b>.</p>
+      <div class="piege" id="a-piege"></div>
+    </div>
+  </section>
+
+  <!-- ============ B · SOUS-DOSSIER ============ -->
+  <section class="ecran" data-id="sous-dossier" data-m="2" data-lettre="B" data-titre="Le sous-dossier" hidden>
+    <p class="eyebrow">J’apprends · B</p>
+    <h2 tabindex="-1">Un dossier dans un dossier</h2>
+    <ol class="demarche" data-demarche="sous-dossier"></ol>
+    <p class="question-centrale">Ouvre COURS S1, puis Sciences. Que se passe-t-il ?</p>
+    <div class="vues">
+      <div class="panneau"><p class="illus">Comme des boîtes rangées dans des boîtes</p><div id="b-boites"></div></div>
+      <div class="panneau"><p class="illus">La même chose, comme dans l’ordinateur</p><div id="b-liste"></div></div>
+    </div>
+    <div class="role" id="b-role" aria-live="polite"></div>
+    <div class="idee" data-idee="sous-dossier" hidden><span class="ampoule">Je comprends</span><div><p>Un <b>sous-dossier</b> est un dossier placé dans un autre dossier.</p><p>Sciences est un sous-dossier de COURS S1… et le <b>dossier parent</b> de Chimie, Biologie et Physique. Tout dépend d’où on regarde.</p></div></div>
+    <div class="bloc" id="b-verif-bloc" hidden>
+      <h3><span class="n">?</span>Je vérifie</h3>
+      <div id="b-verif"></div>
+    </div>
+  </section>
+
+  <!-- ============ C · ARBORESCENCE ============ -->
+  <section class="ecran" data-id="arborescence" data-m="3" data-lettre="C" data-titre="L’arborescence" hidden>
+    <p class="eyebrow">J’apprends · C</p>
+    <h2 tabindex="-1">L’arborescence : voir toute l’organisation</h2>
+    <ol class="demarche" data-demarche="arborescence"></ol>
+    <p class="question-centrale">Deux vues du même rangement. Ouvre un dossier dans l’une : observe l’autre.</p>
+    <div class="legende-tg" aria-hidden="true"><span class="tg ici">tu es ici</span><span class="tg parent">parent</span><span class="tg frere">même niveau</span><span class="tg contenu">contenu</span></div>
+    <div class="liees">
+      <div class="panneau"><p class="illus">Arborescence</p><ul class="arbre-i" id="c-arbre"></ul></div>
+      <div class="panneau vue-contenu"><p class="illus" id="c-titre-contenu">Contenu du dossier ouvert</p><p class="chemin-mini" id="c-chemin"></p><div class="grille-items" id="c-contenu"></div>
+        <div class="rangee" style="margin-top:.6rem"><button type="button" class="bouton second" id="c-parent">↑ Dossier parent</button></div></div>
+    </div>
+    <ul class="taches" id="c-taches" style="margin-top:.8rem"></ul>
+    <div class="bloc" id="c-ranger-bloc" hidden>
+      <h3><span class="n">2</span>Range ces fiches</h3>
+      <p>Choisis une fiche, ouvre le bon dossier, puis clique sur <b>Ranger ici</b>. Observe l’arborescence.</p>
+      <div class="plateau" id="c-plateau"></div>
+      <div class="rangee" style="margin-top:.6rem"><button type="button" class="bouton" id="c-ranger" disabled>Ranger ici</button><button type="button" class="bouton second" id="c-reprendre">Tout reprendre</button></div>
+      <div class="retour" id="c-retour" aria-live="polite"></div>
+    </div>
+    <div class="idee" data-idee="arborescence" hidden><span class="ampoule">Je comprends</span><div><p>L’<b>arborescence</b> montre tous les dossiers et ce qu’ils contiennent, du plus grand au plus petit.</p><p>Des dossiers <b>au même niveau</b> ont le même parent. Un dossier ne montre <b>que ce qu’il contient</b>.</p></div></div>
+    <div class="bloc" id="c-verif-bloc" hidden><h3><span class="n">?</span>Je vérifie</h3><div class="qcm" data-qcm="c1"></div></div>
+  </section>
+
+  <!-- ============ D · CHEMIN ============ -->
+  <section class="ecran" data-id="chemin" data-m="4" data-lettre="D" data-titre="Le chemin" hidden>
+    <p class="eyebrow">J’apprends · D</p>
+    <h2 tabindex="-1">Le chemin : l’adresse de mon fichier</h2>
+    <ol class="demarche" data-demarche="chemin"></ol>
+    <p class="question-centrale">Clique sur chaque étape du chemin. Qu’y a-t-il à ce niveau ?</p>
+    <div class="fil" id="d-fil" role="group" aria-label="Chemin de la fiche"></div>
+    <div class="panneau niveau-vu" id="d-niveau" aria-live="polite"></div>
+    <div class="retour info" id="d-retour" aria-live="polite"></div>
+    <div class="idee" data-idee="chemin" hidden><span class="ampoule">Je comprends</span><div><p>Le <b>chemin</b> dit exactement où se trouve un élément : on part du plus grand emplacement et on entre dans chaque dossier, un par un.</p><p>Les premiers noms sont des <b>dossiers traversés</b>. Le dernier est l’<b>arrivée</b> : ici, le fichier.</p></div></div>
+    <div class="bloc" id="d-verif-bloc" hidden>
+      <h3><span class="n">?</span>Je vérifie : écris l’adresse de <code>Conjugaison.pdf</code></h3>
+      <p class="discret">Elle est rangée dans le dossier Français de COURS S1.</p>
+      <div class="chemin-jeu" data-chemin="conjugaison">
+        <div class="chemin-cible" aria-live="polite"></div>
+        <div class="pastilles"></div>
+        <div class="rangee"><button type="button" class="bouton" data-act="verifier">Vérifier ma réponse</button><button type="button" class="bouton second" data-act="effacer">Effacer</button></div>
+        <div class="retour" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ E · EXPLORATEUR ============ -->
+  <section class="ecran" data-id="explorateur" data-m="5" data-lettre="E" data-titre="L’explorateur" hidden>
+    <p class="eyebrow">J’apprends · E</p>
+    <h2 tabindex="-1">L’explorateur : mon outil pour retrouver et ranger</h2>
+    <ol class="demarche" data-demarche="explorateur"></ol>
+    <p class="question-centrale">Teste chaque partie. Que se passe-t-il quand tu l’utilises ?</p>
+    <ul class="taches" id="e-taches"></ul>
+    <div id="e-explo"></div>
+    <div class="retour info" id="e-retour" aria-live="polite">Simulation : tes vrais fichiers ne sont pas visibles ici.</div>
+    <div class="idee" data-idee="explorateur" hidden><span class="ampoule">Je comprends</span><div><p>L’<b>explorateur</b> est l’outil de Windows pour voir, retrouver et ranger tes fichiers.</p><p>À gauche : les <b>emplacements</b>. Au centre : le <b>contenu</b>. En haut : le <b>chemin</b>, la flèche <b>↑</b> pour remonter et la <b>recherche</b>.</p></div></div>
+    <div class="bloc" id="e-verif-bloc" hidden><h3><span class="n">?</span>Je vérifie</h3><div class="qcm" data-qcm="e1"></div></div>
+  </section>
+
+  <!-- ============ F · LOCAL / EN LIGNE ============ -->
+  <section class="ecran" data-id="local" data-m="6" data-lettre="F" data-titre="Local ou en ligne ?" hidden>
+    <p class="eyebrow">J’apprends · F</p>
+    <h2 tabindex="-1">Local ou en ligne : où sont vraiment mes fichiers ?</h2>
+    <ol class="demarche" data-demarche="local"></ol>
+    <p class="question-centrale">Choisis un fichier. Où son contenu est-il enregistré ?</p>
+    <div class="exemples" id="f-exemples" role="group" aria-label="Fichiers d’exemple"></div>
+    <div class="reseau" id="f-reseau"></div>
+    <div class="constat" id="f-constat" aria-live="polite"></div>
+    <div class="bloc"><h3><span class="n">👁</span>Et dans l’explorateur ?</h3>
+      <table class="vue-explo" id="f-explo"><caption class="sr">Ce que montre l’explorateur</caption><thead><tr><th>Nom</th><th>Emplacement</th><th>État</th></tr></thead><tbody></tbody></table>
+      <p class="discret" style="margin-top:.4rem">Les trois fichiers sont <b>visibles</b>. Pourtant, leur contenu n’est pas au même endroit.</p>
+    </div>
+    <div class="idee" data-idee="local" hidden><span class="ampoule">Je comprends</span><div><p><b>Local</b> : le contenu est sur le disque de cet ordinateur. <b>En ligne</b> : il est sur un <b>serveur</b>, un ordinateur distant qui garde les fichiers du service.</p><p>Voir un fichier dans l’explorateur ne veut pas dire qu’il est déjà sur l’ordinateur.</p></div></div>
+    <div class="bloc" id="f-verif-bloc" hidden><h3><span class="n">?</span>Je vérifie</h3><div class="qcm" data-qcm="f1"></div></div>
+  </section>
+
+  <!-- ============ G · SYNCHRO ============ -->
+  <section class="ecran" data-id="synchro" data-m="7" data-lettre="G" data-titre="OneDrive et la synchronisation" hidden>
+    <p class="eyebrow">J’apprends · G</p>
+    <h2 tabindex="-1">L’expérience de la synchronisation</h2>
+    <ol class="demarche" data-demarche="synchro"></ol>
+    <p class="question-centrale">OneDrive relie un dossier de ton ordinateur à ton espace en ligne. Fais les expériences et observe les deux côtés.</p>
+    <ul class="objectifs" id="g-objectifs"></ul>
+    <div class="sync" id="g-sync"></div>
+    <div class="actions-sync" id="g-actions"></div>
+    <div class="test-ouvrir" id="g-test" aria-live="polite"></div>
+    <details class="aide" style="margin-top:.6rem"><summary>Journal de l’expérience <span class="etat"></span></summary><div class="dedans"><ol class="journal" id="g-journal" reversed></ol></div></details>
+    <div class="idee" data-idee="synchro" hidden><span class="ampoule">Je comprends</span><div><p>La <b>synchronisation</b> envoie les changements de l’ordinateur vers le serveur (et l’inverse). Sans Internet, ils restent <b>en attente</b>.</p><p>Un fichier « seulement en ligne » ne s’ouvre pas sans Internet. Et une <b>suppression</b> est aussi synchronisée : ce n’est pas une copie de secours.</p></div></div>
+    <div class="bloc" id="g-verif-bloc" hidden><h3><span class="n">?</span>Je vérifie</h3><div class="qcm" data-qcm="g1"></div></div>
+  </section>
+
+  <!-- ============ H · COPIER / DÉPLACER ============ -->
+  <section class="ecran" data-id="copier" data-m="8" data-lettre="H" data-titre="Copier ou déplacer ?" hidden>
+    <p class="eyebrow">J’apprends · H</p>
+    <h2 tabindex="-1">Copier ou déplacer : qu’est-ce qui change ?</h2>
+    <ol class="demarche" data-demarche="copier"></ol>
+    <p class="question-centrale">Choisis un fichier, puis copie-le ou déplace-le. Compte les exemplaires.</p>
+    <ul class="objectifs" id="h-objectifs"></ul>
+    <p class="discret">Les deux dossiers sont sur <b>le même ordinateur</b>. Tu peux aussi glisser un fichier : glisser ici = déplacer.</p>
+    <div class="dossiers-cd" id="h-dossiers"></div>
+    <div class="actions-sync" id="h-actions"></div>
+    <div class="compteur" id="h-compteur" aria-live="polite"></div>
+    <div class="retour info" id="h-retour" aria-live="polite">Choisis un fichier.</div>
+    <div class="idee" data-idee="copier" hidden><span class="ampoule">Je comprends</span><div><p><b>Copier</b> crée un deuxième exemplaire : il y en a un au départ et un à l’arrivée. Ensuite, ils vivent leur vie séparément.</p><p><b>Déplacer</b> change seulement l’emplacement : le fichier quitte le départ.</p></div></div>
+    <div class="bloc" id="h-verif-bloc" hidden><h3><span class="n">?</span>Je vérifie</h3><div class="qcm" data-qcm="h1"></div></div>
+  </section>
+
+  <!-- ============ DÉFIS ============ -->
+  <section class="ecran" data-id="defis" data-m="9" data-lettre="✓" data-titre="Défis" hidden>
+    <p class="eyebrow">J’apprends · Défis</p>
+    <h2 tabindex="-1">6 défis pour vérifier</h2>
+    <p class="question-centrale">De nouvelles situations. Si tu te trompes, regarde l’explication et réessaie.</p>
+    <div id="defis"></div>
+  </section>
+
+  <!-- ============ BILAN ============ -->
+  <section class="ecran" data-id="bilan" data-m="10" data-lettre="★" data-titre="Bilan" hidden>
+    <p class="eyebrow">J’apprends · Bilan</p>
+    <h2 tabindex="-1">Je sais expliquer…</h2>
+    <div id="badge-fin"></div>
+    <ul class="bilan" id="bilan"></ul>
+    <div class="rangee" style="margin-top:1rem"><a class="bouton neon" href="index.html">Je passe à la pratique : j’organise mes cours →</a><a class="bouton second" href="../index.html#informations-donnees">Retour aux ressources OCTET</a></div>
+  </section>
+
+  </main></div>
+
+  <footer class="bas">
+    <button type="button" class="bouton second" id="prec">← Précédent</button>
+    <span class="num" id="num" aria-live="polite"></span>
+    <button type="button" class="bouton" id="suiv">Suivant →</button>
+  </footer>
+  <p class="credit">OCTET · Comment mes fichiers sont rangés · ressource <a href="https://www.esciences.be">eSCIENCES.be</a> · Tommy Berben · CC BY-NC-SA 4.0 · Simulations pédagogiques : elles ne montrent pas tes vrais fichiers.</p>
+</div>
+
+<dialog class="boite" id="dlg-reglages" aria-labelledby="reg-titre">
+  <div class="boite-haut"><h2 id="reg-titre">Réglages</h2><button type="button" class="fermer" data-fermer aria-label="Fermer les réglages">✕</button></div>
+  <fieldset class="reglage"><legend>Taille du texte</legend><div class="seg-ctrl">
+    <label><input type="radio" name="texte" value="normal"> Normal</label><label><input type="radio" name="texte" value="grand"> Grand</label><label><input type="radio" name="texte" value="tres-grand"> Très grand</label></div></fieldset>
+  <fieldset class="reglage"><legend>Couleurs</legend><div class="seg-ctrl">
+    <label><input type="radio" name="theme" value="auto"> Automatique</label><label><input type="radio" name="theme" value="light"> Clair</label><label><input type="radio" name="theme" value="dark"> Sombre</label></div></fieldset>
+  <fieldset class="reglage"><legend>Animations</legend><div class="seg-ctrl">
+    <label><input type="radio" name="anim" value="oui"> Oui</label><label><input type="radio" name="anim" value="non"> Non</label></div></fieldset>
+  <fieldset class="reglage"><legend>Ma progression</legend>
+    <p class="discret" style="margin:0 0 .5rem">Elle est enregistrée sur cet ordinateur uniquement.</p>
+    <button type="button" class="bouton second danger" id="btn-raz">Tout recommencer…</button></fieldset>
+  <p class="discret" style="margin:0">Enseignant : <a href="note-enseignant-comprendre.html" target="_blank" rel="noopener">note pédagogique</a></p>
+</dialog>
+<dialog class="boite" id="dlg-raz" aria-labelledby="raz-titre">
+  <h2 id="raz-titre">Tout recommencer ?</h2>
+  <p>Tes réponses dans « Comment mes fichiers sont rangés » seront effacées. Le parcours pratique ne change pas.</p>
+  <div class="rangee"><button type="button" class="bouton danger second" id="raz-oui">Oui, tout effacer</button><button type="button" class="bouton" data-fermer>Non, annuler</button></div>
+</dialog>
+
+<script src="js/comprendre.js"></script>
+</body>
+</html>
