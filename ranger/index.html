@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mes cours bien rangés · OCTET</title>
+<meta name="description" content="Mission OCTET pour les S1 : découvrir l’explorateur de fichiers, comprendre OneDrive et construire sa propre organisation de cours.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Poppins:wght@600;700;800&family=Fira+Code:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/ranger.css">
+<script>
+/* Réglages de confort appliqués avant l’affichage (pas de clignotement) */
+try { var r = (JSON.parse(localStorage.getItem('octet-cours-ranges-v1') || '{}').reglages) || {};
+  if (r.texte) document.documentElement.dataset.texte = r.texte;
+  if (r.theme && r.theme !== 'auto') document.documentElement.dataset.theme = r.theme;
+  if (r.anim) document.documentElement.dataset.anim = r.anim; } catch (e) {}
+</script>
+</head>
+<body>
+<div class="app">
+
+  <header class="haut">
+    <a class="marque" href="../index.html#informations-donnees" title="Retour à l’accueil Formation numérique"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>OCTET · Mes cours bien rangés</a>
+    <nav class="progression" id="progression" aria-label="Missions"></nav>
+    <div class="outils-haut">
+      <button type="button" class="btn-outil" id="btn-plan" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span class="lbl">Plan</span></button>
+      <button type="button" class="btn-outil" id="btn-arbo" aria-expanded="false" aria-controls="arbo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h6v4H3zM9 14h6v4H9zM15 4h6v4h-6z"/><path d="M6 8v8h3M18 8v4h-3"/></svg><span class="lbl">Mon arbo</span></button>
+      <button type="button" class="btn-outil" id="btn-reglages" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="lbl">Réglages</span></button>
+    </div>
+  </header>
+
+  <div class="zone" id="zone">
+
+  <aside class="arbo" id="arbo" hidden aria-labelledby="arbo-titre">
+    <div class="arbo-haut"><h2 id="arbo-titre">Mon arbo</h2><button type="button" class="fermer" id="arbo-fermer" aria-label="Fermer Mon arbo">✕</button></div>
+    <p class="legende">L’organisation à construire. Clique sur ▸ pour ouvrir un dossier, sur un nom pour voir son chemin. <span style="color:var(--bon);font-weight:700">✓</span> = tu l’as créé.</p>
+    <ul class="arbo-arbre" id="arbo-arbre"></ul>
+    <div class="arbo-info" id="arbo-info" aria-live="polite">Clique sur un dossier pour voir où il se trouve.</div>
+  </aside>
+
+  <main id="scene">
+
+  <!-- ============ ACCUEIL ============ -->
+  <section class="ecran" data-id="accueil" data-m="0" data-titre="Accueil">
+    <div class="duo">
+      <div>
+        <p class="eyebrow">Formation numérique · 1re secondaire</p>
+        <h1 tabindex="-1">Mes cours <span class="neon">bien rangés</span></h1>
+        <p class="grand"><b>Je vais organiser mes cours dans OneDrive et apprendre à retrouver mes fichiers.</b></p>
+        <div class="alerte"><p style="margin:0">Lundi, en physique : « Ouvrez la fiche sur les états de la matière. » Tout le monde l’ouvre… sauf toi. <b>Elle est perdue quelque part.</b></p><p style="margin:.4rem 0 0">Aujourd’hui, tu prépares un espace où chaque fiche a sa place.</p></div>
+        <div class="rangee" style="margin-bottom:.8rem">
+          <span class="lieu appli" data-lieu="appli"></span>
+          <span class="lieu reel" data-lieu="reel"></span>
+        </div>
+        <p class="discret">Ces deux étiquettes te disent où agir : ici, dans l’application, ou dans les vraies fenêtres de ton ordinateur.</p>
+        <div class="rangee"><button type="button" class="bouton neon" id="btn-commencer">Commencer la mission 1 →</button></div>
+      </div>
+      <div class="accueil-carte">
+        <h3>Ta mission · ± 45 minutes</h3>
+        <ul class="plan-mini" id="plan-mini"></ul>
+        <p class="discret" style="margin:.8rem 0 0">Ta progression reste sur cet ordinateur. Rien n’est envoyé.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MISSION 1 ============ -->
+  <section class="ecran" data-id="m1-tri" data-m="1" data-titre="Trier fichiers et dossiers" data-requis="tri" hidden>
+    <p class="eyebrow">Mission 1 · Fichier ou dossier ?</p>
+    <h2 tabindex="-1">Range chaque élément dans la bonne boîte</h2>
+    <span class="lieu appli" data-lieu="appli"></span>
+    <div class="consigne"><p>Clique sur un élément, puis sur <b>Fichier</b> ou <b>Dossier</b>. Tu peux aussi le glisser.</p></div>
+    <div class="tri">
+      <div class="panneau"><h3>À ranger</h3><div class="cartes" id="tri-pioche" aria-label="Éléments à ranger"></div></div>
+      <div class="bacs">
+        <div class="bac" data-bac="fichier"><button type="button" class="cible" data-bac="fichier"><span data-ico="pdf"></span><span>Fichier<small>un contenu : texte, photo, son…</small></span></button><div class="cartes"></div></div>
+        <div class="bac" data-bac="dossier"><button type="button" class="cible" data-bac="dossier"><span data-ico="dossier"></span><span>Dossier<small>une boîte qui range des fichiers</small></span></button><div class="cartes"></div></div>
+      </div>
+    </div>
+    <div class="retour info" id="tri-retour" aria-live="polite">Choisis un élément pour commencer.</div>
+    <div class="aides">
+      <details class="aide"><summary>Comment reconnaître un fichier ? <span class="etat"></span></summary><div class="dedans">
+        <p>Un fichier a souvent une <b>extension</b> : un point et quelques lettres à la fin du nom.</p>
+        <ul><li><code>.pdf</code> : un document à lire</li><li><code>.jpg</code> : une photo</li><li><code>.docx</code> : un texte Word</li><li><code>.mp3</code> : un son</li></ul>
+        <p>Un dossier n’a pas d’extension et son icône ressemble à une chemise jaune.</p>
+        <p class="discret">Windows cache parfois les extensions. Regarde alors l’icône, ou la colonne « Type ».</p>
+      </div></details>
+      <details class="aide"><summary>Je préfère le clavier <span class="etat"></span></summary><div class="dedans">
+        <p><kbd>Tab</kbd> pour aller sur un élément, <kbd>Entrée</kbd> pour le choisir, puis <kbd>Tab</kbd> jusqu’à « Fichier » ou « Dossier » et <kbd>Entrée</kbd>.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m1-sous" data-m="1" data-titre="Le sous-dossier" data-requis="qcm:sous1,qcm:sous2,qcm:sous3" hidden>
+    <p class="eyebrow">Mission 1 · Fichier ou dossier ?</p>
+    <h2 tabindex="-1">Un dossier dans un dossier</h2>
+    <span class="lieu appli" data-lieu="appli"></span>
+    <div class="duo">
+      <div>
+        <div class="consigne"><p>Un dossier rangé dans un autre s’appelle un <b>sous-dossier</b>.</p><p>Le dossier qui le contient est son <b>dossier parent</b>.</p></div>
+        <div class="panneau"><p class="illus">Exemple</p><div data-arbre="exemple"></div></div>
+      </div>
+      <div>
+        <div class="qcm" data-qcm="sous1"></div>
+        <div class="qcm" data-qcm="sous2"></div>
+        <div class="qcm" data-qcm="sous3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MISSION 2 ============ -->
+  <section class="ecran" data-id="m2-explo" data-m="2" data-titre="L’explorateur de fichiers" data-requis="zones" hidden>
+    <p class="eyebrow">Mission 2 · Où sont mes documents ?</p>
+    <h2 tabindex="-1">L’explorateur de fichiers</h2>
+    <span class="lieu appli" data-lieu="appli"></span>
+    <div class="consigne"><p>C’est l’outil de Windows qui montre tes dossiers et tes fichiers. Repère ses parties.</p></div>
+    <p class="cherche-zone" id="zone-question" aria-live="polite"></p>
+    <p class="illus">Illustration simplifiée de l’explorateur (pas une capture de Windows)</p>
+    <div class="fenetre" id="fenetre-explo">
+      <div class="fen-titre"><span data-ico="dossier"></span>COURS S1 — Explorateur de fichiers<span class="fen-btns" aria-hidden="true"><span>—</span><span>☐</span><span>✕</span></span></div>
+      <div class="fen-barre">
+        <span class="mini-btn" aria-hidden="true">←</span>
+        <button type="button" class="zone-clic mini-btn" data-zone="parent" aria-label="Bouton flèche vers le haut">↑</button>
+        <button type="button" class="zone-clic mini-adr" data-zone="adresse" aria-label="Barre en haut avec le texte OneDrive - Ton école, COURS S1"><span data-ico="nuage"></span>OneDrive - Ton école › COURS S1</button>
+        <button type="button" class="zone-clic mini-rech" data-zone="recherche" aria-label="Zone Rechercher">🔍 Rechercher</button>
+      </div>
+      <div class="fen-corps">
+        <button type="button" class="zone-clic fen-nav" data-zone="nav" aria-label="Colonne de gauche">
+          <span><span data-ico="maison"></span>Accueil</span>
+          <span><span data-ico="bureau"></span>Bureau</span>
+          <span><span data-ico="telech"></span>Téléchargements</span>
+          <span><span data-ico="docs"></span>Documents</span>
+          <span><span data-ico="nuage"></span>OneDrive - Ton école</span>
+          <span><span data-ico="pc"></span>Ce PC</span>
+        </button>
+        <button type="button" class="zone-clic fen-contenu" data-zone="contenu" aria-label="Grande zone de droite avec des dossiers">
+          <span><span data-ico="dossier"></span>Sciences</span>
+          <span><span data-ico="dossier"></span>Français</span>
+          <span><span data-ico="dossier"></span>Math</span>
+        </button>
+      </div>
+    </div>
+    <div class="retour info" id="zone-retour" aria-live="polite"></div>
+  </section>
+
+  <section class="ecran" data-id="m2-ou" data-m="2" data-titre="Sur l’ordinateur ou en ligne ?" data-requis="qcm:local" hidden>
+    <p class="eyebrow">Mission 2 · Où sont mes documents ?</p>
+    <h2 tabindex="-1">Sur l’ordinateur ou en ligne ?</h2>
+    <span class="lieu appli" data-lieu="appli"></span>
+    <p class="illus">Schéma</p>
+    <svg class="schema" viewBox="0 0 760 300" role="img" aria-labelledby="schema-t schema-d">
+      <title id="schema-t">Ton ordinateur et ton espace en ligne</title>
+      <desc id="schema-d">Dans l’explorateur de ton ordinateur, Bureau et Téléchargements sont des emplacements locaux. Le dossier OneDrive est relié par Internet à ton espace OneDrive en ligne, celui du compte de l’école. Cet espace en ligne est aussi accessible depuis un autre appareil.</desc>
+      <rect x="10" y="20" width="330" height="262" rx="16" fill="var(--surface)" stroke="var(--encre)" stroke-width="2.5"/>
+      <text x="30" y="52" font-size="19" font-weight="800">Ton ordinateur</text>
+      <text x="30" y="74" font-size="13" fill="var(--discret)" style="fill:var(--discret)">ce que montre l’explorateur</text>
+      <g transform="translate(30 92)">
+        <rect width="290" height="52" rx="8" fill="var(--fond)" stroke="var(--filet)" stroke-width="1.5"/>
+        <path d="M14 16h10l3 3h13v15H14z" fill="var(--dossier)"/><text x="52" y="24" font-size="15" font-weight="700">Bureau · Téléchargements</text>
+        <text x="52" y="42" font-size="11" style="fill:var(--discret)">local : seulement sur cet ordinateur</text>
+      </g>
+      <g transform="translate(30 156)">
+        <rect width="290" height="56" rx="8" fill="var(--bleu-clair)" stroke="var(--bleu)" stroke-width="2"/>
+        <path d="M18 34a8 8 0 0 1 1-16 11 11 0 0 1 20 3 7 7 0 0 1 0 13z" fill="var(--bleu)"/><text x="52" y="27" font-size="15" font-weight="700">OneDrive - Ton école</text>
+        <text x="52" y="45" font-size="11" style="fill:var(--discret)">un dossier relié à ton espace en ligne</text>
+      </g>
+      <text x="30" y="240" font-size="12" style="fill:var(--discret)">Certains fichiers OneDrive sont sur l’ordinateur,</text>
+      <text x="30" y="258" font-size="12" style="fill:var(--discret)">d’autres seulement en ligne (petit nuage).</text>
+      <path d="M352 182 H 466" stroke="var(--violet-texte)" stroke-width="4" marker-end="url(#fl)" marker-start="url(#fl2)"/>
+      <defs><marker id="fl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--violet-texte)"/></marker>
+      <marker id="fl2" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M10 0L0 5L10 10z" fill="var(--violet-texte)"/></marker></defs>
+      <text x="409" y="166" font-size="13" font-weight="800" text-anchor="middle">synchronisation</text>
+      <text x="409" y="206" font-size="12" text-anchor="middle" style="fill:var(--discret)">par Internet</text>
+      <path d="M520 214a44 44 0 0 1 8-87 62 62 0 0 1 114 18 40 40 0 0 1 -6 69z" fill="var(--bleu-clair)" stroke="var(--bleu)" stroke-width="3"/>
+      <text x="600" y="168" font-size="15" font-weight="800" text-anchor="middle">Ton espace</text>
+      <text x="600" y="187" font-size="15" font-weight="800" text-anchor="middle">en ligne</text>
+      <text x="600" y="240" font-size="12" text-anchor="middle" style="fill:var(--discret)">compte de l’école</text>
+      <text x="600" y="258" font-size="12" text-anchor="middle" style="fill:var(--discret)">aussi depuis un autre appareil</text>
+    </svg>
+    <div class="encart"><div><p><b class="titre">« Drive », c’est quoi ?</b> Ce n’est pas un autre nom de l’explorateur. <b>OneDrive</b> et <b>Google Drive</b> sont des services de stockage en ligne. À l’école, tu utilises <b>OneDrive</b>.</p></div></div>
+    <h3 style="margin-top:1rem">Les petites icônes de OneDrive</h3>
+    <div class="etats-od">
+      <div class="etat-od"><span data-ico="od-nuage"></span><span><b>Seulement en ligne</b>Il faut Internet pour l’ouvrir.</span></div>
+      <div class="etat-od"><span data-ico="od-coche"></span><span><b>Sur cet ordinateur</b>Tu peux l’ouvrir sans Internet.</span></div>
+      <div class="etat-od"><span data-ico="od-plein"></span><span><b>Toujours sur cet ordinateur</b>Gardé ici en permanence.</span></div>
+      <div class="etat-od"><span data-ico="od-synchro"></span><span><b>Synchronisation en cours</b>Attends avant d’éteindre.</span></div>
+      <div class="etat-od"><span data-ico="od-erreur"></span><span><b>Problème</b>Appelle ton professeur.</span></div>
+    </div>
+    <div class="qcm" data-qcm="local"></div>
+  </section>
+
+  <section class="ecran" data-id="m2-cas" data-m="2" data-titre="Cinq situations" data-requis="qcm:cas1,qcm:cas2,qcm:cas3,qcm:cas4,qcm:cas5" hidden>
+    <p class="eyebrow">Mission 2 · Où sont mes documents ?</p>
+    <h2 tabindex="-1">Que se passe-t-il ?</h2>
+    <span class="lieu appli" data-lieu="appli"></span>
+    <div class="consigne"><p>Cinq situations. Choisis la bonne réponse. Tu peux réessayer.</p></div>
+    <div class="duo">
+      <div><div class="qcm" data-qcm="cas1"></div><div class="qcm" data-qcm="cas2"></div><div class="qcm" data-qcm="cas3"></div></div>
+      <div><div class="qcm" data-qcm="cas4"></div><div class="qcm" data-qcm="cas5"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ MISSION 3 ============ -->
+  <section class="ecran" data-id="m3-retour" data-m="3" data-titre="Revenir à l’application" data-requis="v:retour" hidden>
+    <p class="eyebrow">Mission 3 · Ton véritable explorateur</p>
+    <h2 tabindex="-1">Avant de partir : comment revenir ici ?</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="consigne"><p>Tu vas passer d’une fenêtre à l’autre.</p><p>Pour revenir ici : clique sur l’icône de ton <b>navigateur</b> dans la <b>barre des tâches</b>, en bas de l’écran.</p></div>
+    <p class="illus">Illustration simplifiée de la barre des tâches</p>
+    <svg class="schema" viewBox="0 0 600 120" role="img" aria-labelledby="bt-t" style="max-width:600px">
+      <title id="bt-t">La barre des tâches en bas de l’écran, avec l’icône de l’explorateur (dossier jaune) et l’icône du navigateur.</title>
+      <rect x="2" y="40" width="596" height="56" rx="10" fill="var(--fond)" stroke="var(--filet)" stroke-width="2"/>
+      <g transform="translate(200 50)"><rect width="36" height="36" rx="8" fill="var(--surface)"/><path d="M8 8h9v9H8zM19 8h9v9h-9zM8 19h9v9H8zM19 19h9v9h-9z" fill="var(--bleu)"/></g>
+      <g transform="translate(252 50)"><rect width="36" height="36" rx="8" fill="var(--surface)"/><circle cx="16" cy="16" r="7" fill="none" stroke="var(--encre)" stroke-width="2.5"/><path d="M21 21l6 6" stroke="var(--encre)" stroke-width="2.5"/></g>
+      <g transform="translate(304 50)"><rect width="36" height="36" rx="8" fill="var(--surface)" stroke="var(--dossier-fonce)" stroke-width="2.5"/><path d="M7 11h9l3 3h11v14H7z" fill="var(--dossier)"/></g>
+      <g transform="translate(356 50)"><rect width="36" height="36" rx="8" fill="var(--surface)" stroke="var(--violet-texte)" stroke-width="2.5"/><circle cx="18" cy="18" r="11" fill="none" stroke="var(--violet-texte)" stroke-width="2.5"/><path d="M7 18h22M18 7c-6 6-6 16 0 22M18 7c6 6 6 16 0 22" fill="none" stroke="var(--violet-texte)" stroke-width="2"/></g>
+      <text x="322" y="24" font-size="14" font-weight="800" text-anchor="middle" fill="var(--encre)" style="font-family:var(--f-titre)">Explorateur</text>
+      <path d="M322 30v14" stroke="var(--encre)" stroke-width="2"/>
+      <text x="460" y="24" font-size="14" font-weight="800" text-anchor="middle" fill="var(--violet-texte)" style="font-family:var(--f-titre)">Ton navigateur</text>
+      <path d="M440 30 L 384 50" stroke="var(--violet-texte)" stroke-width="2"/>
+      <text x="216" y="114" font-size="11" text-anchor="middle" fill="var(--discret)" style="font-family:var(--f-titre)">Démarrer</text>
+    </svg>
+    <div class="aides">
+      <details class="aide"><summary>Un raccourci pour changer de fenêtre <span class="etat"></span></summary><div class="dedans">
+        <p>Garde <kbd>Alt</kbd> enfoncé et appuie sur <kbd>Tab</kbd>. Lâche quand la bonne fenêtre est choisie.</p>
+      </div></details>
+      <details class="aide"><summary>Mettre les deux fenêtres côte à côte <span class="etat"></span></summary><div class="dedans">
+        <ol><li>Clique dans cette page.</li><li>Appuie sur <kbd>⊞ Windows</kbd> + <kbd>←</kbd> : la page se colle à gauche.</li><li>À droite, Windows te propose les autres fenêtres : clique sur l’explorateur.</li></ol>
+        <p class="discret">Tu peux aussi glisser une fenêtre par son titre contre le bord de l’écran.</p>
+      </div></details>
+    </div>
+    <div class="verif" data-cle="retour">
+      <h3>Je vérifie</h3>
+      <ul><li><label><input type="checkbox" class="req" data-save="retour-1"> Je sais où est mon navigateur dans la barre des tâches.</label></li></ul>
+      <button type="button" class="bouton valider">C’est bon, je sais revenir</button>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m3-ouvrir" data-m="3" data-titre="Ouvrir l’explorateur" data-requis="v:ouvrir" hidden>
+    <p class="eyebrow">Mission 3 · Ton véritable explorateur</p>
+    <h2 tabindex="-1">Ouvre l’explorateur de fichiers</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <ol class="etapes">
+      <li>Clique sur l’icône du <b>dossier jaune</b> dans la barre des tâches.</li>
+      <li>Une fenêtre s’ouvre : c’est l’explorateur.</li>
+      <li>Reviens ici, sans la fermer.</li>
+    </ol>
+    <div class="aides">
+      <details class="aide"><summary>Je ne vois pas le dossier jaune <span class="etat"></span></summary><div class="dedans">
+        <ul><li>Appuie sur <kbd>⊞ Windows</kbd> + <kbd>E</kbd>.</li><li>Ou clique sur Démarrer et tape <b>explorateur</b>, puis <kbd>Entrée</kbd>.</li></ul>
+      </div></details>
+    </div>
+    <div class="verif" data-cle="ouvrir">
+      <h3>Je vérifie</h3>
+      <ul>
+        <li><label><input type="checkbox" class="req" data-save="ouvrir-1"> Une fenêtre « Explorateur de fichiers » est ouverte.</label></li>
+        <li><label><input type="checkbox" class="req" data-save="ouvrir-2"> Je suis revenu ici sans la fermer.</label></li>
+      </ul>
+      <button type="button" class="bouton valider">J’ai ouvert l’explorateur</button>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m3-onedrive" data-m="3" data-titre="Trouver mon OneDrive" data-requis="v:onedrive" hidden>
+    <p class="eyebrow">Mission 3 · Ton véritable explorateur</p>
+    <h2 tabindex="-1">Trouve ton OneDrive scolaire</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="duo">
+      <div>
+        <ol class="etapes">
+          <li>Dans le volet de gauche, cherche le <b>nuage bleu</b> : « OneDrive - » suivi du nom de ton école.</li>
+          <li>Clique dessus.</li>
+          <li>Regarde la barre d’adresse en haut.</li>
+        </ol>
+        <div class="ou-suis-je"><div class="t"><span data-ico="cible"></span>Tu dois voir quelque chose comme :</div>
+          <div class="adresse" data-adresse="OneDrive - Ton école"></div>
+          <p class="discret" style="margin:.4rem 0 0">Le nom de l’école peut être écrit autrement chez toi. C’est normal.</p>
+        </div>
+      </div>
+      <div class="panneau">
+        <p class="illus">Illustration : le volet de gauche</p>
+        <div class="fen-nav" style="border:0;padding:0">
+          <span><span data-ico="maison"></span>Accueil</span>
+          <span><span data-ico="bureau"></span>Bureau</span>
+          <span><span data-ico="telech"></span>Téléchargements</span>
+          <span style="background:var(--neon);color:var(--sur-neon);font-weight:700"><span data-ico="nuage"></span>OneDrive - Ton école ← celui-ci</span>
+          <span style="opacity:.6"><span data-ico="nuage-gris"></span>OneDrive - Personnel ← pas celui-ci</span>
+          <span><span data-ico="pc"></span>Ce PC</span>
+        </div>
+      </div>
+    </div>
+    <div class="aides">
+      <details class="aide"><summary>Je ne trouve pas OneDrive <span class="etat"></span></summary><div class="dedans">
+        <ol>
+          <li>Fais défiler le volet de gauche : il est peut-être plus bas.</li>
+          <li>Ou clique sur le <b>nuage</b> près de l’heure (en bas à droite), puis sur l’icône de dossier.</li>
+          <li>Pas de nuage ? Un message « Se connecter » ? <b>Lève la main : ton professeur t’aide.</b> Ne crée rien ailleurs en attendant.</li>
+        </ol>
+      </div></details>
+      <details class="aide"><summary>Je vois deux OneDrive <span class="etat"></span></summary><div class="dedans">
+        <p>Choisis celui avec le <b>nom de ton école</b>. « OneDrive - Personnel » est un autre compte : on ne l’utilise pas ici.</p>
+      </div></details>
+    </div>
+    <div class="verif" data-cle="onedrive">
+      <h3>Je vérifie</h3>
+      <ul>
+        <li><label><input type="checkbox" class="req" data-save="od-1"> Je vois le nuage bleu avec le nom de mon école.</label></li>
+        <li><label><input type="checkbox" class="req" data-save="od-2"> La barre d’adresse commence par <b>OneDrive</b>.</label></li>
+      </ul>
+      <button type="button" class="bouton valider">Je suis dans mon OneDrive</button>
+    </div>
+  </section>
+
+  <!-- ============ MISSION 4 ============ -->
+  <section class="ecran" data-id="m4-essai" data-m="4" data-titre="Entraînement : créer un dossier" data-requis="sim:creer" hidden>
+    <p class="eyebrow">Mission 4 · Construis ton espace de cours</p>
+    <h2 tabindex="-1">Entraîne-toi à créer un dossier</h2>
+    <span class="lieu appli" data-lieu="appli"></span>
+    <div class="consigne"><p><b>La méthode :</b> clic droit dans une zone vide → <b>Nouveau</b> → <b>Dossier</b> → tape le nom → <kbd>Entrée</kbd>.</p></div>
+    <ul class="taches" id="taches-creer"></ul>
+    <div id="sim-creer"></div>
+    <div class="retour info" id="sim-creer-retour" aria-live="polite"></div>
+    <div class="aides">
+      <details class="aide"><summary>Au clavier <span class="etat"></span></summary><div class="dedans">
+        <p>Clique dans la zone blanche, puis <kbd>Maj</kbd> + <kbd>F10</kbd> ouvre le menu. Les flèches choisissent, <kbd>Entrée</kbd> valide.</p>
+        <p>Pour ouvrir un dossier : choisis-le et appuie sur <kbd>Entrée</kbd>.</p>
+      </div></details>
+      <details class="aide"><summary>Des raccourcis pour aller plus vite <span class="etat"></span></summary><div class="dedans">
+        <ul><li><kbd>Ctrl</kbd> + <kbd>Maj</kbd> + <kbd>N</kbd> crée un nouveau dossier.</li><li><kbd>F2</kbd> renomme l’élément choisi.</li><li>Dans Windows 11, le bouton <b>+ Nouveau</b> en haut à gauche marche aussi.</li></ul>
+      </div></details>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m4-cours" data-m="4" data-titre="Créer COURS S1" data-requis="v:cours" hidden>
+    <p class="eyebrow">Mission 4 · Construis ton espace de cours</p>
+    <h2 tabindex="-1">Crée le dossier COURS S1</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="duo">
+      <div>
+        <div class="ou-suis-je"><div class="t"><span data-ico="cible"></span>Dans quel dossier suis-je ?</div>
+          <div class="adresse" data-adresse="OneDrive - Ton école"></div>
+          <label><input type="checkbox" class="req" data-save="cours-ou"> Ma barre d’adresse montre mon OneDrive.</label>
+        </div>
+        <ol class="etapes">
+          <li>Fais un <b>clic droit</b> dans une zone vide.</li>
+          <li>Choisis <b>Nouveau</b> puis <b>Dossier</b>.</li>
+          <li>Tape <code>COURS S1</code> puis <kbd>Entrée</kbd>.</li>
+        </ol>
+        <p class="discret">En majuscules, avec un espace avant le 1.</p>
+      </div>
+      <div class="panneau"><p class="illus">Ce que tu construis</p><div data-arbre="cours"></div></div>
+    </div>
+    <div class="verif" data-cle="cours">
+      <h3>Je vérifie</h3>
+      <ul>
+        <li><label><input type="checkbox" class="req" data-save="cours-1"> Le dossier s’appelle exactement <code>COURS S1</code>.</label></li>
+        <li><label><input type="checkbox" class="req" data-save="cours-2"> Il est dans OneDrive (pas dans Bureau ni Téléchargements).</label></li>
+      </ul>
+      <button type="button" class="bouton valider">J’ai créé le dossier</button>
+    </div>
+    <div class="aides" data-oups></div>
+  </section>
+
+  <section class="ecran" data-id="m4-sciences" data-m="4" data-titre="Créer Sciences" data-requis="v:sciences" hidden>
+    <p class="eyebrow">Mission 4 · Construis ton espace de cours</p>
+    <h2 tabindex="-1">Entre dans COURS S1 et crée Sciences</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="duo">
+      <div>
+        <ol class="etapes">
+          <li><b>Double-clique</b> sur <code>COURS S1</code> pour l’ouvrir.</li>
+          <li>Vérifie ta barre d’adresse (ci-dessous).</li>
+          <li>Clic droit dans une zone vide → <b>Nouveau</b> → <b>Dossier</b>.</li>
+          <li>Tape <code>Sciences</code> puis <kbd>Entrée</kbd>.</li>
+        </ol>
+        <div class="ou-suis-je"><div class="t"><span data-ico="cible"></span>Dans quel dossier suis-je ?</div>
+          <div class="adresse" data-adresse="OneDrive - Ton école|COURS S1"></div>
+          <label><input type="checkbox" class="req" data-save="sci-ou"> Ma barre d’adresse se termine par COURS S1.</label>
+        </div>
+      </div>
+      <div class="panneau"><p class="illus">Ce que tu construis</p><div data-arbre="sciences"></div></div>
+    </div>
+    <div class="verif" data-cle="sciences">
+      <h3>Je vérifie</h3>
+      <ul>
+        <li><label><input type="checkbox" class="req" data-save="sci-1"> <code>Sciences</code> est <b>dans</b> COURS S1.</label></li>
+        <li><label><input type="checkbox" class="req" data-save="sci-2"> Le nom est bien écrit : un S majuscule, puis <code>ciences</code>.</label></li>
+      </ul>
+      <button type="button" class="bouton valider">J’ai créé Sciences</button>
+    </div>
+    <div class="aides" data-oups></div>
+  </section>
+
+  <section class="ecran" data-id="m4-matieres" data-m="4" data-titre="Créer les 8 autres matières" data-requis="v:matieres" hidden>
+    <p class="eyebrow">Mission 4 · Construis ton espace de cours</p>
+    <h2 tabindex="-1">Crée les 8 autres matières</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="consigne"><p><b>Reste dans COURS S1.</b> Crée ces dossiers à côté de Sciences. Coche chaque dossier créé.</p></div>
+    <div class="niveaux">
+      <div><h3>✓ Au même niveau</h3><div data-arbre="niveau-meme"></div><p class="discret" style="margin:.4rem 0 0">Tous dans COURS S1, côte à côte. <b>C’est ce qu’on fait maintenant.</b></p></div>
+      <div><h3>✗ À l’intérieur</h3><div data-arbre="niveau-dans"></div><p class="discret" style="margin:.4rem 0 0">Math ne va pas dans Sciences !</p></div>
+    </div>
+    <div class="ou-suis-je"><div class="t"><span data-ico="cible"></span>Dans quel dossier suis-je ?</div>
+      <div class="adresse" data-adresse="OneDrive - Ton école|COURS S1"></div>
+      <label><input type="checkbox" class="req" data-save="mat-ou"> Ma barre d’adresse se termine par COURS S1.</label>
+    </div>
+    <ul class="matieres" data-groupe="matieres"></ul>
+    <div class="aides">
+      <details class="aide"><summary>Taper ç et é <span class="etat"></span></summary><div class="dedans">
+        <p>Sur un clavier belge : <kbd>é</kbd> est sur la touche <kbd>2</kbd> et <kbd>ç</kbd> sur la touche <kbd>9</kbd>, sans appuyer sur <kbd>Maj</kbd>.</p>
+      </div></details>
+      <details class="aide"><summary>Aller plus vite <span class="etat"></span></summary><div class="dedans">
+        <p><kbd>Ctrl</kbd> + <kbd>Maj</kbd> + <kbd>N</kbd> crée directement un nouveau dossier. Tape le nom, puis <kbd>Entrée</kbd>.</p>
+      </div></details>
+    </div>
+    <div class="verif" data-cle="matieres">
+      <h3>Je vérifie</h3>
+      <ul><li><label><input type="checkbox" class="req" data-save="mat-1"> Aucune de ces matières n’est rangée dans Sciences.</label></li></ul>
+      <button type="button" class="bouton valider">J’ai créé les 8 dossiers</button>
+      <p class="note">Le bouton s’active quand les 8 matières sont cochées.</p>
+    </div>
+    <div class="aides" data-oups></div>
+  </section>
+
+  <section class="ecran" data-id="m4-sous" data-m="4" data-titre="Chimie, Biologie, Physique" data-requis="v:sous" hidden>
+    <p class="eyebrow">Mission 4 · Construis ton espace de cours</p>
+    <h2 tabindex="-1">Entre dans Sciences et crée 3 sous-dossiers</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="duo">
+      <div>
+        <ol class="etapes">
+          <li><b>Double-clique</b> sur <code>Sciences</code>.</li>
+          <li>Vérifie ta barre d’adresse (ci-dessous).</li>
+          <li>Crée <code>Chimie</code>, <code>Biologie</code> et <code>Physique</code>.</li>
+        </ol>
+        <div class="ou-suis-je"><div class="t"><span data-ico="cible"></span>Dans quel dossier suis-je ?</div>
+          <div class="adresse" data-adresse="OneDrive - Ton école|COURS S1|Sciences"></div>
+          <label><input type="checkbox" class="req" data-save="sous-ou"> Ma barre d’adresse se termine par Sciences.</label>
+        </div>
+        <ul class="matieres" data-groupe="sciences"></ul>
+      </div>
+      <div class="panneau"><p class="illus">Ce que tu construis</p><div data-arbre="sous"></div></div>
+    </div>
+    <div class="verif" data-cle="sous">
+      <h3>Je vérifie</h3>
+      <ul><li><label><input type="checkbox" class="req" data-save="sous-1"> Les trois dossiers sont <b>dans Sciences</b>, pas dans COURS S1.</label></li></ul>
+      <button type="button" class="bouton valider">J’ai créé les 3 sous-dossiers</button>
+    </div>
+    <div class="aides" data-oups></div>
+  </section>
+
+  <section class="ecran" data-id="m4-verif" data-m="4" data-titre="Remonter et vérifier" data-requis="qcm:parent,saisie:compte,v:arbo" hidden>
+    <p class="eyebrow">Mission 4 · Construis ton espace de cours</p>
+    <h2 tabindex="-1">Remonte et vérifie ton travail</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="duo">
+      <div>
+        <div class="consigne"><p>Clique sur la flèche <kbd>↑</kbd> pour remonter dans COURS S1.</p><p><b>Ne ferme pas</b> la fenêtre : le <kbd>✕</kbd> ferme tout.</p></div>
+        <div class="qcm" data-qcm="parent"></div>
+        <div class="panneau">
+          <label for="saisie-compte"><b>Compte les dossiers dans ton COURS S1.</b> Combien en vois-tu ?</label>
+          <div class="rangee" style="margin-top:.5rem"><input class="saisie" id="saisie-compte" data-saisie="compte" inputmode="numeric" autocomplete="off" style="width:6rem"><button type="button" class="bouton" data-saisie-btn="compte">Vérifier ma réponse</button></div>
+          <div class="retour" id="saisie-compte-retour" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="panneau"><p class="illus">Le modèle complet</p><div data-arbre="complet"></div></div>
+    </div>
+    <div class="verif" data-cle="arbo">
+      <h3>Je compare avec le modèle</h3>
+      <ul>
+        <li><label><input type="checkbox" class="req" data-save="arbo-1"> Il y a 9 dossiers de matières dans COURS S1.</label></li>
+        <li><label><input type="checkbox" class="req" data-save="arbo-2"> Chimie, Biologie et Physique sont dans Sciences.</label></li>
+        <li><label><input type="checkbox" class="req" data-save="arbo-3"> Pas de « Nouveau dossier », pas de doublon comme « Math (2) ».</label></li>
+        <li><label><input type="checkbox" class="req" data-save="arbo-4"> Les noms sont écrits comme le modèle, accents compris.</label></li>
+      </ul>
+      <button type="button" class="bouton valider">J’ai vérifié mon organisation</button>
+      <p class="note">Ton professeur pourra vérifier aussi.</p>
+    </div>
+    <div class="aides" data-oups></div>
+  </section>
+
+  <!-- ============ MISSION 5 ============ -->
+  <section class="ecran" data-id="m5-essai" data-m="5" data-titre="Entraînement : déplacer un fichier" data-requis="sim:deplacer" hidden>
+    <p class="eyebrow">Mission 5 · Un fichier à ranger</p>
+    <h2 tabindex="-1">Entraîne-toi à déplacer un fichier</h2>
+    <span class="lieu appli" data-lieu="appli"></span>
+    <div class="consigne"><p><b>Déplacer :</b> clic droit sur le fichier → <b>Couper</b>. Va dans le bon dossier. Clic droit dans une zone vide → <b>Coller</b>.</p></div>
+    <div class="encart"><p><b class="titre">Couper ou Copier ?</b> <b>Couper</b> déplace : le fichier quitte son dossier. <b>Copier</b> fait un double : tu aurais deux fiches, et bientôt tu ne saurais plus laquelle est la bonne.</p></div>
+    <ul class="taches" id="taches-deplacer"></ul>
+    <div id="sim-deplacer"></div>
+    <div class="retour info" id="sim-deplacer-retour" aria-live="polite"></div>
+    <div class="aides">
+      <details class="aide"><summary>Dans Windows 11, je ne vois pas « Couper » <span class="etat"></span></summary><div class="dedans">
+        <p>Regarde tout en haut du menu : <b>Couper</b> est une petite icône de <b>ciseaux</b> ✂, et <b>Coller</b> une icône de <b>presse-papiers</b> 📋.</p>
+      </div></details>
+      <details class="aide"><summary>Au clavier <span class="etat"></span></summary><div class="dedans">
+        <p><kbd>Ctrl</kbd> + <kbd>X</kbd> coupe, <kbd>Ctrl</kbd> + <kbd>V</kbd> colle. <kbd>Ctrl</kbd> + <kbd>C</kbd> copie.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m5-telecharger" data-m="5" data-titre="Télécharger la fiche" data-requis="v:dl" hidden>
+    <p class="eyebrow">Mission 5 · Un fichier à ranger</p>
+    <h2 tabindex="-1">Télécharge la fiche</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="dl"><span data-ico="pdf"></span><span style="flex:1;min-width:12rem"><b>Les_etats_de_la_matiere.pdf</b><span class="discret">Fiche de physique · 1 page · <span data-taille="etats">56 Ko</span></span></span>
+      <a class="bouton neon" href="fichiers/Les_etats_de_la_matiere.pdf" download="Les_etats_de_la_matiere.pdf" data-dl="etats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Télécharger la fiche</a></div>
+    <div class="encart"><p><b class="titre">Télécharger, ce n’est pas ranger.</b> Ta fiche arrive d’abord dans un dossier d’attente, souvent <b>Téléchargements</b>.</p></div>
+    <fieldset class="reglage" style="max-width:72ch"><legend>Qu’est-ce qui s’est passé ?</legend>
+      <div class="choix-radio" data-cas="dl">
+        <label><input type="radio" name="cas-dl" value="a"> Une petite fenêtre en haut à droite montre ma fiche.</label>
+        <label><input type="radio" name="cas-dl" value="b"> Une fenêtre me demande où l’enregistrer.</label>
+        <label><input type="radio" name="cas-dl" value="c"> La fiche s’est ouverte dans le navigateur.</label>
+        <label><input type="radio" name="cas-dl" value="d"> Rien ne s’est passé.</label>
+      </div>
+    </fieldset>
+    <div class="reponse-cas" data-pour="dl-a" hidden>Elle est dans <b>Téléchargements</b>. L’icône de dossier de cette petite fenêtre l’affiche dans l’explorateur.</div>
+    <div class="reponse-cas" data-pour="dl-b" hidden>Clique sur <b>Téléchargements</b> dans la colonne de gauche, puis sur <b>Enregistrer</b>. Tu la rangeras juste après.</div>
+    <div class="reponse-cas" data-pour="dl-c" hidden>Elle est affichée, mais peut-être pas enregistrée. Cherche la flèche <b>↓ Télécharger</b> en haut de la fiche et clique dessus.</div>
+    <div class="reponse-cas" data-pour="dl-d" hidden>Clique encore une fois sur « Télécharger la fiche ». Toujours rien ? Lève la main.</div>
+    <div class="verif" data-cle="dl">
+      <h3>Je vérifie</h3>
+      <ul><li><label><input type="checkbox" class="req" data-save="dl-1"> Je sais où mon navigateur a enregistré la fiche.</label></li></ul>
+      <button type="button" class="bouton valider">J’ai téléchargé la fiche</button>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m5-deplacer" data-m="5" data-titre="Ranger la fiche dans Physique" data-requis="v:deplacer" hidden>
+    <p class="eyebrow">Mission 5 · Un fichier à ranger</p>
+    <h2 tabindex="-1">Range la fiche dans Physique</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="duo">
+      <div>
+        <ol class="etapes">
+          <li>Dans l’explorateur, clique sur <b>Téléchargements</b> (à gauche).</li>
+          <li>Clic droit sur <code>Les_etats_de_la_matiere</code> → <b>Couper</b>.</li>
+          <li>Va dans OneDrive → COURS S1 → Sciences → Physique.</li>
+          <li>Clic droit dans une zone vide → <b>Coller</b>.</li>
+        </ol>
+      </div>
+      <div>
+        <div class="ou-suis-je"><div class="t"><span data-ico="cible"></span>Avant de coller, tu dois être ici :</div>
+          <div class="adresse" data-adresse="OneDrive - Ton école|COURS S1|Sciences|Physique"></div>
+          <label><input type="checkbox" class="req" data-save="dep-ou"> Ma barre d’adresse se termine par Physique.</label>
+        </div>
+      </div>
+    </div>
+    <div class="aides">
+      <details class="aide"><summary>Je ne trouve pas la fiche dans Téléchargements <span class="etat"></span></summary><div class="dedans">
+        <ul><li>Les fichiers récents sont souvent en haut de la liste.</li><li>Tape <b>etats</b> dans la zone « Rechercher » en haut à droite.</li><li>Elle s’appelle <code>…(1)</code> ? Tu l’as téléchargée deux fois. Range celle-là et signale-le.</li></ul>
+      </div></details>
+      <details class="aide"><summary>Je ne vois pas « Couper » <span class="etat"></span></summary><div class="dedans">
+        <p>Windows 11 : c’est l’icône des <b>ciseaux</b> ✂ en haut du menu. « Coller » est l’icône du <b>presse-papiers</b> 📋.</p>
+      </div></details>
+      <details class="aide"><summary>Une autre façon : glisser <span class="etat"></span></summary><div class="dedans">
+        <p>Mets les deux dossiers côte à côte et fais glisser la fiche avec la souris. <b>Attention :</b> entre deux emplacements différents (Téléchargements → OneDrive), glisser peut <b>copier</b> au lieu de déplacer. Couper → Coller est plus sûr.</p>
+      </div></details>
+    </div>
+    <div class="verif" data-cle="deplacer">
+      <h3>Je vérifie</h3>
+      <ul>
+        <li><label><input type="checkbox" class="req" data-save="dep-1"> La fiche est dans <b>Physique</b>.</label></li>
+        <li><label><input type="checkbox" class="req" data-save="dep-2"> Elle n’est plus dans <b>Téléchargements</b>.</label></li>
+      </ul>
+      <button type="button" class="bouton valider">J’ai rangé la fiche</button>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m5-ouvrir" data-m="5" data-titre="Ouvrir la fiche depuis Physique" data-requis="v:ouvrirfiche" hidden>
+    <p class="eyebrow">Mission 5 · Un fichier à ranger</p>
+    <h2 tabindex="-1">Ouvre la fiche depuis Physique</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <ol class="etapes">
+      <li>Dans <code>Physique</code>, <b>double-clique</b> sur la fiche.</li>
+      <li>Elle s’ouvre dans ton navigateur ou ton lecteur PDF.</li>
+      <li>Reviens ici.</li>
+    </ol>
+    <div class="encart"><p><b class="titre">Des flèches bleues sur ta fiche ?</b> OneDrive l’envoie dans ton espace en ligne. Attends la coche verte avant d’éteindre.</p></div>
+    <div class="verif" data-cle="ouvrirfiche">
+      <h3>Je vérifie</h3>
+      <ul>
+        <li><label><input type="checkbox" class="req" data-save="of-1"> La fiche s’ouvre : je vois « Les états de la matière ».</label></li>
+        <li><label><input type="checkbox" class="req" data-save="of-2"> Je l’ai ouverte depuis le dossier Physique.</label></li>
+      </ul>
+      <button type="button" class="bouton valider">J’ai ouvert la fiche</button>
+    </div>
+  </section>
+
+  <!-- ============ MISSION 6 ============ -->
+  <section class="ecran" data-id="m6-defi" data-m="6" data-titre="Retrouver la fiche sans guide" data-requis="chemin:fiche,saisie:fusion,v:sansguide" hidden>
+    <p class="eyebrow">Mission 6 · Retrouve-la sans le guide</p>
+    <h2 tabindex="-1">Défi : retrouve ta fiche tout seul</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <ol class="etapes">
+      <li><b>Ferme</b> la fiche et l’explorateur.</li>
+      <li>Rouvre l’explorateur. Retrouve la fiche et ouvre-la.</li>
+    </ol>
+    <p class="discret">Aucun chemin affiché : c’est à toi de jouer.</p>
+    <div class="rangee"><button type="button" class="bouton second" id="btn-indice">Je suis bloqué : un indice</button></div>
+    <div class="indices" id="indices" aria-live="polite"></div>
+    <div class="verif" data-cle="sansguide">
+      <ul><li><label><input type="checkbox" class="req" data-save="sg-1"> J’ai retrouvé et ouvert ma fiche.</label></li></ul>
+      <button type="button" class="bouton valider">C’est fait</button>
+    </div>
+    <h3 style="margin-top:1.4rem">Dans l’application : prouve-le</h3>
+    <div class="duo">
+      <div class="panneau chemin-jeu" data-chemin="fiche">
+        <p style="margin:0"><b>Reconstruis le chemin de ta fiche.</b> Clique sur les dossiers dans l’ordre.</p>
+        <div class="chemin-cible" aria-live="polite"></div>
+        <div class="pastilles"></div>
+        <div class="rangee"><button type="button" class="bouton" data-act="verifier">Vérifier ma réponse</button><button type="button" class="bouton second" data-act="effacer">Effacer</button></div>
+        <div class="retour" aria-live="polite"></div>
+      </div>
+      <div class="panneau">
+        <label for="saisie-fusion"><b>Dans ta fiche :</b> comment appelle-t-on le passage de l’état solide à l’état liquide ?</label>
+        <div class="rangee" style="margin-top:.5rem"><input class="saisie" id="saisie-fusion" data-saisie="fusion" autocomplete="off" style="width:12rem"><button type="button" class="bouton" data-saisie-btn="fusion">Vérifier ma réponse</button></div>
+        <div class="retour" id="saisie-fusion-retour" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m6-quiz" data-m="6" data-titre="Turbo-check" data-requis="qcm:q1,qcm:q2,qcm:q3,qcm:q4,qcm:q5" hidden>
+    <p class="eyebrow">Mission 6 · Retrouve-la sans le guide</p>
+    <h2 tabindex="-1">Turbo-check</h2>
+    <span class="lieu appli" data-lieu="appli"></span>
+    <div class="duo">
+      <div><div class="qcm" data-qcm="q1"></div><div class="qcm" data-qcm="q2"></div><div class="qcm" data-qcm="q3"></div></div>
+      <div><div class="qcm" data-qcm="q4"></div><div class="qcm" data-qcm="q5"></div></div>
+    </div>
+  </section>
+
+  <section class="ecran" data-id="m6-bilan" data-m="6" data-titre="Bilan" hidden>
+    <p class="eyebrow">Mission 6 · Bilan</p>
+    <h2 tabindex="-1">Je sais maintenant…</h2>
+    <div id="badge-fin"></div>
+    <ul class="bilan" id="bilan"></ul>
+    <p class="discret"><span class="pastille-etat verifie" style="padding:.15rem .5rem;border-radius:999px;font:700 .72rem var(--f-titre)">Vérifié</span> = l’application a contrôlé ta réponse. <span class="pastille-etat declare" style="padding:.15rem .5rem;border-radius:999px;font:700 .72rem var(--f-titre)">Fait sur l’ordi</span> = tu l’as fait et vérifié toi-même.</p>
+    <div class="verif" style="border-color:var(--violet-texte)">
+      <h3>Dernière étape : montre ton OneDrive à ton professeur</h3>
+      <ul class="plan-mini" style="margin-bottom:.4rem">
+        <li><i>1</i>COURS S1 est dans le OneDrive de l’école.</li>
+        <li><i>2</i>Les 9 matières sont dedans, au même niveau.</li>
+        <li><i>3</i>Chimie, Biologie, Physique sont dans Sciences.</li>
+        <li><i>4</i>La fiche est dans Physique et s’ouvre.</li>
+        <li><i>5</i>Je sais expliquer où elle se trouve.</li>
+      </ul>
+    </div>
+    <div class="rangee" style="margin-top:1rem"><button type="button" class="bouton neon" data-aller="bonus">Faire le bonus ★</button><a class="bouton second" href="../index.html#informations-donnees">Retour aux ressources OCTET</a></div>
+  </section>
+
+  <!-- ============ BONUS ============ -->
+  <section class="ecran" data-id="bonus" data-m="7" data-titre="Bonus : une fiche à ranger seul" data-requis="chemin:bonus,v:bonus" hidden>
+    <p class="eyebrow">Bonus ★ · Pour aller plus loin</p>
+    <h2 tabindex="-1">Range une nouvelle fiche, seul</h2>
+    <span class="lieu reel" data-lieu="reel"></span>
+    <div class="dl"><span data-ico="pdf"></span><span style="flex:1;min-width:12rem"><b>Mesurer_un_angle.pdf</b><span class="discret">1 page · <span data-taille="angle">57 Ko</span></span></span>
+      <a class="bouton neon" href="fichiers/Mesurer_un_angle.pdf" download="Mesurer_un_angle.pdf" data-dl="angle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Télécharger la fiche</a></div>
+    <ol class="etapes" style="margin-top:1rem">
+      <li>Ouvre la fiche : de quelle matière parle-t-elle ?</li>
+      <li>Range-la dans le bon dossier de COURS S1.</li>
+      <li><b>Ne crée aucun nouveau dossier.</b></li>
+    </ol>
+    <div class="duo">
+      <div class="panneau chemin-jeu" data-chemin="bonus">
+        <p style="margin:0"><b>Où l’as-tu rangée ?</b> Clique sur les dossiers dans l’ordre.</p>
+        <div class="chemin-cible" aria-live="polite"></div>
+        <div class="pastilles"></div>
+        <div class="rangee"><button type="button" class="bouton" data-act="verifier">Vérifier ma réponse</button><button type="button" class="bouton second" data-act="effacer">Effacer</button></div>
+        <div class="retour" aria-live="polite"></div>
+      </div>
+      <div class="verif" data-cle="bonus" style="margin-top:0">
+        <h3>Je vérifie</h3>
+        <ul>
+          <li><label><input type="checkbox" class="req" data-save="bo-1"> La fiche est rangée et s’ouvre depuis son dossier.</label></li>
+          <li><label><input type="checkbox" class="req" data-save="bo-2"> Je n’ai créé aucun nouveau dossier.</label></li>
+          <li><label><input type="checkbox" class="req" data-save="bo-3"> Elle n’est plus dans Téléchargements.</label></li>
+        </ul>
+        <button type="button" class="bouton valider">J’ai rangé la fiche bonus</button>
+      </div>
+    </div>
+  </section>
+
+  </main>
+  </div>
+
+  <footer class="bas">
+    <button type="button" class="bouton second" id="prec">← Précédent</button>
+    <span class="num" id="num" aria-live="polite"></span>
+    <button type="button" class="bouton" id="suiv">Suivant →</button>
+  </footer>
+  <p class="credit">OCTET · Mes cours bien rangés · ressource <a href="https://www.esciences.be">eSCIENCES.be</a> · Tommy Berben · CC BY-NC-SA 4.0 · Les illustrations sont des schémas simplifiés, pas des captures de Windows.</p>
+</div>
+
+<!-- Modèle des aides « Oups » (cloné dans chaque étape de construction) -->
+<template id="tpl-oups">
+  <details class="aide oups"><summary>Oups, je me suis trompé <span class="etat"></span></summary><div class="dedans">
+    <details class="aide"><summary>Mon dossier s’appelle « Nouveau dossier » ou le nom est faux</summary><div class="dedans">
+      <p>Clic droit sur le dossier → <b>Renommer</b> (ou <kbd>F2</kbd>). Tape le bon nom, puis <kbd>Entrée</kbd>.</p></div></details>
+    <details class="aide"><summary>Je l’ai créé au mauvais endroit (Téléchargements, Bureau…)</summary><div class="dedans">
+      <ol><li>Clic droit sur le dossier → <b>Couper</b>.</li><li>Va dans le bon dossier.</li><li>Clic droit dans une zone vide → <b>Coller</b>.</li></ol></div></details>
+    <details class="aide"><summary>Je l’ai mis dans la mauvaise matière (ex. : Sciences dans Français)</summary><div class="dedans">
+      <ol><li>Ouvre la matière où il est (ex. : Français).</li><li>Clic droit sur le dossier → <b>Couper</b>.</li><li>Remonte avec <kbd>↑</kbd> dans le bon dossier.</li><li>Clic droit dans une zone vide → <b>Coller</b>.</li></ol></div></details>
+    <details class="aide"><summary>Le dossier existe déjà</summary><div class="dedans">
+      <p><b>N’en crée pas un deuxième.</b> Ouvre celui qui existe, regarde ce qu’il contient et utilise-le. Ne supprime rien.</p></div></details>
+    <details class="aide"><summary>J’ai un doublon : « Math (2) », « Nouveau dossier (2) »…</summary><div class="dedans">
+      <p>Ouvre-le. S’il est vide, demande à ton professeur avant de le supprimer. S’il contient quelque chose, lève la main.</p>
+      <p class="discret">Attention : ce que tu supprimes dans OneDrive disparaît aussi en ligne.</p></div></details>
+    <details class="aide"><summary>J’ai fermé la fenêtre au lieu de remonter</summary><div class="dedans">
+      <p>Pas grave ! Rouvre l’explorateur (dossier jaune), clique sur OneDrive, puis sur COURS S1.</p>
+      <p>Pour remonter sans fermer : la flèche <kbd>↑</kbd>, ou un clic sur le nom du dossier dans la barre d’adresse. Le <kbd>✕</kbd> ferme la fenêtre.</p></div></details>
+  </div></details>
+</template>
+
+<!-- Plan -->
+<dialog class="boite" id="dlg-plan" aria-labelledby="plan-titre">
+  <div class="boite-haut"><h2 id="plan-titre">Plan du parcours</h2><button type="button" class="fermer" data-fermer aria-label="Fermer le plan">✕</button></div>
+  <ul class="plan" id="plan"></ul>
+</dialog>
+
+<!-- Réglages -->
+<dialog class="boite" id="dlg-reglages" aria-labelledby="reg-titre">
+  <div class="boite-haut"><h2 id="reg-titre">Réglages</h2><button type="button" class="fermer" data-fermer aria-label="Fermer les réglages">✕</button></div>
+  <fieldset class="reglage"><legend>Taille du texte</legend><div class="seg-ctrl">
+    <label><input type="radio" name="texte" value="normal"> Normal</label><label><input type="radio" name="texte" value="grand"> Grand</label><label><input type="radio" name="texte" value="tres-grand"> Très grand</label></div></fieldset>
+  <fieldset class="reglage"><legend>Couleurs</legend><div class="seg-ctrl">
+    <label><input type="radio" name="theme" value="auto"> Automatique</label><label><input type="radio" name="theme" value="light"> Clair</label><label><input type="radio" name="theme" value="dark"> Sombre</label></div></fieldset>
+  <fieldset class="reglage"><legend>Animations</legend><div class="seg-ctrl">
+    <label><input type="radio" name="anim" value="oui"> Oui</label><label><input type="radio" name="anim" value="non"> Non</label></div></fieldset>
+  <fieldset class="reglage"><legend>Ma progression</legend>
+    <p class="discret" style="margin:0 0 .5rem">Elle est enregistrée sur cet ordinateur uniquement.</p>
+    <button type="button" class="bouton second danger" id="btn-raz">Tout recommencer…</button></fieldset>
+  <p class="discret" style="margin:0">Enseignant : <a href="fiche-enseignant.html" target="_blank" rel="noopener">fiche pédagogique</a></p>
+</dialog>
+
+<dialog class="boite" id="dlg-raz" aria-labelledby="raz-titre">
+  <h2 id="raz-titre">Tout recommencer ?</h2>
+  <p>Tes réponses et tes coches dans l’application seront effacées.</p>
+  <p><b>Tes dossiers sur l’ordinateur ne bougent pas.</b> Ne les recrée pas : vérifie-les et réutilise-les.</p>
+  <div class="rangee"><button type="button" class="bouton danger second" id="raz-oui">Oui, tout effacer</button><button type="button" class="bouton" data-fermer>Non, annuler</button></div>
+</dialog>
+
+<script src="js/ranger.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche enseignant · Mes cours bien rangés · OCTET</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Poppins:wght@600;700;800&family=Fira+Code:wght@500&display=swap">
+<style>
+:root { --fond: #F8F6FC; --surface: #fff; --encre: #1B1030; --discret: #5E5670; --filet: #DCD4EA; --violet: #6C2BD9; --violet-clair: #EAE1FA; --neon: #D4FF3D; --ambre-clair: #FEEFD6; --ambre-texte: #A65F00;
+  --f-titre: "Poppins", Arial, sans-serif; --f-corps: "Atkinson Hyperlegible", Verdana, sans-serif; --f-code: "Fira Code", Consolas, monospace; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); color: var(--encre); font: 16px/1.5 var(--f-corps); }
+.page { max-width: 900px; margin: 0 auto; padding: 24px 20px 40px; }
+.bandeau { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 12px; background: var(--violet); color: #fff; font: 600 13px var(--f-titre); letter-spacing: .08em; text-transform: uppercase; }
+.bandeau i { width: 12px; height: 12px; border: 2px solid var(--neon); border-radius: 3px; display: inline-block; } .bandeau i.on { background: var(--neon); }
+.bandeau .octet { margin-left: auto; display: flex; gap: 4px; }
+h1 { font: 800 36px/1.1 var(--f-titre); margin: 22px 0 4px; }
+h1 span { background: var(--neon); padding: 0 6px; border-radius: 4px; }
+h2 { font: 700 19px var(--f-titre); margin: 26px 0 8px; padding-left: 12px; border-left: 5px solid var(--violet); }
+.sous { color: var(--discret); margin: 0 0 14px; }
+.grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.carte { background: var(--surface); border: 1.5px solid var(--filet); border-radius: 10px; padding: 10px 14px; }
+.carte b { display: block; font: 700 13px var(--f-titre); text-transform: uppercase; letter-spacing: .05em; color: var(--violet); }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 10px; overflow: hidden; font-size: 14.5px; }
+th { background: var(--violet); color: #fff; font: 700 13px var(--f-titre); text-align: left; padding: 8px 10px; }
+td { padding: 8px 10px; border-top: 1px solid var(--filet); vertical-align: top; }
+tr:nth-child(even) td { background: #FBFAFE; }
+.tag { display: inline-block; font: 700 11px var(--f-titre); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.tag.s1 { background: var(--neon); } .tag.prim { background: var(--violet-clair); color: var(--violet); }
+ul, ol { padding-left: 1.3em; margin: 6px 0; } li + li { margin-top: 3px; }
+.encadre { background: var(--ambre-clair); border-left: 5px solid #F5A623; padding: 10px 14px; border-radius: 0 10px 10px 0; margin: 12px 0; }
+.encadre b.t { color: var(--ambre-texte); font-family: var(--f-titre); }
+.coche { list-style: none; padding: 0; } .coche li::before { content: "☐  "; font-size: 18px; }
+code { font: 13.5px var(--f-code); background: var(--violet-clair); padding: 1px 5px; border-radius: 4px; }
+footer { margin-top: 30px; padding-top: 12px; border-top: 1.5px solid var(--filet); font-size: 13px; color: var(--discret); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.imprimer { font: 700 14px var(--f-titre); padding: 8px 14px; border-radius: 8px; border: 2px solid var(--violet); background: transparent; color: var(--violet); cursor: pointer; }
+@media print { body { background: #fff; font-size: 12.5px; } .page { padding: 0; } .imprimer { display: none; } h2 { break-after: avoid; } table, .carte, .encadre { break-inside: avoid; } @page { size: A4; margin: 15mm; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bandeau"><span>Fiche enseignant</span><span>·</span><span>Formation numérique S1</span><span class="octet" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></span></div>
+  <h1>Mes cours <span>bien rangés</span></h1>
+  <p class="sous">Mission OCTET · champ « Informations et données » · parcours web en autonomie + manipulations réelles dans Windows et OneDrive.</p>
+  <button class="imprimer" onclick="window.print()">Imprimer la fiche</button>
+
+  <h2>En bref</h2>
+  <div class="grille">
+    <div class="carte"><b>Durée</b>45 à 50 min (1 période) · bonus ±5 min</div>
+    <div class="carte"><b>Public</b>S1, 12-13 ans, en autonomie, 1 élève par ordinateur</div>
+    <div class="carte"><b>Matériel</b>PC Windows, Edge ou Chrome, OneDrive scolaire configuré</div>
+    <div class="carte"><b>Production</b>L’arborescence COURS S1 dans le OneDrive de l’élève + une fiche rangée dans Physique</div>
+  </div>
+
+  <h2>Prérequis à vérifier avant la séance</h2>
+  <ul>
+    <li>Chaque élève ouvre une session Windows avec <b>son</b> compte scolaire.</li>
+    <li>Le client OneDrive est connecté : un nuage bleu « OneDrive - nom de l’école » apparaît dans le volet de gauche de l’explorateur.</li>
+    <li>Le site <code>esciences.github.io</code> est accessible ; le téléchargement de PDF est autorisé dans le navigateur.</li>
+    <li>Prévoir une solution de repli pour les élèves sans OneDrive opérationnel (voir plus bas).</li>
+  </ul>
+
+  <h2>Objectifs</h2>
+  <ol>
+    <li>Distinguer fichier, dossier, sous-dossier et dossier parent.</li>
+    <li>Se repérer dans l’explorateur et lire un chemin.</li>
+    <li>Distinguer emplacement local et stockage en ligne ; comprendre la synchronisation OneDrive et ses icônes d’état.</li>
+    <li>Créer et nommer des dossiers au bon niveau d’une arborescence imposée.</li>
+    <li>Télécharger un fichier, le déplacer (Couper / Coller), le retrouver et l’ouvrir.</li>
+  </ol>
+
+  <h2>Ancrage dans le référentiel FMTTN (FWB) · volet numérique · « Informations et données »</h2>
+  <table>
+    <thead><tr><th style="width:16%">Niveau</th><th>Attendu (texte du référentiel)</th><th style="width:13%">Page</th><th style="width:22%">Dans la mission</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag s1">S1 · travaillé</span><br>Compétence</td><td>« Organiser des données numériques, afin de faciliter leur gestion dans un espace de stockage adapté à la situation. »</td><td>p. 63</td><td>M2 (choix de l’espace), M4 à M6, bonus</td></tr>
+      <tr><td><span class="tag s1">S1 · en lien</span><br>Savoir</td><td>« Distinguer […] stockage interne de stockage externe. » <i>(seule la partie stockage est effleurée)</i></td><td>p. 63</td><td>M2 : local / en ligne</td></tr>
+      <tr><td><span class="tag prim">P4 · réactivé</span><br>Savoir</td><td>« Distinguer des supports de stockage utilisés dont disque dur, cloud. » · « Utiliser, adéquatement en contexte, les termes dont fichier, dossier […]. »</td><td>p. 43</td><td>M1, M2</td></tr>
+      <tr><td><span class="tag prim">P4 · réactivé</span><br>Savoir-faire</td><td>« Créer, (re)nommer un fichier et un dossier pour permettre une exploitation ultérieure efficiente. » · « Déplacer, dupliquer, supprimer un fichier et un dossier. »</td><td>p. 43</td><td>M4 (créer, renommer), M5 (déplacer ; copier vs couper)</td></tr>
+      <tr><td><span class="tag prim">P4 · réactivé</span><br>Compétence</td><td>« Organiser des fichiers, des dossiers numériques, avec l’aide de l’enseignant. »</td><td>p. 43</td><td>M4 (guidage dégressif)</td></tr>
+      <tr><td><span class="tag prim">P3 · réactivé</span><br>Savoir-faire</td><td>« Enregistrer un document localement. »</td><td>p. 37</td><td>M5 : téléchargement</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13.5px;color:var(--discret)">Source : référentiel FMTTN, <code>ifpc-fwb.be/v5/documents/tc/refFMTTN.pdf</code>. Les gestes de base (créer, renommer, déplacer) sont des acquis de P4 ; la nouveauté S1 est le choix d’un <b>espace de stockage adapté</b> (OneDrive scolaire) et l’organisation autonome d’une arborescence durable. Pages indiquées selon la pagination du PDF : à confirmer sur ton exemplaire imprimé.</p>
+
+  <h2>Déroulement</h2>
+  <table>
+    <thead><tr><th style="width:26%">Mission</th><th style="width:10%">Durée</th><th style="width:16%">Où ?</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Fichier ou dossier ?</td><td>5 min</td><td>Application</td><td>Tri cliquer/glisser (7 éléments), sous-dossier et dossier parent (3 QCM).</td></tr>
+      <tr><td>2 · Où sont mes documents ?</td><td>8 min</td><td>Application</td><td>Parties de l’explorateur (illustration), local / OneDrive / synchronisation, icônes d’état, « drive », 5 situations.</td></tr>
+      <tr><td>3 · Ton véritable explorateur</td><td>5 min</td><td>Ordinateur</td><td>Revenir à l’appli, fenêtres côte à côte (aide), ouvrir l’explorateur, trouver le OneDrive scolaire.</td></tr>
+      <tr><td>4 · Construis ton espace</td><td>15 min</td><td>Appli puis ordi</td><td>Entraînement dans un explorateur simulé, puis création réelle : COURS S1 → Sciences → 8 matières → 3 sous-dossiers → vérification.</td></tr>
+      <tr><td>5 · Un fichier à ranger</td><td>8 min</td><td>Appli puis ordi</td><td>Entraînement Couper/Coller, téléchargement de <code>Les_etats_de_la_matiere.pdf</code>, rangement dans Physique, ouverture.</td></tr>
+      <tr><td>6 · Retrouve-le sans guide</td><td>5 min</td><td>Ordi + appli</td><td>Retrouver la fiche sans chemin affiché, reconstruire le chemin, question sur le contenu (« fusion »), turbo-check, bilan.</td></tr>
+      <tr><td>★ Bonus</td><td>5 min</td><td>Ordinateur</td><td><code>Mesurer_un_angle.pdf</code> à ranger seul dans Math, sans créer de dossier.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Arborescence attendue</h2>
+<pre style="font:14px/1.6 var(--f-code);background:var(--surface);border:1.5px solid var(--filet);border-radius:10px;padding:12px 16px;margin:0">OneDrive - [nom de l’école]
+└── COURS S1
+    ├── Sciences
+    │   ├── Chimie
+    │   ├── Biologie
+    │   └── Physique ── Les_etats_de_la_matiere.pdf
+    ├── Français
+    ├── Math              (bonus : Mesurer_un_angle.pdf)
+    ├── FHGES
+    ├── Langues
+    ├── FMTT
+    ├── Numérique
+    ├── Religion
+    └── ECA</pre>
+
+  <h2>Critères de réussite (vérification en 30 secondes)</h2>
+  <ul class="coche">
+    <li>COURS S1 est dans le OneDrive <b>scolaire</b> (pas Bureau, Téléchargements ni « OneDrive - Personnel »).</li>
+    <li>Les 9 dossiers de matières sont directement dans COURS S1, noms exacts (accents, majuscules).</li>
+    <li>Chimie, Biologie, Physique sont dans Sciences ; aucun « Nouveau dossier » ni doublon « (2) ».</li>
+    <li>Le PDF est dans Physique, plus dans Téléchargements, et s’ouvre.</li>
+    <li>L’élève explique oralement le chemin : OneDrive › COURS S1 › Sciences › Physique.</li>
+  </ul>
+
+  <div class="encadre"><b class="t">Ce que l’application vérifie… et ne vérifie pas.</b> Une page web ne peut pas lire le OneDrive de l’élève (et ne le doit pas). Le bilan distingue donc les réponses <b>vérifiées</b> par l’application (tri, QCM, chemin, contenu de la fiche) des manipulations <b>déclarées</b> par l’élève (coches « J’ai vérifié »). La question sur le mot « fusion » n’est trouvable qu’en ouvrant la fiche : c’est un indice fort, pas une preuve. Seul ton contrôle visuel valide l’arborescence réelle.</div>
+
+  <h2>Erreurs fréquentes et remédiations (prévues dans l’aide « Oups »)</h2>
+  <ul>
+    <li><b>Dossier créé dans Téléchargements / Bureau</b> → Couper / Coller vers le bon dossier.</li>
+    <li><b>Sciences créé dans Français</b>, matière dans Sciences → ouvrir, couper, remonter avec ↑, coller.</li>
+    <li><b>Nom incorrect</b> ou « Nouveau dossier » → Renommer (clic droit ou F2).</li>
+    <li><b>Doublon</b> « Math (2) » → ne rien supprimer sans l’enseignant ; une suppression dans OneDrive est aussi répercutée en ligne (corbeille OneDrive).</li>
+    <li><b>Fenêtre fermée au lieu de remonter</b> → distinguer ↑ (dossier parent) et ✕.</li>
+    <li><b>Glisser-déposer entre Téléchargements et OneDrive</b> → peut copier au lieu de déplacer : la méthode enseignée est Couper / Coller.</li>
+    <li><b>Copie au lieu de déplacement</b> → deux exemplaires de la fiche ; l’élève range celui de Téléchargements.</li>
+  </ul>
+
+  <h2>Si OneDrive ne fonctionne pas chez un élève</h2>
+  <ul>
+    <li>Il fait les missions 1, 2 et les entraînements simulés, puis attend ton aide pour la connexion. Il ne crée <b>pas</b> l’arborescence ailleurs « en attendant ».</li>
+    <li>Une fois le compte connecté, il reprend là où il était : la progression est gardée dans le navigateur de cet ordinateur.</li>
+  </ul>
+
+  <h2>Points techniques</h2>
+  <ul>
+    <li>Progression enregistrée en <code>localStorage</code> (clé <code>octet-cours-ranges-v1</code>), sur cet ordinateur et ce navigateur uniquement. Aucune donnée n’est envoyée, aucune connexion Microsoft n’est demandée.</li>
+    <li>Bouton <b>Réglages</b> : taille du texte, thème clair/sombre, animations, remise à zéro avec confirmation (n’efface rien sur l’ordinateur).</li>
+    <li>Navigation au clavier, focus visible, préférence « réduire les animations » respectée, pas de son ni de chronomètre.</li>
+    <li>Le nom du OneDrive (« OneDrive - … ») varie selon l’établissement : les écrans parlent de « Ton école ».</li>
+  </ul>
+
+  <footer><span><b style="font-family:var(--f-titre);color:var(--violet)">OCTET</b> · Ressource créée par Tommy Berben · eSCIENCES.be · réalisée avec l’aide de l’IA Claude (Anthropic)</span><span>CC BY-NC-SA 4.0</span></footer>
+</div>
+</body>
+</html>
